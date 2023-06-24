@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="rm_overview_tree" model="ir.ui.view">
+		<field name="name">rm.overview.tree</field>
+		<field name="model">rm.overview</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="product_id" />
+				<field name="required_qty" />
+				<field name="on_hand_qty" />
+				<field name="missing_qty" />
+				<field name="uom_id" />
+				<field name="bom_id" />
+			</tree>
+		</field>
+	</record>
+</odoo>

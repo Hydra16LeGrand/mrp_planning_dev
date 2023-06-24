@@ -1,0 +1,10 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_mrp_planning,mrp.planning,model_mrp_planning,,1,1,1,1
+access_mrp_planning_line,mrp.planning.line,model_mrp_planning_line,,1,1,1,1
+access_mrp_detail_planning_line,mrp.detail.planning.line,model_mrp_detail_planning_line,,1,1,1,1
+access_mrp_packaging_line,mrp.packaging.line,model_mrp_packaging_line,,1,1,1,1
+access_mrp_section,mrp.planning,model_mrp_section,,1,1,1,1
+access_mrp_team,mrp.team,model_mrp_team,,1,1,1,1
+access_mrp_planning_days,mrp.planning.days,model_mrp_planning_days,,1,1,1,1
+access_mrp_packaging_pp,mrp.packaging.pp,model_mrp_packaging_pp,,1,1,1,1
+access_rm_overview,rm.overview,model_rm_overview,,1,1,1,1

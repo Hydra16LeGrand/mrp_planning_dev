@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="mrp_packaging_line_tree" model="ir.ui.view">
+		<field name="name">mrp.packaging.line.tree</field>
+		<field name="model">mrp.packaging.line</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="name" />
+				<field name="code" />
+				<field name="section_id" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="mrp_packaging_line_form" model="ir.ui.view">
+		<field name="name">mrp.packaging.line.form</field>
+		<field name="model">mrp.packaging.line</field>
+		<field name="arch" type="xml">
+			<form>
+				<sheet>
+					<div class="oe_title">
+						<h1>
+							<field name="name" placeholder="Name" />
+						</h1>
+					</div>
+					<group>
+						<group>
+							<field name="code" />
+						</group>
+						<group>
+							<field name="section_id" options="{'no_create': 1}" />
+						</group>
+					</group>
+					<notebook>
+						<page name="ppp_ids" string="Products proportions">
+							<field name="ppp_ids">
+								<tree editable="bottom">
+									<field name="product_id" />
+									<field name="qty" />
+									<field name="capacity" />
+									<field name="employee_number" />
+								</tree>
+							</field>
+						</page>
+					</notebook>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<record id="action_mrp_packaging_line" model="ir.actions.act_window">
+		<field name="name">Packaging line</field>
+		<field name="res_model">mrp.packaging.line</field>
+		<field name="view_mode">tree,form</field>
+	</record>
+
+	<menuitem 
+		id="mrp_packaging_line_menu"
+		action="action_mrp_packaging_line"
+		name="Packaging lines"
+		parent="mrp.menu_mrp_configuration"
+		/>
+</odoo>

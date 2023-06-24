@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<data>
+		<function model="mrp.planning.days" name="update_mrp_days"></function>
+	</data>
+</odoo>

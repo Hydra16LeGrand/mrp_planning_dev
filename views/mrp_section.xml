@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="mrp_section_tree" model="ir.ui.view">
+		<field name="name">mrp.section.tree</field>
+		<field name="model">mrp.section</field>
+		<field name="arch" type="xml">
+			<tree editable="bottom">
+				<field name="name" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="action_mrp_section" model="ir.actions.act_window">
+		<field name="name">Sections</field>
+		<field name="res_model">mrp.section</field>
+		<field name="view_mode">tree</field>
+	</record>
+
+	<menuitem 
+		id="mrp_section_menu"
+		action="action_mrp_section"
+		name="Sections"
+		parent="mrp.menu_mrp_configuration"
+		/>
+</odoo>
