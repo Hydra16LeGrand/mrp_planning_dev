@@ -18,9 +18,17 @@ class MrpPackagingPP(models.Model):
 	_name = "mrp.packaging.pp"
 	_description = "Mrp packaging product proportion"
 
+	def _compute_uom_domain(self):
+		for rec in self:
+			if rec.product_id:
+				rec.uom_domain = [uom_id.id for uom_id in rec.product_id.product_tmpl_id.uom_id.category_id.uom_ids]
+
 	product_id = fields.Many2one('product.product', string=_("Product"), required=True)
 	qty = fields.Integer(_("Quantity"), required=True)
 	capacity = fields.Float(_("Capacity"), required=True)
 	employee_number = fields.Integer(_("EN"))
+	uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1)
+	uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain")
+	uom_category_id = fields.Many2one(related="uom_id.category_id")
 
 	packaging_line_id = fields.Many2one("mrp.packaging.line")

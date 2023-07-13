@@ -6,14 +6,25 @@
 		<field name="arch" type="xml">
 			<form>
 				<header>
-					<button name="action_cancel" type="object" string="Cancel" states="confirm" />
+					<button name="action_cancel" type="object" string="Cancel" states="confirm" confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?" />
 					<button name="action_draft" type="object" string="Re-draft" states="cancel" />
 					<button name="action_confirm" type="object" string="Confirm" states="draft" class="oe_highlight" />
+					<button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight" confirm="Are you sure to do this action ?" />
 					<field name="state" widget="statusbar" />
 				</header>
 				<sheet>
+					<field name="mrp_production_ids" invisible="1" />
+					<field name="picking_ids" invisible="1"/>
 					<div name="button_box" class="oe_button_box">
-						<button name="view_rm_overview" type="object" icon="fa-address-card-o" class="oe_stat_button">
+						<button name="view_mrp_orders" type="object" icon="fa-address-card-o" class="oe_stat_button" attrs="{'invisible': [('mrp_production_ids', '=', [])]}">
+							<div class="o_field_widget o_stat_info">
+								<span class="o_stat_text">Mrp orders</span>
+							</div>
+						</button>
+						<button name="view_internal_transfer" type="object" attrs="{'invisible': [('picking_ids', '=', [])]}" icon="fa-cubes" class="oe_stat_button" position="before">
+			            	<field string="Transfer(s)" name="internal_transfer_count" widget="statinfo"/>
+			            </button>
+						<button name="view_rm_overview" type="object" attrs="{'invisible': [('state','in',['draft','cancel'])]}" icon="fa-address-card-o" class="oe_stat_button">
 							<div class="o_field_widget o_stat_info">
 								<span class="o_stat_text">RM Overview</span>
 							</div>
@@ -40,11 +51,10 @@
 							<field name="planning_line_ids" widget="stock_move_one2many" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}">
 								<tree editable="bottom">
 									<field name="product_id" />
-									<field name="packaging_line_id" options="{'no_create': 1}" />
+									<field name="packaging_line_id" options="{'no_create': 1}" domain="[('section_id', 'in', parent.section_ids)]" />
 									<field name="package" />
-									<!-- <field name="qty" />
-									<field name="capacity" />
-									<field name="employee_number" /> -->
+									<field name="uom_domain" invisible="1" />
+									<field name="uom_id" domain="[('id', 'in', uom_domain)]" options="{'no_create': 1, 'no_open': 1}" />
 									<field name="section_id" invisible="0" />
 									<field name="mrp_days" widget="many2many_tags" options="{'no_create': 1}" style="width:40%%"/>
 								</tree>
@@ -58,8 +68,8 @@
 									<field name="date" />
 									<field name="packaging_line_id" />
 									<!-- <field name="packaging_line_id" options="{'no_create': 1}" /> -->
+									<field name="product_ref" />
 									<field name="product_id" />
-									<field name="product_designation" />
 									<field name="package" />
 									<field name="qty" />
 									<field name="capacity" />

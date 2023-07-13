@@ -39,6 +39,8 @@
 									<field name="qty" />
 									<field name="capacity" />
 									<field name="employee_number" />
+									<field name="uom_domain" invisible="1" />
+									<field name="uom_id" domain="[('id', 'in', uom_domain)]" />
 								</tree>
 							</field>
 						</page>
