@@ -4,9 +4,24 @@ from odoo import fields, models, api, _
 class RM_Overview(models.Model):
 	_name = "rm.overview"
 
+	def _compute_on_hand_qty_count(self):
+		temp_stock = self.env['stock.location'].search([('temp_stock', '=', 1)])
+		if not temp_stock:
+			raise ValidationError(_("No temp location found. Please configure it or contact support."))
+
+		for overview in self:
+			quant = self.env['stock.quant'].search([
+				('product_id', '=', overview.product_id.id),
+				('location_id', '=', temp_stock.id)
+				])
+			# Convert qty about unit of measure. Because of each raw material can have a different unit of measure for bom and storage(same categorie)
+			on_hand_qty = quant.product_uom_id._compute_quantity(quant.available_quantity, overview.uom_id)
+			overview.on_hand_qty = on_hand_qty
+		
+	  
 	product_id = fields.Many2one("product.product", string=_("Raw materiel"))
 	required_qty = fields.Integer(_("Required qty"))
-	on_hand_qty = fields.Integer(_("On hand qty"))
+	on_hand_qty = fields.Integer(_("On hand qty"), compute="_compute_on_hand_qty_count")
 	missing_qty = fields.Integer(_("Missing qty"))
 	uom_id = fields.Many2one("uom.uom", string=_("Unit of measure"))
 

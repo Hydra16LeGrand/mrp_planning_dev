@@ -1,0 +1,39 @@
+<odoo>
+    <record id="view_create_overview_wizard_from" model="ir.ui.view">
+        <field name="name">overview.wizard.form</field>
+        <field name="model">overview.wizard</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <notebook>
+                        <page name="overview_page" string="Overview">
+                            <field name="overview_line_ids" widget="one2many">
+                                <tree create="false" delete="0">
+                                    <field name="product_id" />
+                                    <field name="required_qty" />
+                                    <field name="on_hand_qty" />
+                                    <field name="missing_qty" />
+                                    <field name="uom_id" />
+                                    <field name="bom_ids" invisible="1" widget="many2many_tags" />
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+
+                <footer>
+                    <button name="create_internal_transfer" type="object"
+                        string="Create Internal Transfer"
+                        invisible="context.get('total_missing_qty') == 0"
+                        confirm="All previous internal transfer will be canceled, are you sure to do this operation ?"
+                        class="oe_highlight" />
+                    <button string="Annuler" special="cancel"
+                        invisible="context.get('total_missing_qty') == 0" />
+                </footer>
+            </form>
+
+        </field>
+    </record>
+
+</odoo>

@@ -17,6 +17,7 @@ class MrpProductionInherit(models.Model):
 	section_id = fields.Many2one("mrp.section")
 	planning_line_id = fields.Many2one("mrp.planning.line")
 	planning_id = fields.Many2one("mrp.planning")
+	plant_id = fields.Many2one("mrp.plant", string="Plant")
 
 
 	def action_view_planning(self):
@@ -31,3 +32,30 @@ class MrpProductionInherit(models.Model):
 		}
 
 		return action
+	
+	def write(self, vals):
+		for rec in self:
+			old_qty = rec.product_qty
+			old_move_raw_ids = rec.move_raw_ids
+			res = super(MrpProductionInherit, rec).write(vals)
+			print(f'vals : {vals}')
+			if 'product_id' in vals:
+				product_id = self.env['product.product'].search([('id', '=', vals['product_id'])])
+				bom_id = self.env['mrp.bom'].search([('product_tmpl_id', '=', product_id.product_tmpl_id.id)])
+				if bom_id:
+					rec.detailed_pl_id.write({'product_id': vals['product_id']})
+					rec.product_qty = old_qty
+					rec.bom_id = bom_id
+					for move in rec.move_raw_ids:
+						for old_move in old_move_raw_ids:
+							if move == old_move:
+								move.unlink()
+
+		return True
+
+
+	# def _compute_state(self):
+
+	# 	for rec in self:
+	# 		super(MrpProductionInherit, rec)._compute_state()
+	# 		rec.detailed_pl_id.state = rec.state
