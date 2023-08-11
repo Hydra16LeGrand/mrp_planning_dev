@@ -6,25 +6,36 @@
 		<field name="arch" type="xml">
 			<form>
 				<header>
-					<button name="action_cancel" type="object" string="Cancel" states="confirm" confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?" />
+					<button name="action_cancel" type="object" string="Cancel" states="confirm,04_mo_generated" confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?" />
 					<button name="action_draft" type="object" string="Re-draft" states="cancel" />
 					<button name="action_confirm" type="object" string="Confirm" states="draft" class="oe_highlight" />
 					<button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight" confirm="Are you sure to do this action ?" />
+					<button name="create_overview_wizard" type="object" string="RM Overview"
+                        class="oe_highlight" attrs="{'invisible': [('state','!=','04_mo_generated')]}"/>
+					<button name="action_product_replacement" type="object" string="Replace product" attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary" />
+					<button name="action_confirm_productions" type="object" string="CONFIRM PRODUCTION ORDERS" class="btn-success" confirm="All productions orders will be in confirmed state. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('mrp_production_general_state', '!=', 'draft')]}" />
+					<button name="action_mark_productions_as_done" type="object" string="MARK PO AS DONE"  class="btn-warning" confirm="This action will complete all manufacturing orders process in this planning. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('mrp_production_general_state', '!=', 'confirm')]}" />
 					<field name="state" widget="statusbar" />
+					<field name="mrp_production_general_state" invisible="1" />
 				</header>
 				<sheet>
 					<field name="mrp_production_ids" invisible="1" />
 					<field name="picking_ids" invisible="1"/>
 					<div name="button_box" class="oe_button_box">
-						<button name="view_mrp_orders" type="object" icon="fa-address-card-o" class="oe_stat_button" attrs="{'invisible': [('mrp_production_ids', '=', [])]}">
-							<div class="o_field_widget o_stat_info">
-								<span class="o_stat_text">Mrp orders</span>
-							</div>
-						</button>
-						<button name="view_internal_transfer" type="object" attrs="{'invisible': [('picking_ids', '=', [])]}" icon="fa-cubes" class="oe_stat_button" position="before">
-			            	<field string="Transfer(s)" name="internal_transfer_count" widget="statinfo"/>
-			            </button>
-						<button name="view_rm_overview" type="object" attrs="{'invisible': [('state','in',['draft','cancel'])]}" icon="fa-address-card-o" class="oe_stat_button">
+						<button name="view_mrp_orders" type="object" icon="fa-flask"
+                            class="oe_stat_button"
+                            attrs="{'invisible': [('mrp_production_ids', '=', [])]}">
+                            <div class="o_field_widget o_stat_info">
+                                <span class="o_stat_text">Mrp orders</span>
+                            </div>
+                        </button>
+                        <button name="view_internal_transfer" type="object"
+                            attrs="{'invisible': [('picking_ids', '=', [])]}" icon="fa-cubes"
+                            class="oe_stat_button" position="before">
+                            <field string="Transfer(s)" name="internal_transfer_count"
+                                widget="statinfo" />
+                        </button>
+						<button name="view_rm_overview" type="object" attrs="{'invisible': [('state','in',['draft','cancel'])]}" icon="fa-pie-chart" class="oe_stat_button">
 							<div class="o_field_widget o_stat_info">
 								<span class="o_stat_text">RM Overview</span>
 							</div>
@@ -37,34 +48,69 @@
 					</div>
 					<group>
 						<group>
-							<field name="team_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}"/>
-							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}"/>
-							<field name="code" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}"/>
+							<!-- <field name="team_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/> -->
+							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+							<field name="mrp_production_general_state"/>
 						</group>
 						<group>
-							<field name="scheduled_date" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}"/>
-							<field name="week_of" />
+							<field name="scheduled_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+							<field name="week_of" widget="many2many_tags"/>
 						</group>
 					</group>
 					<notebook>
 						<page name="planning_lines" string="Planning lines">
-							<field name="planning_line_ids" widget="stock_move_one2many" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}">
+							<field name="planning_line_ids" widget="stock_move_one2many" attrs="{'readonly': [('state', 'not in', ['draft'])]}" context="{'default_mrp_days':week_of}">
 								<tree editable="bottom">
 									<field name="product_id" />
-									<field name="packaging_line_id" options="{'no_create': 1}" domain="[('section_id', 'in', parent.section_ids)]" />
-									<field name="package" />
+									<field name="packaging_line_domain" invisible="1" />
+									<field name="packaging_line_id" domain="[('id', '=', packaging_line_domain)]" options="{'no_create': 1}" />
+									<field name="package" invisible="1" />
+									<field name="qty_compute" invisible="1" />
+									<field name="qty" />
 									<field name="uom_domain" invisible="1" />
-									<field name="uom_id" domain="[('id', 'in', uom_domain)]" options="{'no_create': 1, 'no_open': 1}" />
-									<field name="section_id" invisible="0" />
-									<field name="mrp_days" widget="many2many_tags" options="{'no_create': 1}" style="width:40%%"/>
+									<field name="uom_id" optional="hide" domain="[('id', 'in', uom_domain)]" options="{'no_create': 1, 'no_open': 1}" />
+									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
+									<!-- <field name="qty" /> -->
+									<field name="mrp_days" domain="[('id', 'in', parent.week_of)]" widget="many2many_tags" options="{'no_create': 1}" style="width:40%%"/>
 								</tree>
 							</field>
 						</page>
-						<page name="detailed_planning_lines" string="Detailed planning lines">
-							<field name="detailed_pl_ids" attrs="{'readonly': [('state', 'in', ['confirm', 'cancel'])]}" context="{'search_default_gp_packaging_line_id': 1}">
-								<tree editable="bottom">
+						<page name="detailed_planning_lines" attrs="{'invisible': [('detailed_pl_ids', '=', [])]}" string="Detailed planning lines">
+							<field name="detailed_pl_ids" widget="section_and_note_one2many" mode="tree" attrs="{'readonly': [('state', 'in', ['cancel', '04_mo_generated'])]}" context="{'search_default_gp_packaging_line_id': 1}">
+								<form>
+                                    <sheet>
+                                        <field name="display_type" invisible="1"/>
+                                        <group>
+                                            <group attrs="{'invisible': [('display_type', '!=', False)]}">
+                                                <field name="packaging_line_id" string="Packaging Line ID"/>
+                                                <field name="product_id" string="Product ID"/>
+                                                <field name="package" string="Package"/>
+                                            </group>
+                                            <group attrs="{'invisible': [('display_type', '!=', False)]}">
+                                                <field name="qty" string="Quantity"/>
+                                                <field name="capacity" string="Capacity"/>
+                                                <field name="employee_number" string="Employee Number"/>
+                                                <field name="state" widget="badge"
+                                                       decoration-info="state == 'draft'"
+                                                       decoration-danger="state == 'cancel'"
+                                                       decoration-bg="state == 'confirmed'"
+                                                       decoration-warning="state == 'progress'"
+                                                       decoration-success="state == 'done'"
+                                                       string="State"
+                                                />
+                                            </group>
+                                        </group>
+                                        <label for="name" string="Sections Name" attrs="{'invisible': [('display_type', '!=', 'line_section')]}"/>
+                                        <label for="name" string="Packaging line section" attrs="{'invisible': [('display_type', '!=', 'line_note')]}"/>
+                                        <field name="name"/>
+                                    </sheet>
+                                </form>
+								<tree editable="bottom" create="False">
 									<field name="planning_line_id" invisible="1" />
 									<field name="planning_id" invisible="1" />
+									<field name="display_type" invisible="1"/>
+                                    <field name="name" widget="section_and_note_text" optional="show"/>
 									<field name="date" />
 									<field name="packaging_line_id" />
 									<!-- <field name="packaging_line_id" options="{'no_create': 1}" /> -->
@@ -74,6 +120,8 @@
 									<field name="qty" />
 									<field name="capacity" />
 									<field name="employee_number" />
+									<field name="state" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-bf="state == 'confirmed'" decoration-warning="state == 'progress'" decoration-success="state == 'done'" />
+									<button name="action_manage_production" type="object" title="Manage Production"  icon="fa-flask" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" />
 								</tree>
 							</field>
 						</page>
@@ -87,11 +135,11 @@
 		<field name="name">mrp.planning.tree</field>
 		<field name="model">mrp.planning</field>
 		<field name="arch" type="xml">
-			<tree>
+			<tree default_order="create_date DESC">
 				<field name="reference" />
 				<field name="code" />
 				<field name="section_ids" widget="many2many_tags" />
-				<field name="team_ids" widget="many2many_tags" />
+				<!-- <field name="team_ids" widget="many2many_tags" /> -->
 			</tree>
 		</field>
 	</record>
@@ -109,6 +157,27 @@
 		</field>
 	</record>
 
+	<record id="mrp_planning_search" model="ir.ui.view">
+        <field name="name">mrp.planning.search</field>
+        <field name="model">mrp.planning</field>
+        <field name="arch" type="xml">
+            <search>
+
+                <filter name="draft_filter" string="Draft"
+                    domain="[('state','=','draft')]" />
+
+                <filter name="confirm_filter" string="Confirm"
+                    domain="[('state','=','confirm')]" />
+
+                <filter name="mo_generate_filter" string="Generate"
+                    domain="[('state','=','04_mo_generated')]" />
+
+                <filter name="cancel_filter" string="Cancel"
+                    domain="[('state','=','cancel')]" />
+            </search>
+        </field>
+    </record>
+
 	<record id="action_mrp_planning" model="ir.actions.act_window" >
 		<field name="name">MRP Planning</field>
 		<field name="res_model">mrp.planning</field>
@@ -116,4 +185,6 @@
 	</record>
 
 	<menuitem id="mrp_planning_menu" action="action_mrp_planning" parent="mrp.menu_mrp_manufacturing" sequence="1" name="MRP Planning" />
+	<menuitem id="mrp.menu_mrp_production_action" action="mrp.mrp_production_action" parent="mrp.menu_mrp_manufacturing" sequence="2" />
+		
 </odoo>

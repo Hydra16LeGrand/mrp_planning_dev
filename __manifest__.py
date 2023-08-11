@@ -37,10 +37,14 @@
         'views/rm_overview.xml',
         'views/stock_location_views.xml',
         'views/mrp_production_views.xml',
+        'views/mrp_bom_views.xml',
 
+        'wizard/replace_product_views.xml',
+        'wizard/create_overview_wizard_view.xml',
+        'reports/planning_detail_template.xml',
 
         'data/ir_sequence_data.xml',
-        'data/update_functions.xml',
+        'data/planning_print.xml',
 
     ],
     # only loaded in demonstration mode

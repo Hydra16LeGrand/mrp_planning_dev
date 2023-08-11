@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="action_report_planning_details" model="ir.actions.report">
+        <field name="name">Print planning(s)</field>
+        <field name="model">mrp.planning</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">mrp_planning.report_planning_detail</field>
+        <field name="report_file">mrp_planning.report_planning_detail</field>
+        <field name="print_report_name">'Planning Details - %s' % (object.reference)</field>
+        <field name="binding_model_id" ref="model_mrp_planning"/>
+        <field name="binding_type">report</field>
+    </record>
+
+
+</odoo>

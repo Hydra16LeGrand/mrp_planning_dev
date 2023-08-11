@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <template id="report_planning_detail">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <div class="page">
+                    <t t-call="web.basic_layout">
+                        <div class="header">
+                            <table class="table table-sm">
+                                <tbody style="border: 1px solid black;">
+                                    <tr>
+                                        <th rowspan="2" style="border: 1px solid black; width:15%">
+                                            <img src="/mrp_planning/static/src/img/logo_sivop_planning.png"/>
+                                        </th>
+                                        <th style="border: 1px solid black; width:65%;">
+                                            <!--                                            <p>-->
+                                            <strong>SYSTEME MANAGEMENT QUALITE</strong>
+                                            <!--                                            </p>-->
+                                        </th>
+                                        <th rowspan="2" style="border: 1px solid black; width:20%;">
+                                            <!--                                            <p>-->
+                                            <strong>
+                                                Code :
+                                                <span t-field="o.code"/>
+                                                <br/>
+                                                Planning :
+                                                <span t-field="o.reference"/>
+                                            </strong>
+                                            <!--                                            </p>-->
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th style="border: 1px solid black;">
+                                            <!--                                            <p>-->
+                                            <strong>
+                                                PROCESSUS PLANNING PRODUCTION
+                                                <br/>
+                                                PLANNING PRODUCTION
+                                            </strong>
+                                            <!--                                            </p>-->
+                                        </th>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style="width: 100%">
+                            <t t-set="result_dict" t-value="o.regroup_for_report()"/>
+                            <t t-foreach="result_dict.items()" t-as="grouped_line">
+                                <div style="page-break-after:always;">
+                                    <t t-set="packaging_lines" t-value="grouped_line[1]"/>
+                                    <t t-foreach="packaging_lines.items()" t-as="packaging">
+                                        <div style="border: 1px solid black; page-break-inside: avoid">
+                                            <t t-set="packaging_line" t-value="packaging[0]"/>
+                                            <t t-set="section" t-value="grouped_line[0]"/>
+                                            <br/>
+                                            <div style="margin-left: 5px;">Section :
+                                                <span t-field="section.name"/>
+                                            </div>
+                                            <br/>
+                                            <div style="margin-left: 5px;">Ligne de Conditionnement :
+                                                <span t-field="packaging_line.name"/>
+                                            </div>
+                                            <br/>
+
+                                            <table class="table table-sm"
+                                                   name="detailled_planning"
+                                            >
+                                                <thead>
+                                                    <tr style="border: none;  text-align:left;">
+                                                        <th style="border: none;">
+                                                            <strong>Date</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>Article</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>Désignation</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>Colis</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>Quantité</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>Contenance</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>N.E</strong>
+                                                        </th>
+                                                        <th style="border: none;">
+                                                            <strong>Référence</strong>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <t t-set="detailed_planning_lines" t-value="packaging[1]"/>
+                                                    <tr t-foreach="detailed_planning_lines"
+                                                        t-as="detailed_planning_line">
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.date.strftime('%A %m/%y')"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.product_ref"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.product_id.name"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.package"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.qty"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.capacity"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.employee_number"/>
+                                                        </td>
+                                                        <td style="border: none;">
+                                                            <span t-esc="detailed_planning_line.employee_number"/>
+                                                        </td>
+                                                    </tr>
+
+                                                </tbody>
+                                            </table>
+
+                                            <t t-set="detailed_planning_lines" t-value="packaging[1]"/>
+                                            <t t-foreach="detailed_planning_lines" t-as="detailed_planning_line">
+                                            </t>
+                                        </div>
+                                    </t>
+                                </div>
+                            </t>
+                        </div>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+</odoo>

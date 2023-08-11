@@ -1,20 +1,64 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 	<record id="mrp_production_form_view_inherit" model="ir.ui.view">
-        <field name="name">mrp.production.form.inherit</field>
-        <field name="model">mrp.production</field>
-        <field name="inherit_id" ref="mrp.mrp_production_form_view" />
-        <field name="arch" type="xml">
-        	<field name="reservation_state" position="before">
-        		<div name="button_box" class="oe_button_box">
-        			<field name="planning_id" invisible="1" />
-        			<button name="action_view_planning" type="object" icon="fa-address-card-o" class="oe_stat_button" attrs="{'invisible': [('planning_id', '=', False)]}">
-        				<div class="o_field_widget o_stat_info">
-							<span class="o_stat_text">Planning</span>
-						</div>
-        			</button>
-        		</div>
-        	</field>
-        </field>
-    </record>
+		<field name="name">mrp.production.form.inherit</field>
+		<field name="model">mrp.production</field>
+		<field name="inherit_id" ref="mrp.mrp_production_form_view" />
+		<field name="arch" type="xml">
+			<div name="button_box" position="inside">
+				<field name="planning_id" invisible="1" />
+				<button name="action_view_planning" type="object" icon="fa-calendar-o" class="oe_stat_button" attrs="{'invisible': [('planning_id', '=', False)]}">
+					<div class="o_field_widget o_stat_info">
+						<span class="o_stat_text">Planning</span>
+					</div>
+				</button>
+			</div>
+		</field>
+	</record>
+
+	<record id="mrp_production_tree_view_inherit" model="ir.ui.view">
+		<field name="name">mrp.mrp_production_tree_view.inherit</field>
+		<field name="model">mrp.production</field>
+		<field name="inherit_id" ref="mrp.mrp_production_tree_view" />
+		<field name="arch" type="xml">
+			<tree position="attributes">
+				<attribute name="default_order">planning_id</attribute>
+			</tree>
+		</field>
+	</record>
+	
+
+	<record id="view_mrp_production_filter_inherit" model="ir.ui.view">
+		<field name="name">mrp.production.filter.inherit</field>
+		<field name="model">mrp.production</field>
+		<field name="inherit_id" ref="mrp.view_mrp_production_filter" />
+		<field name="arch" type="xml">
+		  <xpath expr="//filter[@name='product']" position="before">
+
+			<field name="planning_id" invisible="1" />
+			<field name="packaging_line_id" invisible="1" />
+			<field name="section_id" invisible="1" />
+
+			<filter string="Planning" name="group_by_planning" domain="[]"
+			  context="{'group_by': 'planning_id'}" />
+			<filter string="Section" name="group_by_section" domain="[]"
+			  context="{'group_by': 'section_id'}" />
+			<filter string="Package Line" name="group_by_packaging_line_id" domain="[]"
+			  context="{'group_by': 'packaging_line_id'}" />
+
+		  </xpath>
+		</field>
+	  </record>
+
+
+	  <record id="mrp.mrp_production_action" model="ir.actions.act_window">
+		<field name="context">
+		  {'search_default_todo': True,
+		  'default_company_id':allowed_company_ids[0],
+		  'search_default_group_by_planning':1,
+		  'search_default_group_by_section':1,
+		  'search_default_group_by_packaging_line_id':1,
+		  }
+		</field>
+	  </record>
 </odoo>

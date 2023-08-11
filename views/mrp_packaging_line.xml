@@ -28,7 +28,7 @@
 							<field name="code" />
 						</group>
 						<group>
-							<field name="section_id" options="{'no_create': 1}" />
+							<!-- <field name="section_id" options="{'no_create': 1}" /> -->
 						</group>
 					</group>
 					<notebook>
@@ -36,11 +36,11 @@
 							<field name="ppp_ids">
 								<tree editable="bottom">
 									<field name="product_id" />
-									<field name="qty" />
+									<!-- <field name="qty" /> -->
 									<field name="capacity" />
-									<field name="employee_number" />
 									<field name="uom_domain" invisible="1" />
 									<field name="uom_id" domain="[('id', 'in', uom_domain)]" />
+									<field name="employee_number" />
 								</tree>
 							</field>
 						</page>
