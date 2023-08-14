@@ -7,6 +7,7 @@
         <field name="arch" type="xml">
         	<field name="replenish_location" position="after">
         		<field name="temp_stock" />
+                <field name="plant_id" options="{'no_create': 1}" />
         	</field>
         </field>
     </record>

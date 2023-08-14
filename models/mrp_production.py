@@ -17,6 +17,7 @@ class MrpProductionInherit(models.Model):
 	section_id = fields.Many2one("mrp.section")
 	planning_line_id = fields.Many2one("mrp.planning.line")
 	planning_id = fields.Many2one("mrp.planning")
+	plant_id = fields.Many2one("mrp.plant", string="Plant")
 
 
 	def action_view_planning(self):
@@ -45,14 +46,12 @@ class MrpProductionInherit(models.Model):
 					rec.detailed_pl_id.write({'product_id': vals['product_id']})
 					rec.product_qty = old_qty
 					rec.bom_id = bom_id
-					print(f'rec.move_raw_ids : {rec.move_raw_ids}')
-					print(f'old_move_raw_ids : {old_move_raw_ids}')
-					# for move in rec.move_raw_ids:
-					# 	for old_move in old_move_raw_ids:
-					# 		print(f"move.state mrp_production : {move.state}")
-					# 		if move and move == old_move:
-					# 			if move.state in ['draft', 'cancel']:
-					# 				move.unlink()
+
+					for move in rec.move_raw_ids:
+						for old_move in old_move_raw_ids:
+							if move == old_move:
+								move.unlink()
+
 
 		return True
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from . import mrp_plant
 from . import mrp_packaging_line
 from . import mrp_section
 from . import mrp_team
