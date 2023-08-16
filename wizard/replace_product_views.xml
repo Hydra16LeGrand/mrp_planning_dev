@@ -11,7 +11,7 @@
 							<field name="product_to_replace_domain" widget="many2many_tags" invisible="1" />
 
 							<field name="product_to_replace" options="{'no_create': 1, 'no_open': 1}" domain="[('id', 'in', product_to_replace_domain)]"/>
-							<field name="replacement_product" domain="[('id', '!=', product_to_replace)]" attrs="{'readonly': [('product_to_replace', '=', False)]}"/>
+							<field name="replacement_product" domain="[('id', '!=', product_to_replace), ('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" attrs="{'readonly': [('product_to_replace', '=', False)]}"/>
 							<field name="section_domain" widget="many2many_tags" invisible="1" />
 							<field name="section" domain="[('id', 'in', section_domain)]" attrs="{'readonly': [('product_to_replace', '=', False)]}"/>
 						</group>

@@ -12,12 +12,12 @@ class MrpPlanning(models.Model):
 
 	today_date = fields.Date.today()
 	iso = today_date.isocalendar()
-	monday = date.fromisocalendar(year=iso.year, week=iso.week, day=1)
-	tuesday = date.fromisocalendar(year=iso.year, week=iso.week, day=2)
-	wednesday = date.fromisocalendar(year=iso.year, week=iso.week, day=3)
-	thursday = date.fromisocalendar(year=iso.year, week=iso.week, day=4)
-	friday = date.fromisocalendar(year=iso.year, week=iso.week, day=5)
 
+	monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
+	tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
+	wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
+	thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
+	friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
 
 	week_days = [
         'monday {}/{}'.format(monday.strftime('%d'), monday.month),
@@ -31,11 +31,11 @@ class MrpPlanning(models.Model):
 	def _get_default_week_of(self):
 		today_date = fields.Date.today()
 		iso = today_date.isocalendar()
-		monday = date.fromisocalendar(year=iso.year, week=iso.week, day=1)
-		tuesday = date.fromisocalendar(year=iso.year, week=iso.week, day=2)
-		wednesday = date.fromisocalendar(year=iso.year, week=iso.week, day=3)
-		thursday = date.fromisocalendar(year=iso.year, week=iso.week, day=4)
-		friday = date.fromisocalendar(year=iso.year, week=iso.week, day=5)
+		monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
+		tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
+		wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
+		thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
+		friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
 
 		current_week_days = [
 			(0, 0, {'name': 'monday {}/{}'.format(monday.strftime('%d'), monday.month), 'date': monday}),
@@ -76,7 +76,9 @@ class MrpPlanning(models.Model):
 				], default="draft", index=True, readonly=True, copy=False, tracking=True
 			)
 	scheduled_date = fields.Date(_("Add a date"), default=lambda self: fields.Date.today(), required=True)
+
 	week_of = fields.Many2many('mrp.planning.days', string='Scheduled dates', default=_get_default_week_of, domain=lambda self: [('name', 'in', self.week_days)], copy=True)
+
 	company_id = fields.Many2one('res.company', string='Company', required=True, index=True, default=lambda self: self.env.company.id)
 	mrp_production_general_state = fields.Selection([
 			['draft', "Draft"],
@@ -88,6 +90,7 @@ class MrpPlanning(models.Model):
 
 	section_ids = fields.Many2many("mrp.section", string=_("Sections"), required=True, tracking=5)
 	# team_ids = fields.Many2many("mrp.team", string=_("Teams"), tracking=True, required=True)
+
 	planning_line_ids = fields.One2many("mrp.planning.line", "planning_id", string=_("Planning lines"), tracking=5)
 	detailed_pl_ids = fields.One2many("mrp.detail.planning.line", "planning_id", string=_("Detailed planning lines"), tracking=4)
 	mrp_production_ids = fields.One2many("mrp.production", "planning_id", string=_("Mrp orders"), copy=False, tracking=4)
@@ -185,7 +188,6 @@ class MrpPlanning(models.Model):
 													  dico.values() if
 													  len(dictionnaires) == 1]
 
-
 						if liste_meme_packaging_line_id:
 							for elm in liste_meme_packaging_line_id:
 								print(f'elm : {elm}')
@@ -206,7 +208,6 @@ class MrpPlanning(models.Model):
 									ppp_id = self.env['mrp.packaging.pp'].search(
 										[('packaging_line_id', '=', value['packaging_line_id'].id),
 										 ('product_id', '=', value['product_id'].id)], limit=1)
-
 
 									self.env['mrp.detail.planning.line'].create([{
 										'date_char': day['name'],
@@ -610,7 +611,6 @@ class MrpPlanning(models.Model):
 		# self.mrp_production_general_state = "done"
 		return result
 
-
 	
 	# Dupliquer le modele avec toutes les données qu'il contient
 	def copy(self, default=None):
@@ -642,28 +642,28 @@ class MrpPlanning(models.Model):
 		if self.scheduled_date != self.today_date:
 			iso = self.scheduled_date.isocalendar()
 			print(f"iso : {iso}")
-			print(f"iso.weekday : {iso.weekday}")
-			monday = date.fromisocalendar(year=iso.year, week=iso.week, day=1)
-			tuesday = date.fromisocalendar(year=iso.year, week=iso.week, day=2)
-			wednesday = date.fromisocalendar(year=iso.year, week=iso.week, day=3)
-			thursday = date.fromisocalendar(year=iso.year, week=iso.week, day=4)
-			friday = date.fromisocalendar(year=iso.year, week=iso.week, day=5)
-			saturday = date.fromisocalendar(year=iso.year, week=iso.week, day=6)
-			sunday = date.fromisocalendar(year=iso.year, week=iso.week, day=7)
+			print(f"iso[2] : {iso[2]}")
+			monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
+			tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
+			wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
+			thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
+			friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
+			saturday = date.fromisocalendar(year=iso[0], week=iso[1], day=6)
+			sunday = date.fromisocalendar(year=iso[0], week=iso[1], day=7)
 
-			if iso.weekday == 1:
+			if iso[2] == 1:
 				day_name = 'monday {}/{}'.format(monday.strftime('%d'), monday.month)
-			elif iso.weekday == 2:
+			elif iso[2] == 2:
 				day_name = 'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month)
-			elif iso.weekday == 3:
+			elif iso[2] == 3:
 				day_name = 'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month)
-			elif iso.weekday == 4:
+			elif iso[2] == 4:
 				day_name = 'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month)
-			elif iso.weekday == 5:
+			elif iso[2] == 5:
 				day_name = 'friday {}/{}'.format(friday.strftime('%d'), friday.month)
-			elif iso.weekday == 6:
+			elif iso[2] == 6:
 				day_name = 'saturday {}/{}'.format(saturday.strftime('%d'), saturday.month)
-			elif iso.weekday == 7:
+			elif iso[2] == 7:
 				day_name = 'sunday {}/{}'.format(sunday.strftime('%d'), sunday.month)
 			print(f"day_name : {day_name}")
 			print(f"self.week_of : {self.week_of}")

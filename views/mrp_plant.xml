@@ -37,11 +37,36 @@
 		</field>
 	</record>
 
-	<record id="action_mrp_plant" model="ir.actions.act_window">
+	<record id="mrp_plant_kanban" model="ir.ui.view">
+		<field name="name">mrp.plant.kanban</field>
+		<field name="model">mrp.plant</field>
+		<field name="arch" type="xml">
+			<kanban class="oe_background_grey o_kanban_dashboard" create="0">
+				<templates>
+					<t t-name="kanban-box">
+						<div t-attf-class="o_kanban_card_header">
+							<div class="o_kanban_card_header_title">
+								<field name="name" />
+							</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
+
+	<record id="action_mrp_plant_conf" model="ir.actions.act_window">
 		<field name="name">Manufacturing plant</field>
 		<field name="res_model">mrp.plant</field>
 		<field name="view_mode">tree,form</field>
 	</record>
 
-	<menuitem id="mrp_plant_menu" parent="mrp.menu_mrp_configuration" action="action_mrp_plant" name="Manufacturing plants" />
+	<record id="action_mrp_plant_dashboard" model="ir.actions.act_window">
+		<field name="name">Manufacturing plant</field>
+		<field name="res_model">mrp.plant</field>
+		<field name="view_mode">kanban</field>
+	</record>
+
+	<menuitem id="mrp_plant_menu_conf" parent="mrp.menu_mrp_configuration" action="action_mrp_plant_conf" name="Manufacturing plants" />
+	<menuitem id="mrp_plant_menu_dashboard" parent="mrp.menu_mrp_manufacturing" sequence="1" action="action_mrp_plant_dashboard" name="Plants" />
 </odoo>

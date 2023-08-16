@@ -67,7 +67,7 @@
 						<page name="planning_lines" string="Planning lines">
 							<field name="planning_line_ids" widget="stock_move_one2many" attrs="{'readonly': [('state', 'not in', ['draft'])]}" context="{'default_mrp_days':week_of}">
 								<tree editable="bottom">
-									<field name="product_id" />
+									<field name="product_id" options="{'no_create': 1, 'no_open': 1}" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" />
 									<field name="packaging_line_domain" invisible="1" />
 									<field name="packaging_line_id" domain="[('id', '=', packaging_line_domain)]" options="{'no_create': 1}" />
 									<field name="package" invisible="1" />
@@ -205,7 +205,7 @@
 		<field name="context">{'search_default_by_plants': 1}</field>
 	</record>
 
-	<menuitem id="mrp_planning_menu" action="action_mrp_planning" parent="mrp.menu_mrp_manufacturing" sequence="1" name="MRP Planning" />
-	<menuitem id="mrp.menu_mrp_production_action" action="mrp.mrp_production_action" parent="mrp.menu_mrp_manufacturing" sequence="2" />
+	<menuitem id="mrp_planning_menu" action="action_mrp_planning" parent="mrp.menu_mrp_manufacturing" sequence="2" name="MRP Planning" />
+	
 		
 </odoo>
