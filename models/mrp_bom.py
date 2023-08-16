@@ -39,7 +39,3 @@ class MrpBomLineInherit(models.Model):
 			total += rec.percentage
 			if total > 100:
 				raise ValidationError(_("Total percentage don't have to exceed 100%"))
-
-
-	
-
