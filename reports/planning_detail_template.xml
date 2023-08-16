@@ -44,13 +44,25 @@
                                 </tbody>
                             </table>
                         </div>
+
+                        <style>
+                            .no-header-repeat thead {
+                                display: table-header-group;
+                            }
+                            .no-header-repeat:not(:first-child) thead {
+                                display: none;
+                            }
+                        </style>
+
                         <div style="width: 100%">
                             <t t-set="result_dict" t-value="o.regroup_for_report()"/>
                             <t t-foreach="result_dict.items()" t-as="grouped_line">
                                 <div style="page-break-after:always;">
+<!--                                <div>-->
                                     <t t-set="packaging_lines" t-value="grouped_line[1]"/>
                                     <t t-foreach="packaging_lines.items()" t-as="packaging">
-                                        <div style="border: 1px solid black; page-break-inside: avoid">
+<!--                                        <div style="border: 1px solid black; page-break-inside: avoid">-->
+                                        <div style="border: 1px solid black;">
                                             <t t-set="packaging_line" t-value="packaging[0]"/>
                                             <t t-set="section" t-value="grouped_line[0]"/>
                                             <br/>
@@ -63,7 +75,7 @@
                                             </div>
                                             <br/>
 
-                                            <table class="table table-sm"
+                                            <table class="table table-sm no-header-repeat"
                                                    name="detailled_planning"
                                             >
                                                 <thead>
@@ -127,9 +139,6 @@
                                                 </tbody>
                                             </table>
 
-                                            <t t-set="detailed_planning_lines" t-value="packaging[1]"/>
-                                            <t t-foreach="detailed_planning_lines" t-as="detailed_planning_line">
-                                            </t>
                                         </div>
                                     </t>
                                 </div>

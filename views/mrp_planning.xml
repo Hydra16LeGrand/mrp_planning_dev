@@ -8,7 +8,7 @@
 				<header>
 					<button name="action_cancel" type="object" string="Cancel" states="confirm,04_mo_generated" confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?" />
 					<button name="action_draft" type="object" string="Re-draft" states="cancel" />
-					<button name="action_confirm" type="object" string="Confirm" states="draft" class="oe_highlight" />
+					<button name="action_confirm" type="object" string="Confirm" states="draft" class="oe_highlight" confirm="Planning lines will no longer be editable. Are you sure to do this?" />
 					<button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight" confirm="Are you sure to do this action ?" />
 					<button name="create_overview_wizard" type="object" string="RM Overview"
                         class="oe_highlight" attrs="{'invisible': [('state','!=','04_mo_generated')]}"/>
@@ -35,11 +35,13 @@
                             <field string="Transfer(s)" name="internal_transfer_count"
                                 widget="statinfo" />
                         </button>
-						<button name="view_rm_overview" type="object" attrs="{'invisible': [('state','in',['draft','cancel'])]}" icon="fa-pie-chart" class="oe_stat_button">
+
+						<!-- <button name="view_rm_overview" type="object" attrs="{'invisible': [('state','in',['draft','cancel'])]}" icon="fa-pie-chart" class="oe_stat_button">
+
 							<div class="o_field_widget o_stat_info">
 								<span class="o_stat_text">RM Overview</span>
 							</div>
-						</button>
+						</button> -->
 					</div>
 					<div class="oe_title">
 						<h1>
@@ -49,13 +51,16 @@
 					<group>
 						<group>
 							<!-- <field name="team_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/> -->
+
+							<field name="plant_id" options="{'no_open': 1, 'no_create': 1}" />
 							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
 							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-							<field name="mrp_production_general_state"/>
+							<field name="mrp_production_general_state" invisible="1" />
+
 						</group>
 						<group>
 							<field name="scheduled_date" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-							<field name="week_of" widget="many2many_tags"/>
+							<field name="week_of" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
 						</group>
 					</group>
 					<notebook>
@@ -76,7 +81,7 @@
 								</tree>
 							</field>
 						</page>
-						<page name="detailed_planning_lines" attrs="{'invisible': [('detailed_pl_ids', '=', [])]}" string="Detailed planning lines">
+						<page name="detailed_planning_lines" attrs="{'invisible': [('detailed_pl_ids', '=', [])]}" string="Detailed planning lines" autofocus="autofocus">
 							<field name="detailed_pl_ids" widget="section_and_note_one2many" mode="tree" attrs="{'readonly': [('state', 'in', ['cancel', '04_mo_generated'])]}" context="{'search_default_gp_packaging_line_id': 1}">
 								<form>
                                     <sheet>
@@ -126,6 +131,10 @@
 							</field>
 						</page>
 					</notebook>
+					<div class="oe_chatter">
+						<field name="message_follower_ids"/>
+						<field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+					</div>
 				</sheet>
 			</form>
 		</field>
@@ -139,6 +148,9 @@
 				<field name="reference" />
 				<field name="code" />
 				<field name="section_ids" widget="many2many_tags" />
+
+				<field name="state" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-warning="state == 'confirm'" decoration-success="state == '04_mo_generated'" />
+
 				<!-- <field name="team_ids" widget="many2many_tags" /> -->
 			</tree>
 		</field>
@@ -163,6 +175,9 @@
         <field name="arch" type="xml">
             <search>
 
+            	<field name="plant_id" invisible="1" />
+
+
                 <filter name="draft_filter" string="Draft"
                     domain="[('state','=','draft')]" />
 
@@ -174,6 +189,11 @@
 
                 <filter name="cancel_filter" string="Cancel"
                     domain="[('state','=','cancel')]" />
+
+                <group string="Group by">
+                	<filter string="Plants" name="by_plants" context="{'group_by': 'plant_id'}" />
+                </group>
+
             </search>
         </field>
     </record>
@@ -182,6 +202,7 @@
 		<field name="name">MRP Planning</field>
 		<field name="res_model">mrp.planning</field>
 		<field name="view_mode">tree,form</field>
+		<field name="context">{'search_default_by_plants': 1}</field>
 	</record>
 
 	<menuitem id="mrp_planning_menu" action="action_mrp_planning" parent="mrp.menu_mrp_manufacturing" sequence="1" name="MRP Planning" />

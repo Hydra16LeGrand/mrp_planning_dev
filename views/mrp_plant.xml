@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+
+	<record id="mrp_plant_tree" model="ir.ui.view">
+		<field name="name">mrp.plant.tree</field>
+		<field name="model">mrp.plant</field>
+		<field name="arch" type="xml">
+			<tree>
+				<field name="name" />
+				<field name="code" />
+				<field name="is_principal" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="mrp_plant_form" model="ir.ui.view">
+		<field name="name">mrp.plant.form</field>
+		<field name="model">mrp.plant</field>
+		<field name="arch" type="xml">
+			<form>
+				<sheet>
+					<group>
+						<group>
+							<field name="id" invisible="1" />
+							<field name="name" />
+							<field name="code" />
+							<field name="company_id" options="{'no_create': 1, 'no_open': 1}" />
+						</group>
+						<group>
+							<field name="is_principal" />
+							<field name="default_location_src_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />
+							<field name="default_location_dest_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />
+						</group>
+					</group>
+				</sheet>
+			</form>
+		</field>
+	</record>
+
+	<record id="action_mrp_plant" model="ir.actions.act_window">
+		<field name="name">Manufacturing plant</field>
+		<field name="res_model">mrp.plant</field>
+		<field name="view_mode">tree,form</field>
+	</record>
+
+	<menuitem id="mrp_plant_menu" parent="mrp.menu_mrp_configuration" action="action_mrp_plant" name="Manufacturing plants" />
+</odoo>

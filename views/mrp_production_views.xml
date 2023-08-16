@@ -39,11 +39,14 @@
 			<field name="packaging_line_id" invisible="1" />
 			<field name="section_id" invisible="1" />
 
-			<filter string="Planning" name="group_by_planning" domain="[]"
+			<field name="plant_id" invisible="1" />
+
+			<filter string="Plants" name="by_plants" domain="[]" context="{'group_by': 'plant_id'}" />
+			<filter string="Plannings" name="group_by_planning" domain="[]"
 			  context="{'group_by': 'planning_id'}" />
-			<filter string="Section" name="group_by_section" domain="[]"
+			<filter string="Sections" name="group_by_section" domain="[]"
 			  context="{'group_by': 'section_id'}" />
-			<filter string="Package Line" name="group_by_packaging_line_id" domain="[]"
+			<filter string="Package Lines" name="group_by_packaging_line_id" domain="[]"
 			  context="{'group_by': 'packaging_line_id'}" />
 
 		  </xpath>
@@ -55,6 +58,8 @@
 		<field name="context">
 		  {'search_default_todo': True,
 		  'default_company_id':allowed_company_ids[0],
+
+		  'search_default_by_plants': 1,
 		  'search_default_group_by_planning':1,
 		  'search_default_group_by_section':1,
 		  'search_default_group_by_packaging_line_id':1,

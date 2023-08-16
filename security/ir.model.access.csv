@@ -10,5 +10,5 @@ access_mrp_packaging_pp,mrp.packaging.pp,model_mrp_packaging_pp,,1,1,1,1
 access_rm_overview,rm.overview,model_rm_overview,,1,1,1,1
 access_overview_wizard,overview.wizard,model_overview_wizard,,1,1,1,1
 access_overview_wizard_line,overview.wizard.line,model_overview_wizard_line,,1,1,1,1
-
 access_replace_product,replace.product,model_replace_product,,1,1,1,1
+access_mrp_plant,access.mrp.plant,model_mrp_plant,,1,1,1,1

@@ -37,7 +37,11 @@
         'views/rm_overview.xml',
         'views/stock_location_views.xml',
         'views/mrp_production_views.xml',
+
         'views/mrp_bom_views.xml',
+
+        'views/mrp_plant.xml',
+
 
         'wizard/replace_product_views.xml',
         'wizard/create_overview_wizard_view.xml',
