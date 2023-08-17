@@ -31,6 +31,14 @@
     'data': [
         'security/ir.model.access.csv',
 
+        'data/ir_sequence_data.xml',
+        'data/planning_print.xml',
+
+        'reports/planning_detail_template.xml',
+
+        'wizard/replace_product_views.xml',
+        'wizard/create_overview_wizard_view.xml',
+
         'views/mrp_planning.xml',
         'views/mrp_section.xml',
         'views/mrp_team.xml',
@@ -40,18 +48,11 @@
         'views/mrp_production_views.xml',
 
         'views/mrp_bom_views.xml',
-
         'views/mrp_plant.xml',
-
-
-        'wizard/replace_product_views.xml',
-        'wizard/create_overview_wizard_view.xml',
-        'reports/planning_detail_template.xml',
-
-        'data/ir_sequence_data.xml',
-        'data/planning_print.xml',
+        'views/stock_picking_type_views.xml',
 
     ],
+
     # only loaded in demonstration mode
     'demo': [
         'demo/demo.xml',

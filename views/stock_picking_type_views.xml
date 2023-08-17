@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+	<record id="stock_picking_type_action_inherit" model="ir.actions.act_window">
+        <field name="name">Manufacturing Overview</field>
+        <field name="res_model">stock.picking.type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="view_mode">kanban,form</field>
+        <field name="domain">[('code', '=', 'mrp_operation')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+            Create a new operation type
+            </p><p>
+            The operation type system allows you to assign each stock
+            operation a specific type which will alter its views accordingly.
+            On the operation type you could e.g. specify if packing is needed by default,
+            if it should show the customer.
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="mrp.menu_mrp_production_action" action="stock_picking_type_action_inherit" parent="mrp.menu_mrp_manufacturing" sequence="3" />
+</odoo>
