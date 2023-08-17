@@ -1,72 +1,85 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <odoo>
 
-	<record id="mrp_plant_tree" model="ir.ui.view">
-		<field name="name">mrp.plant.tree</field>
-		<field name="model">mrp.plant</field>
-		<field name="arch" type="xml">
-			<tree>
-				<field name="name" />
-				<field name="code" />
-				<field name="is_principal" />
-			</tree>
-		</field>
-	</record>
+    <record id="mrp_plant_tree" model="ir.ui.view">
+        <field name="name">mrp.plant.tree</field>
+        <field name="model">mrp.plant</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="is_principal"/>
+            </tree>
+        </field>
+    </record>
 
-	<record id="mrp_plant_form" model="ir.ui.view">
-		<field name="name">mrp.plant.form</field>
-		<field name="model">mrp.plant</field>
-		<field name="arch" type="xml">
-			<form>
-				<sheet>
-					<group>
-						<group>
-							<field name="id" invisible="1" />
-							<field name="name" />
-							<field name="code" />
-							<field name="company_id" options="{'no_create': 1, 'no_open': 1}" />
-						</group>
-						<group>
-							<field name="is_principal" />
-							<field name="default_location_src_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />
-							<field name="default_location_dest_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />
-						</group>
-					</group>
-				</sheet>
-			</form>
-		</field>
-	</record>
+    <record id="mrp_plant_form" model="ir.ui.view">
+        <field name="name">mrp.plant.form</field>
+        <field name="model">mrp.plant</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="id" invisible="1"/>
+                            <field name="name"/>
+                            <field name="code"/>
 
-	<record id="mrp_plant_kanban" model="ir.ui.view">
-		<field name="name">mrp.plant.kanban</field>
-		<field name="model">mrp.plant</field>
-		<field name="arch" type="xml">
-			<kanban class="oe_background_grey o_kanban_dashboard" create="0">
-				<templates>
-					<t t-name="kanban-box">
-						<div t-attf-class="o_kanban_card_header">
-							<div class="o_kanban_card_header_title">
-								<field name="name" />
-							</div>
-						</div>
-					</t>
-				</templates>
-			</kanban>
-		</field>
-	</record>
+                        </group>
+                        <group>
+                            <field name="is_principal"/>
+                            <field name="company_id" options="{'no_create': 1, 'no_open': 1}"/>
+                            <!--							<field name="default_location_src_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />-->
+                            <!--							<field name="default_location_dest_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />-->
+                        </group>
+                        <group string="Locations" name="locations">
+                            <field name="default_location_src_id" domain="[('plant_id', '=', id)]"
+                                   options="{'no_create': 1, 'no_open': 1}"/>
+                            <field name="default_location_dest_id" domain="[('plant_id', '=', id)]"
+                                   options="{'no_create': 1, 'no_open': 1}"/>
+                        </group>
 
-	<record id="action_mrp_plant_conf" model="ir.actions.act_window">
-		<field name="name">Manufacturing plant</field>
-		<field name="res_model">mrp.plant</field>
-		<field name="view_mode">tree,form</field>
-	</record>
+                        <group string="Type of operation" name="type_of_operation">
+                            <field name="picking_type_id"/>
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
 
-	<record id="action_mrp_plant_dashboard" model="ir.actions.act_window">
-		<field name="name">Manufacturing plant</field>
-		<field name="res_model">mrp.plant</field>
-		<field name="view_mode">kanban</field>
-	</record>
+    <record id="mrp_plant_kanban" model="ir.ui.view">
+        <field name="name">mrp.plant.kanban</field>
+        <field name="model">mrp.plant</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard" create="0">
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="o_kanban_card_header">
+                            <div class="o_kanban_card_header_title">
+                                <field name="name"/>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 
-	<menuitem id="mrp_plant_menu_conf" parent="mrp.menu_mrp_configuration" action="action_mrp_plant_conf" name="Manufacturing plants" />
-	<menuitem id="mrp_plant_menu_dashboard" parent="mrp.menu_mrp_manufacturing" sequence="1" action="action_mrp_plant_dashboard" name="Plants" />
+    <record id="action_mrp_plant_conf" model="ir.actions.act_window">
+        <field name="name">Manufacturing plant</field>
+        <field name="res_model">mrp.plant</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <record id="action_mrp_plant_dashboard" model="ir.actions.act_window">
+        <field name="name">Manufacturing plant</field>
+        <field name="res_model">mrp.plant</field>
+        <field name="view_mode">kanban</field>
+    </record>
+
+    <menuitem id="mrp_plant_menu_conf" parent="mrp.menu_mrp_configuration" action="action_mrp_plant_conf"
+              name="Manufacturing plants"/>
+    <menuitem id="mrp_plant_menu_dashboard" parent="mrp.menu_mrp_manufacturing" sequence="1"
+              action="action_mrp_plant_dashboard" name="Plants"/>
 </odoo>

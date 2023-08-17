@@ -53,7 +53,7 @@
 							<!-- <field name="team_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/> -->
 
 							<field name="plant_id" options="{'no_open': 1, 'no_create': 1}" />
-							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}" />
 							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
 							<field name="mrp_production_general_state" invisible="1" />
 

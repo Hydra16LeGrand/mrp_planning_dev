@@ -1,5 +1,5 @@
 from odoo import fields, models, api, _
-
+from odoo.exceptions import ValidationError
 
 class StockPickingTypeInherit(models.Model):
 	_inherit = "stock.picking.type"
@@ -32,6 +32,20 @@ class StockPickingTypeInherit(models.Model):
 			"""
 		}
 		return action
+
+	@api.onchange('plant_id')
+	def onchange_plant_id(self):
+		if self.plant_id:
+			# Empêcher toute modification future du champ plant_id
+			plant_id = self.search([('plant_id', '=', self.plant_id.id)])
+			print("Plant", plant_id)
+			if plant_id:
+				raise ValidationError(
+					_(f"This factory is already selected in other plant. This factory have to be selected only once"))
+
+		# self.update({
+			# 	'plant_id': self.plant_id.id,
+			# })
 
 
 

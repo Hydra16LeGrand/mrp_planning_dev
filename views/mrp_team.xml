@@ -27,7 +27,7 @@
 							<field name="number" />
 						</group>
 						<group>
-							<field name="employee_ids" widget="many2many_tags" options="{'no_create': 1}" />
+							<field name="employee_ids" widget="many2many_tags" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />
 						</group>
 					</group>
 				</sheet>
@@ -41,7 +41,7 @@
 		<field name="view_mode">tree,form</field>
 	</record>
 
-	<menuitem 
+	<menuitem
 		id="mrp_team_menu"
 		action="action_mrp_team"
 		name="Teams"

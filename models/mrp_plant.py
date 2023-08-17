@@ -5,12 +5,19 @@ class MrpPlant(models.Model):
 	_name = "mrp.plant"
 	_rec_name = "name"
 
+	@api.depends('picking_type_id')
+	def _compute_picking_type(self):
+		self.picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id)]).name
+		print("le picking", self.picking_type_id)
+
+
 	name = fields.Char(_("Name"), required=1)
 	code = fields.Char(_("Short name"), required=1)
 	company_id = fields.Many2one("res.company", _("Company"), default=lambda self: self.env.company, required=1)
-	is_principal = fields.Boolean(_("Principal plant"))
+	is_principal = fields.Boolean(_("Principal plant"), unique=True)
 	default_location_src_id = fields.Many2one("stock.location", string=_("Default components location"))
 	default_location_dest_id = fields.Many2one("stock.location", string=_("Default finished products location"))
+	picking_type_id = fields.Char('Type of operation', compute='_compute_picking_type')
 
 	_sql_constraints = [
         ('warehouse_code_uniq', 'unique(code, company_id)', 'The short name of the plant must be unique per company!'),
@@ -24,6 +31,7 @@ class MrpPlant(models.Model):
 			print("Plant", plant_id)
 			if plant_id:
 				raise ValidationError(_(f"This field is already checked in other plant ({plant_id}). This field have to be checked only once"))
+
 
 
 	@api.model
