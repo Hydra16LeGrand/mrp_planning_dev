@@ -984,9 +984,6 @@ class MrpPlanninLine(models.Model):
 
 	planning_id = fields.Many2one("mrp.planning")
 
-	def unlink(self):
-		for rec in self:
-			pass
 
 
 
