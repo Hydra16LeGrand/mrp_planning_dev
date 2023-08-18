@@ -1,14 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="view_location_form_inherit" model="ir.ui.view">
-                <field name="name">stock.location.form.inherit</field>
-                <field name="model">stock.location</field>
-                <field name="inherit_id" ref="stock.view_location_form" />
-                <field name="arch" type="xml">
-                	<field name="replenish_location" position="after">
-                		<field name="temp_stock" />
-                                <field name="plant_id" options="{'no_create': 1}" />
-                	</field>
-                </field>
-        </record>
+    <record id="view_location_form_inherit" model="ir.ui.view">
+        <field name="name">stock.location.form.inherit</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//sheet/group" position="after">
+                <group>
+                    <group string="Plant Information" name="plant_information">
+                        <field name="temp_stock"/>
+                        <field name="plant_id" options="{'no_create': 1}"/>
+                    </group>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_stock_location_search_inherit" model="ir.ui.view">
+        <field name="name">stock.location.search.inherit</field>
+        <field name="model">stock.location</field>
+        <field name="inherit_id" ref="stock.view_location_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//search/filter[@name='inactive']" position="after">
+                <group string="Group by">
+                    <filter string="Location Type" name="usage" context="{'group_by': 'usage'}"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="stock.action_location_form" model="ir.actions.act_window">
+        <field name="res_model">stock.location</field>
+        <field name="context">
+            {
+            'search_default_in_location':1,
+            'search_default_usage': 1,
+            }
+        </field>
+    </record>
+
 </odoo>

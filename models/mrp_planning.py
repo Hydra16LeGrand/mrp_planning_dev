@@ -1015,6 +1015,13 @@ class MrpDetailPlanningLine(models.Model):
 					print(
 						f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
 
+	def _compute_mrp_production_id(self):
+		print("le self",self)
+		for line in self:
+			mrp_productions = self.env['mrp.production'].search([('detailed_pl_id', '=', line.id)]).id
+			line.mrp_production_id = mrp_productions
+
+
 	date_char = fields.Char(_("Date"))
 	date = fields.Date(_("Date"), required=1)
 	product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
@@ -1044,6 +1051,7 @@ class MrpDetailPlanningLine(models.Model):
 		],
 		default=False)
 	name = fields.Text()
+	mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
 
 
 	# @api.onchange('state')

@@ -231,6 +231,7 @@ class WizardOverview(models.TransientModel):
 			'params': {
 				'type': 'success',
 				'message': _("the internal transfer has been successfully completed"),
+				'next': {'type': 'ir.actions.act_window_close'},
 			}
 		}
 	
