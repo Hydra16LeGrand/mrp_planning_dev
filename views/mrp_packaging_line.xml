@@ -38,8 +38,9 @@
 									<field name="product_id" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
 									<!-- <field name="qty" /> -->
 									<field name="capacity" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
-									<field name="uom_domain" invisible="1" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />
-									<field name="uom_id" domain="[('id', 'in', uom_domain)]" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />
+<!--									<field name="uom_domain" invisible="1" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />-->
+<!--									<field name="uom_id" domain="[('id', '=', uom_domain)]" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />-->
+									<field name="uom_id" readonly="1"/>
 									<field name="employee_number" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />
 								</tree>
 							</field>

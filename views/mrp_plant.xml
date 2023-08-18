@@ -48,37 +48,44 @@
     </record>
 
     <record id="mrp_plant_kanban" model="ir.ui.view">
-		<field name="name">mrp.plant.kanban</field>
-		<field name="model">mrp.plant</field>
-		<field name="arch" type="xml">
-			<kanban class="oe_background_grey o_kanban_dashboard" create="0">
-				<field name="count_mrp_planning_draft"/>
-				<field name="count_mrp_planning_confirm"/>
-				<field name="count_mrp_planning"/>
-				<field name="count_mrp_planning_generated"/>
-				<field name="count_mrp_planning_cancel"/>
-				<templates>
-					<t t-name="kanban-box">
-						<div t-attf-class="o_kanban_card_header">
-							<div class="o_kanban_card_header_title">
-								<div class="o_primary">
-									<a type="object" name="get_mrp_planning_action">
-										<field name="name" />
-									</a>
-								</div>
-							</div>
-							<div class="o_kanban_manage_button_section">
-								<a class="o_kanban_manage_toggle_button" href="#"><i class="fa fa-ellipsis-v" role="img" aria-label="Manage" title="Manage"/></a>
-							</div>
-							<br/>
-							<div class="container o_kanban_card_content">
-								<div class="row">
-									<div class="col-6 o_kanban_primary_left">
-                                        <button class="btn btn-primary" name="get_action_mrp_planning_tree_draft" type="object">
-                                            <span><t t-esc="record.count_mrp_planning_draft.value"/> To Process</span>
+        <field name="name">mrp.plant.kanban</field>
+        <field name="model">mrp.plant</field>
+        <field name="arch" type="xml">
+            <kanban class="oe_background_grey o_kanban_dashboard o_stock_kanban" create="0">
+                <field name="count_mrp_planning_draft"/>
+                <field name="count_mrp_planning_confirm"/>
+                <field name="count_mrp_planning"/>
+                <field name="count_mrp_planning_generated"/>
+                <field name="count_mrp_planning_cancel"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div>
+                            <div t-attf-class="o_kanban_card_header">
+                                <div class="d-flex justify-content-end">
+                                    <a type="object" name="get_plant_configuration">
+                                        <i class="fa fa-gear" role="img" aria-label="Manage" title="Manage"></i>
+                                    </a>
+                                </div>
+                                <div class="o_kanban_card_header_title">
+                                    <div class="o_primary">
+                                        <a type="object" name="get_mrp_planning_action">
+                                            <field name="name"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container o_kanban_card_content">
+                                <div class="row">
+                                    <div class="col-6 o_kanban_primary_left">
+                                        <button class="btn btn-primary" name="get_action_mrp_planning_tree_draft"
+                                                type="object">
+                                            <span>
+                                                <t t-esc="record.count_mrp_planning_draft.value"/>
+                                                To Process
+                                            </span>
                                         </button>
                                     </div>
-									<div class="col-6 o_kanban_primary_right">
+                                    <div class="col-6 o_kanban_primary_right">
                                         <div t-if="record.count_mrp_planning.raw_value > 0" class="row">
                                         </div>
 
@@ -93,7 +100,8 @@
 
                                         <div t-if="record.count_mrp_planning_generated.raw_value > 0" class="row">
                                             <div class="col-12">
-                                                <a class="oe_kanban_stock_picking_type_list" name="get_action_mrp_planning_tree_generated" type="object">
+                                                <a class="oe_kanban_stock_picking_type_list"
+                                                   name="get_action_mrp_planning_tree_generated" type="object">
                                                     <field name="count_mrp_planning_generated"/>
                                                     Generated
                                                 </a>
@@ -102,28 +110,22 @@
 
                                         <div t-if="record.count_mrp_planning_cancel.raw_value > 0" class="row">
                                             <div class="col-12">
-                                                <a class="oe_kanban_stock_picking_type_list" name="get_action_mrp_planning_tree_cancel" type="object">
+                                                <a class="oe_kanban_stock_picking_type_list"
+                                                   name="get_action_mrp_planning_tree_cancel" type="object">
                                                     <field name="count_mrp_planning_cancel"/>
                                                     Cancel
                                                 </a>
                                             </div>
                                         </div>
                                     </div>
-								</div>
-							</div>
-							<div class="container o_kanban_card_manage_pane dropdown-menu" role="menu">
-								<div class="o_kanban_card_manage_settings row">
-                                    <div role="menuitem">
-                                        <a class="dropdown-item" role="menuitem" type="object" name="get_plant_configuration">Configuration</a>
-                                    </div>
                                 </div>
-							</div>
-						</div>
-					</t>
-				</templates>
-			</kanban>
-		</field>
-	</record>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
 
     <record id="action_mrp_plant_conf" model="ir.actions.act_window">
         <field name="name">Manufacturing plant</field>

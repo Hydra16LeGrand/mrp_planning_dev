@@ -56,6 +56,7 @@
 							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}" />
 							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
 							<field name="mrp_production_general_state" invisible="1" />
+							<field name="section_first" invisible="1" />
 
 						</group>
 						<group>
@@ -65,7 +66,7 @@
 					</group>
 					<notebook>
 						<page name="planning_lines" string="Planning lines">
-							<field name="planning_line_ids" widget="stock_move_one2many" attrs="{'readonly': [('state', 'not in', ['draft'])]}" context="{'default_mrp_days':week_of}">
+							<field name="planning_line_ids" widget="stock_move_one2many" attrs="{'readonly': [('state', 'not in', ['draft'])]}" context="{'default_mrp_days':week_of, 'default_section_id':section_first}">
 								<tree editable="bottom">
 									<field name="product_id" options="{'no_create': 1, 'no_open': 1}" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" />
 									<field name="packaging_line_domain" invisible="1" />
@@ -111,7 +112,7 @@
                                         <field name="name"/>
                                     </sheet>
                                 </form>
-								<tree editable="bottom" create="False">
+								<tree editable="bottom" create="False" limit="500">
 									<field name="planning_line_id" invisible="1" />
 									<field name="planning_id" invisible="1" />
 									<field name="display_type" invisible="1"/>
