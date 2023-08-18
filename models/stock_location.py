@@ -12,6 +12,6 @@ class StockLocationInherit(models.Model):
 	def _onchange_temp_stock(self):
 		print("Onchange temp", self.temp_stock, self.env['stock.location'].search_count([('temp_stock', '=', 1)]))
 		if self.temp_stock:
-			temp_stock = self.env['stock.location'].search_count([('temp_stock', '=', 1)])
+			temp_stock = self.env['stock.location'].search_count([('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
 			if temp_stock > 0:
 				raise ValidationError(_("A Temp location already exists. Uncheck this one before this operation."))

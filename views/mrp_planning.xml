@@ -52,7 +52,7 @@
 						<group>
 							<!-- <field name="team_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/> -->
 
-							<field name="plant_id" options="{'no_open': 1, 'no_create': 1}" />
+							<field name="plant_id" options="{'no_open': 1, 'no_create': 1}" invisible="1" />
 							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}" />
 							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
 							<field name="mrp_production_general_state" invisible="1" />
@@ -69,13 +69,13 @@
 								<tree editable="bottom">
 									<field name="product_id" options="{'no_create': 1, 'no_open': 1}" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" />
 									<field name="packaging_line_domain" invisible="1" />
-									<field name="packaging_line_id" domain="[('id', '=', packaging_line_domain)]" options="{'no_create': 1}" />
+									<field name="packaging_line_id" domain="[('id', 'in', packaging_line_domain)]" options="{'no_create': 1}" />
+									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
 									<field name="package" invisible="1" />
 									<field name="qty_compute" invisible="1" />
 									<field name="qty" />
 									<field name="uom_domain" invisible="1" />
 									<field name="uom_id" optional="hide" domain="[('id', 'in', uom_domain)]" options="{'no_create': 1, 'no_open': 1}" />
-									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
 									<!-- <field name="qty" /> -->
 									<field name="mrp_days" domain="[('id', 'in', parent.week_of)]" widget="many2many_tags" options="{'no_create': 1}" style="width:40%%"/>
 								</tree>
@@ -111,20 +111,21 @@
                                         <field name="name"/>
                                     </sheet>
                                 </form>
-								<tree editable="bottom" create="False">
+								<tree editable="bottom" >
 									<field name="planning_line_id" invisible="1" />
 									<field name="planning_id" invisible="1" />
 									<field name="display_type" invisible="1"/>
                                     <field name="name" widget="section_and_note_text" optional="show"/>
-									<field name="date" />
-									<field name="packaging_line_id" />
-									<!-- <field name="packaging_line_id" options="{'no_create': 1}" /> -->
+									<field name="product_id" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" />
+									<field name="packaging_line_domain" invisible="1"/>
+									<field name="packaging_line_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', packaging_line_domain)]" />
+									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
 									<field name="product_ref" />
-									<field name="product_id" />
 									<field name="package" />
 									<field name="qty" />
 									<field name="capacity" />
 									<field name="employee_number" />
+									<field name="date" />
 									<field name="state" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-bf="state == 'confirmed'" decoration-warning="state == 'progress'" decoration-success="state == 'done'" />
 									<button name="action_manage_production" type="object" title="Manage Production"  icon="fa-flask" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" />
 								</tree>

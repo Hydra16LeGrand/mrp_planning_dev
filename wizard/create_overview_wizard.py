@@ -55,7 +55,7 @@ class WizardOverview(models.TransientModel):
 				[("product_tmpl_id", "=", dl.product_id.product_tmpl_id.id)]
 			)
 			bom_id = bom_id[0]
-			temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1)])
+			temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1), ('plant_id', '=', planning.plant_id.id)])
 			if not temp_stock:
 				raise ValidationError(
 					_("No temp location find. Please configure it or contact support.")
@@ -180,7 +180,7 @@ class WizardOverview(models.TransientModel):
 
 		# Recherche de l'emplacement 'stock tampon'
 		stock_tampon_location = self.env['stock.location'].search(
-			[('temp_stock', '=', 'True')], limit=1)
+			[('temp_stock', '=', 'True'), ('plant_id', '=', self.env['mrp.planning'].browse(planning_id).plant_id.id)])
 		if not stock_tampon_location:
 			raise ValidationError(
 				_("Error during Internal Transfer creation. Cannot find 'Stock tampon' location."))
@@ -252,7 +252,7 @@ class WizardOverviewLine(models.TransientModel):
 	
 	def _compute_on_hand_qty_count(self):
 		temp_stock = self.env['stock.location'].search(
-			[('temp_stock', '=', 1)])
+			[('temp_stock', '=', 1), ('plant_id', '=', self.overview_id.planning_id.plant_id.id)])
 		if not temp_stock:
 			raise ValidationError(
 				_("No temp location found. Please configure it or contact support."))

@@ -20,12 +20,12 @@ class MrpPlanning(models.Model):
 	friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
 
 	week_days = [
-        'monday {}/{}'.format(monday.strftime('%d'), monday.month),
-        'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month),
-        'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month),
-        'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month),
-        'friday {}/{}'.format(friday.strftime('%d'), friday.month),
-    ]
+		'monday {}/{}'.format(monday.strftime('%d'), monday.month),
+		'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month),
+		'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month),
+		'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month),
+		'friday {}/{}'.format(friday.strftime('%d'), friday.month),
+	]
 
 
 	def _get_default_week_of(self):
@@ -166,6 +166,7 @@ class MrpPlanning(models.Model):
 							'product_id': section_element['product_id'].id,
 							'planning_line_id': section_element['planning_line_id'],
 							'planning_id': section_element['planning_id'],
+							'section_id': section_element['section_id'].id,
 							'qty': section_element['qty'],
 							'packaging_line_id': section_element['packaging_line_id'].id,
 							'date': date.today(),
@@ -198,6 +199,7 @@ class MrpPlanning(models.Model):
 									'name': '       ' + packaging_element['packaging_line_id'].name,
 									'product_id': packaging_element['product_id'].id,
 									'planning_line_id': packaging_element['planning_line_id'],
+									'section_id': packaging_element['section_id'].id,
 									'planning_id': packaging_element['planning_id'],
 									'qty': packaging_element['qty'],
 									'packaging_line_id': packaging_element['packaging_line_id'].id,
@@ -220,6 +222,7 @@ class MrpPlanning(models.Model):
 										'capacity': ppp_id.capacity if ppp_id else 0,
 										'packaging_line_id': value['packaging_line_id'].id,
 										'planning_line_id': value['planning_line_id'],
+										'section_id': value['section_id'].id,
 										'planning_id': value['planning_id'],
 										'employee_number': ppp_id.employee_number if ppp_id else 0,
 									} for day in value['mrp_days']])
@@ -232,6 +235,7 @@ class MrpPlanning(models.Model):
 									'name': '       ' + value['packaging_line_id'].name,
 									'product_id': value['product_id'].id,
 									'planning_line_id': value['planning_line_id'],
+									'section_id': value['section_id'].id,
 									'planning_id': value['planning_id'],
 									'qty': value['qty'],
 									'packaging_line_id': value['packaging_line_id'].id,
@@ -253,17 +257,20 @@ class MrpPlanning(models.Model):
 									'capacity': ppp_id.capacity if ppp_id else 0,
 									'packaging_line_id': value['packaging_line_id'].id,
 									'planning_line_id': value['planning_line_id'],
+									'section_id': value['section_id'].id,
 									'planning_id': value['planning_id'],
 									'employee_number': ppp_id.employee_number if ppp_id else 0,
 								} for day in value['mrp_days']])
 
 				if liste_autres_dictionnaires:
 					for element in liste_autres_dictionnaires:
+						print("Eleemnt---------------", element)
 						self.env['mrp.detail.planning.line'].create([{
 							'display_type': 'line_section',
 							'name': element['section_id'].name,
 							'product_id': element['product_id'].id,
 							'planning_line_id': element['planning_line_id'],
+							'section_id': element['section_id'].id,
 							'planning_id': element['planning_id'],
 							'qty': element['qty'],
 							'packaging_line_id': element['packaging_line_id'].id,
@@ -275,6 +282,7 @@ class MrpPlanning(models.Model):
 							'name': '       ' + element['packaging_line_id'].name,
 							'product_id': element['product_id'].id,
 							'planning_line_id': element['planning_line_id'],
+							'section_id': element['section_id'].id,
 							'planning_id': element['planning_id'],
 							'qty': element['qty'],
 							'packaging_line_id': element['packaging_line_id'].id,
@@ -295,6 +303,7 @@ class MrpPlanning(models.Model):
 							'capacity': ppp_id.capacity if ppp_id else 0,
 							'packaging_line_id': element['packaging_line_id'].id,
 							'planning_line_id': element['planning_line_id'],
+							'section_id': element['section_id'].id,
 							'planning_id': element['planning_id'],
 							'employee_number': ppp_id.employee_number if ppp_id else 0,
 						} for day in element['mrp_days']])
@@ -466,7 +475,7 @@ class MrpPlanning(models.Model):
 						"product_uom_id": line.uom_id.id,
 						"date_planned_start": datetime.combine(line.date, datetime.min.time()),
 						"packaging_line_id": line.packaging_line_id.id,
-						"section_id": line.planning_line_id.section_id.id,
+						"section_id": line.section_id.id,
 						"planning_line_id": line.planning_line_id.id,
 						"detailed_pl_id": line.id,
 						"planning_id": self.id,
@@ -560,7 +569,7 @@ class MrpPlanning(models.Model):
 
 		for detailed_planning_line in self.detailed_pl_ids:
 			if detailed_planning_line.display_type == False:
-				section = detailed_planning_line.planning_line_id.section_id
+				section = detailed_planning_line.section_id
 				packaging_line = detailed_planning_line.packaging_line_id
 
 				grouped_lines[section][packaging_line].append(detailed_planning_line)
@@ -1015,6 +1024,18 @@ class MrpDetailPlanningLine(models.Model):
 					print(
 						f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
 
+	@api.depends('product_id')
+	def _compute_packaging_line_domain(self):
+		print("Selffff", self._origin)
+		for rec in self:
+			if rec.product_id:
+				ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
+				l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
+				print("Test", l)
+				rec.packaging_line_domain = l
+			else:
+				rec.packaging_line_domain = []
+
 	date_char = fields.Char(_("Date"))
 	date = fields.Date(_("Date"), required=1)
 	product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
@@ -1036,7 +1057,9 @@ class MrpDetailPlanningLine(models.Model):
 	uom_id = fields.Many2one("uom.uom", related="planning_line_id.uom_id")
 	packaging_line_id = fields.Many2one("mrp.packaging.line", required=1, tracking=True)
 	planning_line_id = fields.Many2one("mrp.planning.line")
+	section_id = fields.Many2one("mrp.section", required=True)
 	planning_id = fields.Many2one("mrp.planning")
+	packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
 	display_type = fields.Selection(
 		selection=[
 			('line_section', "Section"),
