@@ -419,7 +419,9 @@ class MrpPlanning(models.Model):
 			'target': 'new',
 			"context": {
 				"planning_id": self.id,
-				"overview_ids": self.env["overview.wizard.line"].search([("overview_id.planning_id", "=", self.id)]).ids,
+				"overview_ids": self.env["overview.wizard"].search([("planning_id", "=", self.id)]).ids,
+				# "total_missing_qty": sum(
+				# 	self.env['rm.overview'].search([("planning_id", "=", self.id)]).mapped('missing_qty'))
 			},
 		}
 		return action
@@ -982,9 +984,6 @@ class MrpPlanninLine(models.Model):
 
 	planning_id = fields.Many2one("mrp.planning")
 
-	def unlink(self):
-		for rec in self:
-			pass
 
 
 

@@ -6,7 +6,7 @@ class StockLocationInherit(models.Model):
 	_inherit = "stock.location"
 
 	temp_stock = fields.Boolean(_("Temp location"))
-	plant_id = fields.Many2one(_("mrp.plant"), string=_("Plant"))
+	plant_id = fields.Many2one("mrp.plant", string=_("Plant"))
 
 	@api.onchange('temp_stock')
 	def _onchange_temp_stock(self):

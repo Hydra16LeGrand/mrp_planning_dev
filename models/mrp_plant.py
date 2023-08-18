@@ -23,6 +23,30 @@ class MrpPlant(models.Model):
         ('warehouse_code_uniq', 'unique(code, company_id)', 'The short name of the plant must be unique per company!'),
     ]
 
+	count_mrp_planning_draft = fields.Integer(compute='_compute_mrp_planning_count')
+	count_mrp_planning_confirm = fields.Integer(compute='_compute_mrp_planning_count')
+	count_mrp_planning = fields.Integer(compute='_compute_mrp_planning_count')
+	count_mrp_planning_generated = fields.Integer(compute='_compute_mrp_planning_count')
+	count_mrp_planning_cancel = fields.Integer(compute='_compute_mrp_planning_count')
+
+	def _compute_mrp_planning_count(self):
+		domains = {
+			'count_mrp_planning_draft': [('state', '=', 'draft')],
+			'count_mrp_planning_confirm': [('state', '=', 'confirm')],
+			'count_mrp_planning_generated': [('state', '=', '04_mo_generated')],
+			'count_mrp_planning': [('state', 'in', ('confirm', 'confirm', '04_mo_generated'))],
+			'count_mrp_planning_cancel': [('state', '=', 'cancel')],
+		}
+
+		for field in domains:
+			data = self.env['mrp.planning'].read_group(domains[field] + [('plant_id', 'in', self.ids)], ['plant_id'], ['plant_id'])
+			count = {
+				x['plant_id'][0]: x['plant_id_count']
+				for x in data if x['plant_id']
+			}
+			for record in self:
+				record[field] = count.get(record.id, 0)
+
 	@api.onchange('is_principal')
 	def _onchange_is_principal(self):
 
@@ -53,3 +77,68 @@ class MrpPlant(models.Model):
 		picking_type_id = self.env['stock.picking.type'].create(picking_type)
 
 		return res
+
+
+	def write(self, vals):
+
+		res = super(MrpPlant, self).write(vals)
+		if self:
+			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id)])
+
+			if picking_type_id:
+				if len(picking_type_id) == 1:
+					if vals.get('default_location_src_id', False):
+						picking_type_id.default_location_src_id = vals.get('default_location_src_id')
+					if vals.get('default_location_dest_id', False):
+						picking_type_id.default_location_dest_id = vals.get('default_location_dest_id')
+				else:
+					raise ValidationError(_(""))
+
+		return res
+
+	def get_mrp_planning_action(self):
+		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
+		action['context'] = {
+			'search_default_plant_id': self.id,
+		}
+		return action
+
+	def get_plant_configuration(self):
+		action = self.env.ref('mrp_planning.action_mrp_plant_conf').read()[0]
+		action['context'] = {
+			'search_default_name': self.name,
+		}
+		return action
+
+	def get_action_mrp_planning_tree_draft(self):
+		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
+		action['context'] = {
+			'search_default_plant_id': self.id,
+		}
+		action['domain'] = [('state','=','draft')]
+		return action
+
+	def get_action_mrp_planning_confirm(self):
+		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
+		action['context'] = {
+			'search_default_plant_id': self.id,
+		}
+		action['domain'] = [('state','=','confirm')]
+		return action
+
+	def get_action_mrp_planning_tree_generated(self):
+		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
+		action['context'] = {
+			'search_default_plant_id': self.id,
+		}
+		action['domain'] = [('state','=','04_mo_generated')]
+		return action
+
+	def get_action_mrp_planning_tree_cancel(self):
+		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
+		action['context'] = {
+			'search_default_plant_id': self.id,
+		}
+		action['domain'] = [('state','=','cancel')]
+		return action
+
