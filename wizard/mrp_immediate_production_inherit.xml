@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_mrp_immediate_production_form_inherit" model="ir.ui.view">
+        <field name="name">mrp.immediate.production.form</field>
+        <field name="model">mrp.immediate.production</field>
+        <field name="inherit_id" ref="mrp.view_immediate_production"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='immediate_production_line_ids']/tree/field[@name='production_id']" position="before">
+                <field name="product_id"/>
+                <field name="packaging_line_id"/>
+                <field name="section_id"/>
+                <field name="qty"/>
+            </xpath>
+            <xpath expr="//field[@name='immediate_production_line_ids']/tree/field[@name='production_id']" position="after">
+                <field name="date_planned_start"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

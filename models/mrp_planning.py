@@ -97,6 +97,17 @@ class MrpPlanning(models.Model):
 	picking_ids = fields.One2many('stock.picking', 'planning_id', string='Planning MRP', tracking=True)
 	internal_transfer_count = fields.Integer(string=_("Internal transfer count"), compute='_compute_internal_transfer_count')
 	plant_id = fields.Many2one("mrp.plant", string=_("Plant"), default=_get_default_plant, tracking=2)
+	section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
+
+	@api.depends('section_ids')
+	def _compute_section_first(self):
+		for rec in self:
+			if rec.section_ids:
+				print('yes')
+				ls = [sect.id for sect in rec.section_ids]
+				rec.section_first = ls[0]
+			else:
+				rec.section_first = False
 
 
 	def change_mrp_production_general_state_in_done(self):
@@ -972,9 +983,23 @@ class MrpPlanninLine(models.Model):
 				ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
 				l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
 				print("Test", l)
+				print('l[0] : ', l[0])
 				rec.packaging_line_domain = l
+				rec.packaging_line_id = l[0]
 			else:
 				rec.packaging_line_domain = []
+
+	# @api.depends('product_id')
+	# def _default_packaging_line_id(self):
+	# 	# Obtenez le premier élément de packaging_line_domain
+	# 	for rec in self:
+	# 		print('pppppppp')
+	# 		if rec.product_id:
+	# 			ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
+	# 			l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
+	# 			rec.packaging_line_id = l[0]
+	# 		else:
+	# 			pass
 
 	package = fields.Float(_("Package"))
 	qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
@@ -985,13 +1010,18 @@ class MrpPlanninLine(models.Model):
 	product_id = fields.Many2one("product.product", string=_("Article"), required=True)
 	uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1)
 	uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain")
-	packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
 	packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
+	packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
 	# team_id = fields.Many2one("mrp.team", tracking=True)
 	section_id = fields.Many2one("mrp.section", required=1)
 	mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
 
 	planning_id = fields.Many2one("mrp.planning")
+
+
+			# first_packaging_line = rec.packaging_line_domain[0] if rec.packaging_line_domain else False
+			# print(f'first_packaging_line : {first_packaging_line}')
+			# return first_packaging_line
 
 
 
