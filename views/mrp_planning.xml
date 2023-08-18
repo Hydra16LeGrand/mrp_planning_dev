@@ -112,11 +112,7 @@
                                         <field name="name" />
                                     </sheet>
                                 </form>
-<<<<<<< HEAD
-								<tree editable="bottom" >
-=======
 								<tree editable="bottom" create="False" limit="500">
->>>>>>> origin/joshua
 									<field name="planning_line_id" invisible="1" />
 									<field name="planning_id" invisible="1" />
 									<field name="display_type" invisible="1"/>
