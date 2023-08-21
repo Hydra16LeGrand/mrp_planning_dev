@@ -103,7 +103,7 @@ class MrpPlanning(models.Model):
 	def _compute_section_first(self):
 		for rec in self:
 			if rec.section_ids:
-				print('yes')
+
 				ls = [sect.id for sect in rec.section_ids]
 				rec.section_first = ls[0]
 			else:
@@ -111,7 +111,7 @@ class MrpPlanning(models.Model):
 
 
 	def change_mrp_production_general_state_in_done(self):
-		print('yes change')
+
 		self.mrp_production_general_state = "done"
 
 	@api.model
@@ -119,9 +119,9 @@ class MrpPlanning(models.Model):
 
 		seq_date = fields.Datetime.context_timestamp(self, fields.Datetime.to_datetime(fields.Datetime.now()))
 		vals['reference'] = self.env['ir.sequence'].next_by_code("mrp.planning", sequence_date=seq_date) or _("New")
-		print("La reference", vals['reference'])
+
 		res = super().create(vals)
-		print("Res", res)
+
 		return res
 
 	def action_confirm(self):
@@ -202,9 +202,9 @@ class MrpPlanning(models.Model):
 
 						if liste_meme_packaging_line_id:
 							for elm in liste_meme_packaging_line_id:
-								print(f'elm : {elm}')
+
 								packaging_element = elm[0]
-								print(f"packaging_element {packaging_element}")
+
 								self.env['mrp.detail.planning.line'].create([{
 									'display_type': 'line_note',
 									'name': '       ' + packaging_element['packaging_line_id'].name,
@@ -217,7 +217,7 @@ class MrpPlanning(models.Model):
 									'date': date.today(),
 								}])
 								for value in elm:
-									print(f"value : {value}")
+
 									ppp_id = self.env['mrp.packaging.pp'].search(
 										[('packaging_line_id', '=', value['packaging_line_id'].id),
 										 ('product_id', '=', value['product_id'].id)], limit=1)
@@ -240,7 +240,7 @@ class MrpPlanning(models.Model):
 
 						if liste_autres_dico:
 							for value in liste_autres_dico:
-								print(f"value de liste_autres_dico : {value}")
+
 								self.env['mrp.detail.planning.line'].create([{
 									'display_type': 'line_note',
 									'name': '       ' + value['packaging_line_id'].name,
@@ -275,7 +275,7 @@ class MrpPlanning(models.Model):
 
 				if liste_autres_dictionnaires:
 					for element in liste_autres_dictionnaires:
-						print("Eleemnt---------------", element)
+
 						self.env['mrp.detail.planning.line'].create([{
 							'display_type': 'line_section',
 							'name': element['section_id'].name,
@@ -376,9 +376,9 @@ class MrpPlanning(models.Model):
 		self.env['rm.overview'].search([('planning_id', '=', self.id)]).unlink()
 		overview_lines = []
 
-		print('before for')
+
 		for dl in self.detailed_pl_ids:
-			print(f'dl.state : {dl.state}')
+
 			if dl.state == "draft":
 				bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', dl.product_id.product_tmpl_id.id)])
 				bom_id = bom_id[0]
@@ -387,7 +387,7 @@ class MrpPlanning(models.Model):
 					raise ValidationError(_("No temp location find. Please configure it or contact support."))
 				rm_lines = []
 				# Create a line of overview for each bill of materials line's for each end product.
-				print(f'bom_id.bom_line_ids : {bom_id.bom_line_ids}')
+
 				for line in bom_id.bom_line_ids:
 					quant = self.env['stock.quant'].search([
 						('product_id', '=', line.product_id.id),
@@ -636,7 +636,7 @@ class MrpPlanning(models.Model):
 	def copy(self, default=None):
 		if default is None:
 			default = {}
-		print(f'default : {default}')
+
 		if self.planning_line_ids:
 			new_planning_line_ids = [(0, 0, {
 				'package': line.package,
@@ -653,16 +653,16 @@ class MrpPlanning(models.Model):
 				'planning_id': self.id,
 			}) for line in self.planning_line_ids]
 			default['planning_line_ids'] = new_planning_line_ids
-		print(f'default after : {default}')
+
 		return super().copy(default)
 
 	@api.onchange('scheduled_date')
 	def _onchange_scheduled_date(self):
-		print(f"self.scheduled_date : {self.scheduled_date}")
+
 		if self.scheduled_date != self.today_date:
 			iso = self.scheduled_date.isocalendar()
-			print(f"iso : {iso}")
-			print(f"iso[2] : {iso[2]}")
+
+
 			monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
 			tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
 			wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
@@ -685,25 +685,25 @@ class MrpPlanning(models.Model):
 				day_name = 'saturday {}/{}'.format(saturday.strftime('%d'), saturday.month)
 			elif iso[2] == 7:
 				day_name = 'sunday {}/{}'.format(sunday.strftime('%d'), sunday.month)
-			print(f"day_name : {day_name}")
-			print(f"self.week_of : {self.week_of}")
+
+
 
 			for day in self.week_of:
 				if day_name in day.name:
 					raise UserError(_("This day already exists in the week"))
 
 				day_iso = day.date.isocalendar()
-				print(f'day_iso : {day_iso}')
+
 				if iso.year < day_iso.year:
-					print("year")
+
 					raise UserError(_("The date must not be less than the current week's dates."))
 				elif self.scheduled_date.month < day.date.month:
-					print("month")
+
 					raise UserError(_("The date must not be less than the current week's dates."))
 				elif iso.week < day_iso.week:
 					if self.scheduled_date.month <= day.date.month:
 						if iso.year <= day_iso.year:
-							print("day")
+
 							raise UserError(_("The date must not be less than the current week's dates."))
 
 			day_in_week_of = self.env['mrp.planning.days'].search([
@@ -724,7 +724,7 @@ class MrpPlanning(models.Model):
 					'name': day_name,
 					'date': self.scheduled_date
 				})
-				print(f'day_record : {day_record}')
+
 				# Récupérer les valeurs actuelles du champ Many2many self.week_of
 				existing_week_of = self.week_of.ids
 
@@ -734,10 +734,10 @@ class MrpPlanning(models.Model):
 				# Écrire la liste mise à jour dans le champ Many2many self.week_of
 				self.week_of = [(6, 0, existing_week_of)]
 				self._get_week_of_domain(day_name)
-				print(f"self.week_of after : {self.week_of}")
+
 
 	def _get_week_of_domain(self, day_name):
-		print(f'self.week_days : {self.week_days}')
+
 		return self.week_days.append(day_name)
 
 	def view_internal_transfer(self):
@@ -765,7 +765,7 @@ class MrpPlanning(models.Model):
 				}
 
 	def unlink(self):
-		print('delete')
+
 		records_to_delete = self.filtered(lambda rec: rec.state not in ['confirm', '04_mo_generated'])
 		if records_to_delete:
 			super(MrpPlanning, records_to_delete).unlink()
@@ -802,20 +802,20 @@ class MrpPlanning(models.Model):
 		if not pls:
 			return ""
 		message = f"<p>{label} :</p><ul>"
-		print(f'pls : {pls}')
+
 		for elm in pls:
-			print(f"elm : {elm}")
+
 			product = self.env['product.product'].browse(elm['product_id'])
 			section = self.env['mrp.section'].browse(elm['section_id'])
 			packaging_line = self.env['mrp.packaging.line'].browse(elm['packaging_line_id'])
-			print(f"{product}")
+
 			message += f"<li>{product.name}, packaging line {packaging_line.name}, section {section.name}</li>"
-			print(f"message : {message}")
+
 		return message
 	
 	def write(self, vals):
 		for rec in self:
-			print(f'self.env.context : {self.env.context}')
+
 			params = self.env.context.get('params')
 			if params:
 				mrp_planning = self.env['mrp.planning'].browse(params.get('id'))
@@ -833,11 +833,11 @@ class MrpPlanning(models.Model):
 				'mrp_days': pl.mrp_days,
 				'uom_id': pl.uom_id,
 			} for pl in rec.planning_line_ids]
-			print(f"old_planning_line : {old_planning_line}")
+
 
 			super(MrpPlanning, rec).write(vals)
 
-			print(f"vals : {vals}")
+
 
 			if 'section_ids' in vals:
 				new_sect_id = [sect for val in vals['section_ids'] for sect in val[2]]
@@ -867,7 +867,7 @@ class MrpPlanning(models.Model):
 
 			if 'planning_line_ids' in vals:
 				new_pl_id = [val[1] for val in vals['planning_line_ids']]
-				print(f'new_pl_id : {new_pl_id}')
+
 				add_pl = [val[2] for val in vals['planning_line_ids'] if val[0] == 0]
 				delete_pl = [val[1] for val in vals['planning_line_ids'] if val[0] == 2]
 				update_pl = []
@@ -881,16 +881,16 @@ class MrpPlanning(models.Model):
 
 				if update_pl:
 					update_pl_id = [pl['id'] for pl in update_pl]
-					print(f'update_pl : {update_pl}')
+
 					for pl in update_pl:
-						print(f"pl : {pl['id']}")
+
 						for planning in old_planning_line:
-							print(f"planning : {planning['id']}")
+
 							if pl['id'] == planning['id']:
 
 								position = update_pl_id.index(pl['id'])
 								value = update_pl[position]['value']
-								print(f'value : {value}')
+
 								if 'product_id' in value:
 									msg = ""
 									message_to_update_pl = f"<p><b> Packaging Line {planning['packaging_line_id']['name']}, Section {planning['section_id']['name']}<em> (Planning lines)</em> : </b></p><ul>"
@@ -916,12 +916,12 @@ class MrpPlanning(models.Model):
 
 									old_day_name = [day['name'] for day in planning['mrp_days']]
 									new_day_id = [day for dy in value['mrp_days'] for day in dy[2]]
-									print(f'old_day_name : {old_day_name}')
+
 									new_day_name = []
 									for ndi in new_day_id:
 										ndi_name = self.env['mrp.planning.days'].browse(ndi)
 										new_day_name.append(ndi_name.name)
-									print(f'new_day_name : {new_day_name}')
+
 									msg += f"<li><p><b>{old_day_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_day_name}</span></b></p></li>"
 								if 'uom_id' in value:
 									new_uom = self.env['uom.uom'].browse(value['uom_id'])
@@ -965,7 +965,7 @@ class MrpPlanninLine(models.Model):
 
 	@api.depends('product_id', 'packaging_line_id')
 	def _compute_qty(self):
-		print("COmpute qtyyyyyyyyyyuk", self)
+
 		for rec in self:
 			if rec.product_id and rec.packaging_line_id:
 				ppp_id = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id), ('packaging_line_id', '=', rec.packaging_line_id.id)], limit=1)
@@ -977,15 +977,14 @@ class MrpPlanninLine(models.Model):
 
 	@api.depends('product_id')
 	def _compute_packaging_line_domain(self):
-		print("Selffff", self._origin)
+
 		for rec in self:
 			if rec.product_id:
 				ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
 				l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
-				print("Test", l)
-				print('l[0] : ', l[0])
 				rec.packaging_line_domain = l
-				rec.packaging_line_id = l[0]
+				if l:
+					rec.packaging_line_id = l[0]
 			else:
 				rec.packaging_line_domain = []
 
@@ -993,7 +992,7 @@ class MrpPlanninLine(models.Model):
 	# def _default_packaging_line_id(self):
 	# 	# Obtenez le premier élément de packaging_line_domain
 	# 	for rec in self:
-	# 		print('pppppppp')
+
 	# 		if rec.product_id:
 	# 			ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
 	# 			l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
@@ -1020,7 +1019,7 @@ class MrpPlanninLine(models.Model):
 
 
 			# first_packaging_line = rec.packaging_line_domain[0] if rec.packaging_line_domain else False
-			# print(f'first_packaging_line : {first_packaging_line}')
+
 			# return first_packaging_line
 
 
@@ -1034,40 +1033,40 @@ class MrpDetailPlanningLine(models.Model):
 			production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', rec.id)])
 			rec.state = production_id.state
 
-			print(f"rec.state : {rec.state}")
+
 			if rec.state == 'done':
 				mrp = self.env['mrp.planning'].search([
 					('id', '=', rec.planning_id.id)
 				])
 				mrp_detail_states = [detail.state for detail in mrp.detailed_pl_ids if
 									 detail.display_type == False]
-				print(f'mrp_detail_states : {mrp_detail_states}')
+
 				mrp_state = list(set(mrp_detail_states))
-				print(f'mrp_state : {mrp_state}')
+
 				if len(mrp_state) == 1:
 					# rec.planning_id.mrp_production_general_state = "done"
-					print(f"rec.planning_id.mrp_production_general_state before : {rec.planning_id.change_mrp_production_general_state_in_done}")
+
 					# rec.planning_id.write({
 					# 	'change_mrp_production_general_state_in_done': True
 					# })
 					rec.planning_id.change_mrp_production_general_state_in_done()
-					print(
+
 						f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
 
 	@api.depends('product_id')
 	def _compute_packaging_line_domain(self):
-		print("Selffff", self._origin)
+
 		for rec in self:
 			if rec.product_id:
 				ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
 				l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
-				print("Test", l)
+
 				rec.packaging_line_domain = l
 			else:
 				rec.packaging_line_domain = []
 
 	def _compute_mrp_production_id(self):
-		print("le self",self)
+
 		for line in self:
 			mrp_productions = self.env['mrp.production'].search([('detailed_pl_id', '=', line.id)]).id
 			line.mrp_production_id = mrp_productions
@@ -1110,15 +1109,15 @@ class MrpDetailPlanningLine(models.Model):
 	# @api.onchange('state')
 	# def mark_done(self):
 	# 	for rec in self:
-	# 		print(f'state : {rec.state}')
+
 	# 		if rec.state == 'done':
 	# 			mrp = self.env['mrp.planning'].search([
 	# 				('id', '=', rec.planning_id)
 	# 			])
 	# 			mrp_detail_states = [detail.state for detail in mrp.detailed_pl_ids if mrp.detailed_pl_ids.display_type == False]
-	# 			print(f'mrp_detail_states : {mrp_detail_states}')
+
 	# 			mrp_state = list(set(mrp_detail_states))
-	# 			print(f'mrp_state : {mrp_state}')
+
 
 
 	def action_manage_production(self):
