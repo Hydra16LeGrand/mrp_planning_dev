@@ -110,7 +110,6 @@ class MrpPlanning(models.Model):
                 rec.section_first = False
 
     def change_mrp_production_general_state_in_done(self):
-
         self.mrp_production_general_state = "done"
 
     @api.model
@@ -596,6 +595,10 @@ class MrpPlanning(models.Model):
             production_id.action_confirm() if production_id else False
 
         self.mrp_production_general_state = "confirm"
+        message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
+                   f"<li><p><b> Draft <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Confirmed</span></b></p></li>")
+        mrp_planning = self.env['mrp.planning'].browse(self.id)
+        mrp_planning.message_post(body=message)
         return {
             'type': 'ir.actions.client',
             'tag': 'display_notification',
@@ -760,35 +763,10 @@ class MrpPlanning(models.Model):
         else:
             raise UserError(_("You cannot delete confirmed schedules or generated schedules"))
 
-    def _get_unique_ids(self, old_ids, new_ids):
-        old_set = set(old_ids)
-        new_set = set(new_ids)
-        added = list(new_set - old_set)
-        deleted = list(old_set - new_set)
-        return added, deleted
-
-    def _get_section_message(self, sections, label):
-        if not sections:
-            return ""
-        message = f"<p>{label} :</p><ul>"
-        for elm in sections:
-            section = self.env['mrp.section'].browse(elm)
-            message += f"<li>{section.name}</li>"
-        return message
-
-    def _get_day_message(self, days, label):
-        if not days:
-            return ""
-        message = f"<p>{label} :</p><ul>"
-        for elm in days:
-            day = self.env['mrp.planning.days'].browse(elm)
-            message += f"<li>{day.name}</li>"
-        return message
-
     def _get_pl_message(self, pls, label):
         if not pls:
             return ""
-        message = f"<p>{label} :</p><ul>"
+        message = f"<p><em>(Planning line)</em> {label} :</p><ul>"
 
         for elm in pls:
             product = self.env['product.product'].browse(elm['product_id'])
@@ -876,7 +854,7 @@ class MrpPlanning(models.Model):
 
                                 if 'product_id' in value:
                                     msg = ""
-                                    message_to_update_pl = f"<p><b> Packaging Line {planning['packaging_line_id']['name']}, Section {planning['section_id']['name']}<em> (Planning lines)</em> : </b></p><ul>"
+                                    message_to_update_pl = f"<p><b><em> (Planning lines)</em> Packaging Line {planning['packaging_line_id']['name']}, Section {planning['section_id']['name']} : </b></p><ul>"
                                     new_prod = self.env['product.product'].browse(value['product_id'])
                                     msg += f"<li><p><b>{planning['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
                                     message_to_update_pl += msg
@@ -915,7 +893,7 @@ class MrpPlanning(models.Model):
                                 mrp_planning.message_post(body=message_to_update_pl)
 
                 if delete_pl:
-                    message_to_delete_pl = "<p> Planning lines removed are <em>(Planning line)</em>: </p><ul>"
+                    message_to_delete_pl = "<p><em>(Planning line)</em> Planning lines removed are : </p><ul>"
                     for dl in delete_pl:
                         for planning in old_planning_line:
                             if dl == planning['id']:
@@ -926,7 +904,6 @@ class MrpPlanning(models.Model):
                 message_to_add_pl = self._get_pl_message(add_pl, "Planning lines added to planning_line_ids are")
                 if message_to_add_pl:
                     mrp_planning.message_post(body=message_to_add_pl)
-
 
 class MrpPlanninLine(models.Model):
     _name = "mrp.planning.line"
@@ -1032,6 +1009,9 @@ class MrpDetailPlanningLine(models.Model):
                     # 	'change_mrp_production_general_state_in_done': True
                     # })
                     rec.planning_id.change_mrp_production_general_state_in_done()
+                    message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
+                               f"<li><p><b> Confirmed <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Done</span></b></p></li>")
+                    rec.planning_id.message_post(body=message)
 
                     print(
                         f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")

@@ -516,3 +516,11 @@ class ReplaceProduct(models.TransientModel):
                                 _("You can't select this product as a replacement because it doesn't have a bill of materials"))
             else:
                 raise UserError(_("There are no manufacturing orders for this product for these days."))
+
+            # post message at chatter
+            message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}, line {rec.packaging_line.name} and days : </b></p><ul>"
+            msg = ""
+            for day in rec.replacement_days:
+                msg += f"<li><p><b>{day.name}</b></p></li>"
+            message += msg
+            rec.planning_id.message_post(body=message)
