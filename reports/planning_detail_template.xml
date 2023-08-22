@@ -10,16 +10,13 @@
                             <table class="table table-sm">
                                 <tbody style="border: 1px solid black;">
                                     <tr>
-                                        <th rowspan="2" style="border: 1px solid black; width:15%">
-                                            <img src="/mrp_planning/static/src/img/logo_sivop_planning.png"/>
+                                        <th rowspan="2" style="border: 1px solid black; width: 20%; text-align: center; vertical-align: middle;">
+                                            <img src="/mrp_planning/static/src/img/logo_sivop_planning.png" style="max-width: 100%; max-height: 100%;"/>
                                         </th>
-                                        <th style="border: 1px solid black; width:65%;">
-                                            <!--                                            <p>-->
+                                        <th style="border: 1px solid black; width: 60%;">
                                             <strong>SYSTEME MANAGEMENT QUALITE</strong>
-                                            <!--                                            </p>-->
                                         </th>
-                                        <th rowspan="2" style="border: 1px solid black; width:20%;">
-                                            <!--                                            <p>-->
+                                        <th rowspan="2" style="border: 1px solid black; width: 20%; text-align: center; vertical-align: middle;">
                                             <strong>
                                                 Code :
                                                 <span t-field="o.code"/>
@@ -27,34 +24,32 @@
                                                 Planning :
                                                 <span t-field="o.reference"/>
                                             </strong>
-                                            <!--                                            </p>-->
                                         </th>
                                     </tr>
                                     <tr>
                                         <th style="border: 1px solid black;">
-                                            <!--                                            <p>-->
                                             <strong>
                                                 PROCESSUS PLANNING PRODUCTION
                                                 <br/>
                                                 PLANNING PRODUCTION
                                             </strong>
-                                            <!--                                            </p>-->
                                         </th>
                                     </tr>
                                 </tbody>
+
                             </table>
                         </div>
 
-                        <style>
-                            .no-header-repeat thead {
-                                display: table-header-group;
-                            }
-                            .no-header-repeat:not(:first-child) thead {
-                                display: none;
-                            }
-                        </style>
+<!--                        <style>-->
+<!--                            .no-header-repeat thead {-->
+<!--                                display: table-header-group;-->
+<!--                            }-->
+<!--                            .no-header-repeat:not(:first-child) thead {-->
+<!--                                display: none;-->
+<!--                            }-->
+<!--                        </style>-->
 
-                        <div style="width: 100%">
+                        <div style="width: 100%;">
                             <t t-set="result_dict" t-value="o.regroup_for_report()"/>
                             <t t-foreach="result_dict.items()" t-as="grouped_line">
                                 <div style="page-break-after:always;">
@@ -74,34 +69,51 @@
                                                 <span t-field="packaging_line.name"/>
                                             </div>
                                             <br/>
+<!--                                            <style>-->
+<!--                                                /* Masque l'en-tête du tableau sur toutes les pages sauf la première */-->
+<!--                                                .no-header-repeat thead {-->
+<!--                                                    display: none;-->
+<!--                                                }-->
 
-                                            <table class="table table-sm no-header-repeat"
+<!--                                                /* Affiche l'en-tête du tableau sur la première page */-->
+<!--                                                @media print {-->
+<!--                                                    .no-header-repeat thead:first-of-type {-->
+<!--                                                        display: table-header-group;-->
+<!--                                                    }-->
+<!--                                                }-->
+<!--                                            </style>-->
+
+
+<!--                                            <table class="table table-sm no-header-repeat"-->
+<!--                                                   name="detailled_planning"-->
+<!--                                            >-->
+                                            <table class="table table-sm"
                                                    name="detailled_planning"
                                             >
                                                 <thead>
-                                                    <tr style="border: none;  text-align:left;">
-                                                        <th style="border: none;">
+                                                    <tr style="border: none;">
+                                                        <th style="border: none; text-align:left;">
                                                             <strong>Date</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:left;">
                                                             <strong>Article</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:left;">
                                                             <strong>Désignation</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:right;">
                                                             <strong>Colis</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:right;">
                                                             <strong>Quantité</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:right;">
                                                             <strong>Contenance</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:right;">
                                                             <strong>N.E</strong>
                                                         </th>
-                                                        <th style="border: none;">
+                                                        <th style="border: none; text-align:center;">
                                                             <strong>Référence</strong>
                                                         </th>
                                                     </tr>
@@ -110,29 +122,29 @@
                                                     <t t-set="detailed_planning_lines" t-value="packaging[1]"/>
                                                     <tr t-foreach="detailed_planning_lines"
                                                         t-as="detailed_planning_line">
-                                                        <td style="border: none;">
-                                                            <span t-esc="detailed_planning_line.date.strftime('%A %m/%y')"/>
+                                                        <td style="border: none; text-align:left;">
+                                                            <span t-esc="detailed_planning_line.date.strftime('%A %d/%m')"/>
                                                         </td>
-                                                        <td style="border: none;">
+                                                        <td style="border: none; text-align:left;">
                                                             <span t-esc="detailed_planning_line.product_ref"/>
                                                         </td>
-                                                        <td style="border: none;">
+                                                        <td style="border: none; text-align:left;">
                                                             <span t-esc="detailed_planning_line.product_id.name"/>
                                                         </td>
-                                                        <td style="border: none;">
+                                                        <td style="border: none; text-align:right;">
                                                             <span t-esc="detailed_planning_line.package"/>
                                                         </td>
-                                                        <td style="border: none;">
+                                                        <td style="border: none; text-align:right;">
                                                             <span t-esc="detailed_planning_line.qty"/>
                                                         </td>
-                                                        <td style="border: none;">
+                                                        <td style="border: none; text-align:right;">
                                                             <span t-esc="detailed_planning_line.capacity"/>
                                                         </td>
-                                                        <td style="border: none;">
+                                                        <td style="border: none; text-align:right;">
                                                             <span t-esc="detailed_planning_line.employee_number"/>
                                                         </td>
-                                                        <td style="border: none;">
-                                                            <span t-esc="detailed_planning_line.employee_number"/>
+                                                        <td style="border: none; text-align:center;">
+                                                            <span t-esc="o.reference"/>
                                                         </td>
                                                     </tr>
 

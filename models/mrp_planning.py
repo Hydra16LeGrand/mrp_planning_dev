@@ -58,6 +58,7 @@ class MrpPlanning(models.Model):
         for rec in self:
             rec.internal_transfer_count = len(self.picking_ids)
 
+    @api.onchange('product_id')
     def _get_default_plant(self):
         plant_id = self.env['mrp.plant'].search([('is_principal', '=', True)])
         return plant_id.id if plant_id else False
@@ -80,7 +81,7 @@ class MrpPlanning(models.Model):
                                  default=lambda self: self.env.company.id)
     mrp_production_general_state = fields.Selection([
         ['draft', "Draft"],
-        ['confirm', "Confirmed"],
+        # ['confirm', "Confirmed"],
         ['done', "Done"],
         ['cancel', "Cancelled"],
     ], default="draft", copy=False)
@@ -335,6 +336,7 @@ class MrpPlanning(models.Model):
         else:
             production_ids.action_cancel()
 
+
         self.state = "cancel"
         self.mrp_production_general_state = "cancel"
 
@@ -487,6 +489,7 @@ class MrpPlanning(models.Model):
                     "plant_id": self.plant_id.id,
                     "location_src_id": self.plant_id.default_location_src_id.id,
                     "location_dest_id": self.plant_id.default_location_dest_id.id,
+                    "state": "confirmed",
                 })
 
         # else:
@@ -588,26 +591,26 @@ class MrpPlanning(models.Model):
         return result_dict
 
     # Action to confirm productions orders of current planning
-    def action_confirm_productions(self):
-        for dpl in self.detailed_pl_ids:
-            production_id = self.env['mrp.production'].search(
-                [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['draft']]])
-            production_id.action_confirm() if production_id else False
-
-        self.mrp_production_general_state = "confirm"
-        message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
-                   f"<li><p><b> Draft <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Confirmed</span></b></p></li>")
-        mrp_planning = self.env['mrp.planning'].browse(self.id)
-        mrp_planning.message_post(body=message)
-        return {
-            'type': 'ir.actions.client',
-            'tag': 'display_notification',
-            'params': {
-                'type': 'success',
-                'message': _("Manufacturing orders confirm with success!"),
-                'next': {'type': 'ir.actions.act_window_close'},
-            }
-        }
+    # def action_confirm_productions(self):
+    #     for dpl in self.detailed_pl_ids:
+    #         production_id = self.env['mrp.production'].search(
+    #             [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['draft']]])
+    #         production_id.action_confirm() if production_id else False
+    #
+    #     self.mrp_production_general_state = "confirm"
+    #     message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
+    #                f"<li><p><b> Draft <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Confirmed</span></b></p></li>")
+    #     mrp_planning = self.env['mrp.planning'].browse(self.id)
+    #     mrp_planning.message_post(body=message)
+    #     return {
+    #         'type': 'ir.actions.client',
+    #         'tag': 'display_notification',
+    #         'params': {
+    #             'type': 'success',
+    #             'message': _("Manufacturing orders confirm with success!"),
+    #             'next': {'type': 'ir.actions.act_window_close'},
+    #         }
+    #     }
 
     # Finish products manufacturing action
     def action_mark_productions_as_done(self):
@@ -797,7 +800,7 @@ class MrpPlanning(models.Model):
                 'mrp_days': pl.mrp_days,
                 'uom_id': pl.uom_id,
             } for pl in rec.planning_line_ids]
-
+            print(f'vals : {vals}')
             super(MrpPlanning, rec).write(vals)
 
             if 'section_ids' in vals:
@@ -905,6 +908,8 @@ class MrpPlanning(models.Model):
                 if message_to_add_pl:
                     mrp_planning.message_post(body=message_to_add_pl)
 
+
+
 class MrpPlanninLine(models.Model):
     _name = "mrp.planning.line"
     _inherit = ["mail.thread", "mail.activity.mixin"]
@@ -945,10 +950,16 @@ class MrpPlanninLine(models.Model):
                 ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
                 l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
                 rec.packaging_line_domain = l
-                if l:
-                    rec.packaging_line_id = l[0]
             else:
                 rec.packaging_line_domain = []
+
+
+    @api.onchange('product_id')
+    def _get_default_packaging_line(self):
+        ppp_id = self.env['mrp.packaging.pp'].search([('product_id', '=', self.product_id.id)], limit=1)
+        self.packaging_line_id = ppp_id.id if ppp_id else False
+
+
 
     # @api.depends('product_id')
     # def _default_packaging_line_id(self):
@@ -972,6 +983,7 @@ class MrpPlanninLine(models.Model):
     uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1)
     uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain")
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
+    packaging_line_first = fields.Many2one("mrp.packaging.line")
     packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
     # team_id = fields.Many2one("mrp.team", tracking=True)
     section_id = fields.Many2one("mrp.section", required=1)
