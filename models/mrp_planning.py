@@ -474,7 +474,7 @@ class MrpPlanning(models.Model):
                 bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
                 bom_id = bom_id[0]
                 qty = line.uom_id._compute_quantity(line.qty, bom_id.product_uom_id)
-                self.env['mrp.production'].create({
+                production = self.env['mrp.production'].create({
                     "product_id": line.product_id.id,
                     "product_ref": line.product_id.name,
                     "bom_id": bom_id.id,
@@ -489,8 +489,9 @@ class MrpPlanning(models.Model):
                     "plant_id": self.plant_id.id,
                     "location_src_id": self.plant_id.default_location_src_id.id,
                     "location_dest_id": self.plant_id.default_location_dest_id.id,
-                    "state": "confirmed",
+                    # "state": "confirmed",
                 })
+                production.action_confirm()
 
         # else:
         # 	raise ValidationError(_(""))
