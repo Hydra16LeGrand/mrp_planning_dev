@@ -79,12 +79,12 @@ class MrpPlanning(models.Model):
 
     company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
                                  default=lambda self: self.env.company.id)
-    mrp_production_general_state = fields.Selection([
-        ['draft', "Draft"],
-        # ['confirm', "Confirmed"],
-        ['done', "Done"],
-        ['cancel', "Cancelled"],
-    ], default="draft", copy=False)
+    # mrp_production_general_state = fields.Selection([
+    #     ['draft', "Draft"],
+    #     # ['confirm', "Confirmed"],
+    #     ['done', "Done"],
+    #     ['cancel', "Cancelled"],
+    # ], default="draft", copy=False)
 
     section_ids = fields.Many2many("mrp.section", string=_("Sections"), required=True, tracking=5)
     # team_ids = fields.Many2many("mrp.team", string=_("Teams"), tracking=True, required=True)
@@ -99,6 +99,7 @@ class MrpPlanning(models.Model):
                                              compute='_compute_internal_transfer_count')
     plant_id = fields.Many2one("mrp.plant", string=_("Plant"), default=_get_default_plant, tracking=2)
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
+    detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
 
     @api.depends('section_ids')
     def _compute_section_first(self):
@@ -110,8 +111,24 @@ class MrpPlanning(models.Model):
             else:
                 rec.section_first = False
 
-    def change_mrp_production_general_state_in_done(self):
-        self.mrp_production_general_state = "done"
+    @api.depends('detailed_pl_ids.state')
+    def _compute_detailed_pl_done_state(self):
+        for rec in self:
+            rec.detailed_pl_done_state = False  # Initialisez d'abord à False
+            if rec.detailed_pl_ids:
+                mrp_detail_states = [detail.state for detail in rec.detailed_pl_ids if
+                                     detail.display_type == False]
+
+                mrp_state = list(set(mrp_detail_states))
+                if len(mrp_state) == 1 and mrp_state[0] == 'done':
+                    rec.detailed_pl_done_state = True
+                    message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
+                               f"<li><p><b> Confirmed <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Done</span></b></p></li>")
+                    planning = self.env['mrp.planning'].browse(self.id)
+                    planning.message_post(body=message)
+
+        # self.env.cr.commit()
+
 
     @api.model
     def create(self, vals):
@@ -338,14 +355,14 @@ class MrpPlanning(models.Model):
 
 
         self.state = "cancel"
-        self.mrp_production_general_state = "cancel"
+        # self.mrp_production_general_state = "cancel"
 
         return True
 
     def action_draft(self):
 
         self.state = "draft"
-        self.mrp_production_general_state = "draft"
+        # self.mrp_production_general_state = "draft"
         return True
 
     # Function to obtain an overview for raw materials that will be used
@@ -554,7 +571,7 @@ class MrpPlanning(models.Model):
 
         if self.state != '04_mo_generated':
             raise ValidationError(_("You cannot replace a product when mrp orders are not generated."))
-        if self.mrp_production_general_state == 'done':
+        if self.detailed_pl_done_state:
             raise ValidationError(_("You cannot replace a product when products are manufacted."))
 
         action = {
@@ -1006,28 +1023,29 @@ class MrpDetailPlanningLine(models.Model):
             production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', rec.id)])
             rec.state = production_id.state
 
-            if rec.state == 'done':
-                mrp = self.env['mrp.planning'].search([
-                    ('id', '=', rec.planning_id.id)
-                ])
-                mrp_detail_states = [detail.state for detail in mrp.detailed_pl_ids if
-                                     detail.display_type == False]
-
-                mrp_state = list(set(mrp_detail_states))
-
-                if len(mrp_state) == 1:
+            # if rec.state == 'done':
+            #     mrp = self.env['mrp.planning'].search([
+            #         ('id', '=', rec.planning_id.id)
+            #     ])
+            #     mrp_detail_states = [detail.state for detail in mrp.detailed_pl_ids if
+            #                          detail.display_type == False]
+            #
+            #     mrp_state = list(set(mrp_detail_states))
+            #
+            #     if len(mrp_state) == 1:
                     # rec.planning_id.mrp_production_general_state = "done"
 
                     # rec.planning_id.write({
                     # 	'change_mrp_production_general_state_in_done': True
                     # })
-                    rec.planning_id.change_mrp_production_general_state_in_done()
-                    message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
-                               f"<li><p><b> Confirmed <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Done</span></b></p></li>")
-                    rec.planning_id.message_post(body=message)
+                    # rec.planning_id._compute_detailed_pl_done_state(mrp_state[0])
+                    # rec.planning_id.detailed_pl_done_state = True
+                    # rec.planning_id.write({
+                    #     'detailed_pl_done_state': True
+                    # })
 
-                    print(
-                        f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
+                    # print(
+                    #     f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
 
     @api.depends('product_id')
     def _compute_packaging_line_domain(self):

@@ -51,9 +51,9 @@ class MrpProductionInherit(models.Model):
 						rec.bom_id = bom_id
 						message = f"<p><b> <em> (Detailed planning lines)</em> {old_product_id.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{product_id.name}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
 						rec.planning_id.message_post(body=message)
-				if 'state' in vals:
-					message = f"<p><b> <em> (Detailed planning lines)</em> {old_state} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{vals['state']}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
-					rec.planning_id.message_post(body=message)
+				# if 'state' in vals:
+				# 	message = f"<p><b> <em> (Detailed planning lines)</em> {old_state} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{vals['state']}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
+				# 	rec.planning_id.message_post(body=message)
 					# for move in rec.move_raw_ids:
 					# 	for old_move in old_move_raw_ids:
 					# 		if move == old_move:
