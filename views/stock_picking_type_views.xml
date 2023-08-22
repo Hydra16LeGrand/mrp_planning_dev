@@ -34,6 +34,7 @@
 
 
     <record model="ir.actions.act_window" id="action_rm_main_factory">
+        <field name="context">{'group_by': 'location_id'}</field>
         <field name="domain">[('location_id.plant_id.is_principal', '!=', False)]</field>
         <field name="name">RM main factory</field>
         <field name="res_model">stock.quant</field>
@@ -41,6 +42,7 @@
     </record>
 
     <record model="ir.actions.act_window" id="action_rm_plastic_factory">
+        <field name="context">{'group_by': 'location_id'}</field>
         <field name="domain">[('location_id.plant_id.is_principal', '!=', True)]</field>
         <field name="name">RM plastic factory</field>
         <field name="res_model">stock.quant</field>
