@@ -230,7 +230,7 @@ class WizardOverview(models.TransientModel):
 			'tag': 'display_notification',
 			'params': {
 				'type': 'success',
-				'message': _("the internal transfer has been successfully completed"),
+				'message': _("the internal transfer has been successfully created"),
 				'next': {'type': 'ir.actions.act_window_close'},
 			}
 		}

@@ -1051,8 +1051,6 @@ class MrpDetailPlanningLine(models.Model):
 					# })
 					rec.planning_id.change_mrp_production_general_state_in_done()
 
-						f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
-
 	@api.depends('product_id')
 	def _compute_packaging_line_domain(self):
 
