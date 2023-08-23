@@ -7,6 +7,7 @@ class StockLocationInherit(models.Model):
 
 	temp_stock = fields.Boolean(_("Temp location"))
 	plant_id = fields.Many2one("mrp.plant", string=_("Plant"))
+	packaged_finished_product = fields.Boolean(string=_("Packaged finished product"))
 
 	@api.onchange('temp_stock')
 	def _onchange_temp_stock(self):
@@ -14,4 +15,19 @@ class StockLocationInherit(models.Model):
 		if self.temp_stock:
 			temp_stock = self.env['stock.location'].search_count([('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
 			if temp_stock > 0:
-				raise ValidationError(_("A Temp location already exists. Uncheck this one before this operation."))
+				raise ValidationError(_("A temp location already exists. Uncheck this one before this operation."))
+			else:
+				packaged_finished_product = self.env['stock.location'].search_count([('packaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
+				if packaged_finished_product:
+					raise ValidationError(_("This location can't be both a temp location and a packaged finished product location."))
+
+	@api.onchange('packaged_finished_product')
+	def _onchange_packaged_finished_product(self):
+		if self.packaged_finished_product:
+			packaged_finished_product = self.env['stock.location'].search_count([('packaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
+			if packaged_finished_product > 0:
+				raise ValidationError(_("A packaged finished product location already exists. Uncheck this one before this operation."))
+			else:
+				temp_stock = self.env['stock.location'].search_count([('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
+				if temp_stock:
+					raise ValidationError(_("This location can't be both a temp location and a packaged finished product location."))

@@ -8,7 +8,7 @@
 				<header>
 					<button name="action_cancel" type="object" string="Cancel" states="confirm,04_mo_generated" confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?" />
 					<button name="action_draft" type="object" string="Re-draft" states="cancel" />
-					<button name="action_confirm" type="object" string="Confirm" states="draft" class="oe_highlight" confirm="Planning lines will no longer be editable. Are you sure to do this?" />
+					<button name="action_confirm" type="object" string="DETAILED THE PLANNING" states="draft" class="oe_highlight" confirm="Planning lines will no longer be editable. Are you sure to do this?" />
 					<button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight" confirm="Are you sure to do this action ?" />
 					<button name="create_overview_wizard" type="object" string="RM Overview"
                          attrs="{'invisible': [('state','not in',('04_mo_generated','confirm'))]}"/>
