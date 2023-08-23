@@ -13,6 +13,12 @@
 					</div>
 				</button>
 			</div>
+			<xpath expr="//sheet//group//group[@name='group_extra_info']//div//field[@name='date_planned_start']" position="before">
+				<field name="detailed_pl_id" invisible="1"/>
+			</xpath>
+			<xpath expr="//sheet//group//group[@name='group_extra_info']//div//field[@name='date_planned_start']" position="attributes">
+				<attribute name="attrs">{'readonly': ['|', ('state', 'in', ['close', 'cancel']), ('detailed_pl_id', '!=', 'False')]}</attribute>
+			</xpath>
 		</field>
 	</record>
 

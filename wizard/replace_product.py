@@ -437,11 +437,11 @@ class ReplaceProduct(models.TransientModel):
     product_to_replace_domain = fields.Many2many("product.product", compute="_compute_product_to_replace_domain")
     replacement_product = fields.Many2one("product.product", string=_("Replacement product"), required=True)
     replacement_days_domain = fields.Many2many("mrp.planning.days", compute="_compute_replacement_days")
-    replacement_days = fields.Many2many("mrp.planning.days", string=_("Replacement days"), required=True)
+    replacement_days = fields.Many2many("mrp.planning.days", string=_("Replacement days"))
     line = fields.Many2one('mrp.detail.planning.line', string=_('Line to replace'), compute="_compute_line")
     line_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_line_domain")
     # line_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_line_to_replace_domain")
-    packaging_line = fields.Many2one('mrp.packaging.line', required=True, string=_('Packaging Line'))
+    packaging_line = fields.Many2one('mrp.packaging.line', string=_('Packaging Line'))
     packaging_line_domain = fields.Many2many('mrp.packaging.line', compute="_compute_packaging_line_domain")
     section = fields.Many2one('mrp.detail.planning.line', string=_('Section to replace'), required=True)
     section_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_section_to_replace_domain")
@@ -472,47 +472,107 @@ class ReplaceProduct(models.TransientModel):
                         ('id', '>', rec.line.id),
                     ])
                     # print(f'mrp_detail_line : {mrp_detail_line}')
-            else:
-                mrp_detail_line = self.env['mrp.detail.planning.line'].search([
-                    ('display_type', 'not in', ['line_section', 'line_note']),
+
+                mrp_detail_lst = [mrp.id for mrp in mrp_detail_line]
+                mrp_production = self.env['mrp.production'].sudo().search([
                     ('planning_id', '=', rec.planning_id.id),
+                    ('detailed_pl_id', 'in', mrp_detail_lst),
+                    ('state', 'not in', ['done', 'cancel'])
                 ])
-                # print(f'mrp_detail_line : {mrp_detail_line}')
+                mrp_list = [mrp for mrp in mrp_production.detailed_pl_id if any(
+                    day in mrp.date_char and mrp.product_id.id == rec.product_to_replace.id for day in day_list)]
+                production_list = [mrp for mrp in mrp_production if mrp.detailed_pl_id in mrp_list]
+                # print(f'production_list : {production_list}')
 
-            mrp_detail_lst = [mrp.id for mrp in mrp_detail_line]
-            mrp_production = self.env['mrp.production'].sudo().search([
-                ('planning_id', '=', rec.planning_id.id),
-                ('detailed_pl_id', 'in', mrp_detail_lst),
-                ('state', 'not in', ['done', 'cancel'])
-            ])
-            mrp_list = [mrp for mrp in mrp_production.detailed_pl_id if any(
-                day in mrp.date_char and mrp.product_id.id == rec.product_to_replace.id for day in day_list)]
-            production_list = [mrp for mrp in mrp_production if mrp.detailed_pl_id in mrp_list]
-            # print(f'production_list : {production_list}')
+                if production_list:
+                    for production in production_list:
+                        if production.state not in ['done', 'cancel']:
+                            for line in production.detailed_pl_id:
+                                if any(day in line.date_char for day in day_list):
+                                    line.product_id = rec.replacement_product.id
 
-            if production_list:
-                for production in production_list:
-                    if production.state not in ['done', 'cancel']:
-                        for line in production.detailed_pl_id:
-                            if any(day in line.date_char for day in day_list):
+                            bom_id = self.env["mrp.bom"].search(
+                                [('product_tmpl_id', '=', rec.replacement_product.product_tmpl_id.id)])
+                            if bom_id:
+                                old_qty = production.product_qty
+                                old_move_raw_ids = production.move_raw_ids
+                                production.bom_id = bom_id
+                                production.product_id = rec.replacement_product.id
+                                production.product_qty = old_qty
+                                for move in production.move_raw_ids:
+                                    for old_move in old_move_raw_ids:
+                                        if move == old_move:
+                                            # print(f"move.state replace product : {move.state}")
+                                            if move.state in ['draft', 'cancel']:
+                                                move.unlink()
+                            else:
+                                raise UserError(
+                                    _("You can't select this product as a replacement because it doesn't have a bill of materials"))
+                else:
+                    raise UserError(_("There are no manufacturing orders for this product for these days."))
+
+                # post message at chatter
+                message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}, line {rec.packaging_line.name} and days : </b></p><ul>"
+                msg = ""
+                for day in rec.replacement_days:
+                    msg += f"<li><p><b>{day.name}</b></p></li>"
+                message += msg
+                rec.planning_id.message_post(body=message)
+            else:
+                end_section_id = self.env['mrp.detail.planning.line'].search([
+                    ('id', '>', rec.section.id),
+                    ('display_type', '=', 'line_section'),
+                    ('planning_id', '=', rec.planning_id.id)
+                ], limit=1)
+
+                if end_section_id:
+                    mrp_detail_lines = self.env['mrp.detail.planning.line'].search([
+                        ('display_type', 'not in', ['line_section', 'line_note']),
+                        ('planning_id', '=', rec.planning_id.id),
+                        ('id', '>', rec.section.id),
+                        ('id', '<', end_section_id.id),
+                    ])
+                else:
+                    mrp_detail_lines = self.env['mrp.detail.planning.line'].search([
+                        ('display_type', 'not in', ['line_section', 'line_note']),
+                        ('planning_id', '=', rec.planning_id.id),
+                        ('id', '>', rec.section.id),
+                    ])
+                mrp_detail_lst = [mrp.id for mrp in mrp_detail_lines]
+                mrp_production = self.env['mrp.production'].sudo().search([
+                    ('planning_id', '=', rec.planning_id.id),
+                    ('detailed_pl_id', 'in', mrp_detail_lst),
+                    ('state', 'not in', ['done', 'cancel'])
+                ])
+                mrp_list = [mrp for mrp in mrp_production.detailed_pl_id if mrp.product_id.id == rec.product_to_replace.id]
+                production_list = [mrp for mrp in mrp_production if mrp.detailed_pl_id in mrp_list]
+                if production_list:
+                    for production in production_list:
+                        if production.state not in ['done', 'cancel']:
+                            for line in production.detailed_pl_id:
                                 line.product_id = rec.replacement_product.id
 
-                        bom_id = self.env["mrp.bom"].search(
-                            [('product_tmpl_id', '=', rec.replacement_product.product_tmpl_id.id)])
-                        if bom_id:
-                            old_qty = production.product_qty
-                            old_move_raw_ids = production.move_raw_ids
-                            production.bom_id = bom_id
-                            production.product_id = rec.replacement_product.id
-                            production.product_qty = old_qty
-                            for move in production.move_raw_ids:
-                                for old_move in old_move_raw_ids:
-                                    if move == old_move:
-                                        # print(f"move.state replace product : {move.state}")
-                                        if move.state in ['draft', 'cancel']:
-                                            move.unlink()
-                        else:
-                            raise UserError(
-                                _("You can't select this product as a replacement because it doesn't have a bill of materials"))
-            else:
-                raise UserError(_("There are no manufacturing orders for this product for these days."))
+                            bom_id = self.env["mrp.bom"].search(
+                                [('product_tmpl_id', '=', rec.replacement_product.product_tmpl_id.id)])
+                            if bom_id:
+                                old_qty = production.product_qty
+                                old_move_raw_ids = production.move_raw_ids
+                                production.bom_id = bom_id
+                                production.product_id = rec.replacement_product.id
+                                production.product_qty = old_qty
+                                for move in production.move_raw_ids:
+                                    for old_move in old_move_raw_ids:
+                                        if move == old_move:
+                                            # print(f"move.state replace product : {move.state}")
+                                            if move.state in ['draft', 'cancel']:
+                                                move.unlink()
+                            else:
+                                raise UserError(
+                                    _("You can't select this product as a replacement because it doesn't have a bill of materials"))
+                else:
+                    raise UserError(_("There are no manufacturing orders for this product"))
+
+                # post message at chatter
+                message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}</b></p><ul>"
+                rec.planning_id.message_post(body=message)
+
