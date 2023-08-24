@@ -36,7 +36,7 @@
         <field name="context">
             {
             'search_default_in_location':1,
-            'group_by': 'storage_category_id',
+            'search_default_storage_category': 1,
             }
         </field>
     </record>

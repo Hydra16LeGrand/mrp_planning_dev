@@ -39,7 +39,7 @@ class StockPickingTypeInherit(models.Model):
     def onchange_plant_id(self):
         if self.plant_id:
             # Empêcher toute modification future du champ plant_id
-            plant_id = self.search([('plant_id', '=', self.plant_id.id)])
+            plant_id = self.search([('plant_id', '=', self.plant_id.id), ('code', '=', self.code)])
             print("Plant", plant_id)
             if plant_id:
                 raise ValidationError(

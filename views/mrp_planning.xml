@@ -36,13 +36,6 @@
                             <field string="Supply order(s)" name="internal_transfer_count"
                                 widget="statinfo" />
                         </button>
-
-						<!-- <button name="view_rm_overview" type="object" attrs="{'invisible': [('state','in',['draft','cancel'])]}" icon="fa-pie-chart" class="oe_stat_button">
-
-							<div class="o_field_widget o_stat_info">
-								<span class="o_stat_text">RM Overview</span>
-							</div>
-						</button> -->
 					</div>
 					<div class="oe_title">
 						<h1>
@@ -210,7 +203,7 @@
 		<field name="context">{'search_default_by_plants': 1}</field>
 	</record>
 
-	<menuitem id="mrp_planning_menu" action="action_mrp_planning" parent="mrp.menu_mrp_manufacturing" sequence="2" name="MRP Planning" />
+	<!-- <menuitem id="mrp_planning_menu" action="action_mrp_planning" parent="mrp.menu_mrp_manufacturing" sequence="2" name="MRP Planning" /> -->
 	
 		
 </odoo>

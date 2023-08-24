@@ -44,7 +44,7 @@
         'views/mrp_section.xml',
         'views/mrp_team.xml',
         'views/mrp_packaging_line.xml',
-        'views/rm_overview.xml',
+        # 'views/rm_overview.xml',
         'views/stock_location_views.xml',
         'views/mrp_production_views.xml',
 
