@@ -54,18 +54,14 @@ class StockPickingTypeInherit(models.Model):
 
         print("valsget",vals.get('default_location_src_id'))
         print("le valse",vals)
-        # if self.code == 'internal':  # Vérifier le type d'opération
-        #     if vals.get('default_location_src_id'):
-        #         self.plant_id.supply_location_src_id = vals.get('default_location_src_id')
-        #     if vals.get('default_location_dest_id'):
-        #         self.plant_id.supply_location_dest_id = vals.get('default_location_dest_id')
-        #         
+        if self.code == 'internal':  # Vérifier le type d'opération
+            if vals.get('default_location_src_id'):
+                self.plant_id.supply_location_src_id = vals.get('default_location_src_id')
+            if vals.get('default_location_dest_id'):
+                self.plant_id.supply_location_dest_id = vals.get('default_location_dest_id')
+
         res = super(StockPickingTypeInherit, self).write(vals)
         return res
-
-
-# soit attentif et ecoute bien je veux que tu t'inspire de la fonction que je vais t'envoyer pour me donner la solution. je cherche a mettre a jour les emplacements source et destination. on vas dabord verifier le type d'operation si il s'agit d'un transfert interne on met a jour le emplacement source et destination de notre transfert interne
-
 
 class StockPickingInherit(models.Model):
     _inherit = "stock.picking"

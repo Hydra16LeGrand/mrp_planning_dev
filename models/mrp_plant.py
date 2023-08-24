@@ -154,7 +154,19 @@ class MrpPlant(models.Model):
 		action['context'] = {
 			'search_default_name': self.name,
 		}
+
 		return action
+
+	def picking_type_form_view(self):
+
+		return {
+			'type': 'ir.actions.act_window',
+			'res_model': 'mrp.plant',  # Modèle de l'autre vue formulaire
+			'view_mode': 'form',  # Mode d'affichage
+			'view_id': False,  # ID de la vue (laisser à False pour utiliser la vue par défaut)
+			'res_id': self.id,  # ID de l'enregistrement à afficher
+			'target': 'current',  # Ouvrir dans la fenêtre courante
+		}
 
 	def get_action_mrp_planning_tree_draft(self):
 		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
