@@ -12,3 +12,5 @@ access_overview_wizard,overview.wizard,model_overview_wizard,,1,1,1,1
 access_overview_wizard_line,overview.wizard.line,model_overview_wizard_line,,1,1,1,1
 access_replace_product,replace.product,model_replace_product,,1,1,1,1
 access_mrp_plant,access.mrp.plant,model_mrp_plant,,1,1,1,1
+access_create_picking_finished_product,access.create.picking.finished.product,model_create_picking_finished_product,,1,1,1,1
+access_wizard_finished_product_line,access.wizard.finished.product.line,model_wizard_finished_product_line,,1,1,1,1
