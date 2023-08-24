@@ -164,8 +164,10 @@ class WizardOverview(models.TransientModel):
 
 		# Recherche le type de transfert 'internal'
 		picking_type = self.env['stock.picking.type'].search(
-			[('code', '=', 'internal')], order="id desc")
-		print('le picking ', picking_type.name)
+			[('code', '=', 'internal'), ('plant_id', '=', planning.plant_id.id)])
+		if len(picking_type) !=1:
+			raise ValidationError(
+				_("Error during Delivery Note creation. Cannot find operation type. Contact support."))
 
 		# Recherche des bons de livraison existants liés au planning
 		existing_pickings = self.env['stock.picking'].search([
@@ -174,10 +176,6 @@ class WizardOverview(models.TransientModel):
 		])
 		# Annule les bons de livraison existants
 		existing_pickings.action_cancel()
-
-		if not picking_type:
-			raise ValidationError(
-				_("Error during Delivery Note creation. Cannot find operation type. Contact support."))
 
 		# Recherche de l'emplacement 'stock tampon'
 		stock_tampon_location = self.env['stock.location'].search(

@@ -364,82 +364,6 @@ class MrpPlanning(models.Model):
         # self.mrp_production_general_state = "draft"
         return True
 
-    # Function to obtain an overview for raw materials that will be used
-    def view_rm_overview(self):
-
-        # Verif if products of planning have a bill of material
-        verif_bom = self.verif_bom()
-        # Verif if products of planning have all qty informations necessary
-        verif_product_proportion = self.verif_product_proportion()
-        if verif_bom:
-            raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
-        if verif_product_proportion:
-            raise ValidationError(
-                _("No quantity found for %s in %s" % (verif_product_proportion[0], verif_product_proportion[1])))
-        action = {
-            "name": "Raw material to use",
-            "res_model": "rm.overview",
-            "type": "ir.actions.act_window",
-            "view_mode": "tree",
-            "view_id": self.env.ref("mrp_planning.rm_overview_tree").id,
-        }
-
-        # Delete old overview informations
-        self.env['rm.overview'].search([('planning_id', '=', self.id)]).unlink()
-        overview_lines = []
-
-        for dl in self.detailed_pl_ids:
-
-            if dl.state == "draft":
-                bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', dl.product_id.product_tmpl_id.id)])
-                bom_id = bom_id[0]
-                temp_stock = self.env['stock.location'].search(
-                    [('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
-                if not temp_stock:
-                    raise ValidationError(_("No temp location find. Please configure it or contact support."))
-                rm_lines = []
-                # Create a line of overview for each bill of materials line's for each end product.
-
-                for line in bom_id.bom_line_ids:
-                    quant = self.env['stock.quant'].search([
-                        ('product_id', '=', line.product_id.id),
-                        ('location_id', '=', temp_stock.id)
-                    ])
-                    # Convert qty about unit of measure. Because of each raw material can have a different unit of measure for bom and storage(same categorie)
-                    on_hand_qty = quant.product_uom_id._compute_quantity(quant.available_quantity, line.product_uom_id)
-                    rm_lines = self.env['rm.overview'].create([{
-                        'product_id': line.product_id.id,
-                        'required_qty': dl.qty * line.product_qty,
-                        # 'on_hand_qty': on_hand_qty,
-                        'uom_id': line.product_uom_id.id,
-                        'bom_id': bom_id.id,
-                        'detail_line_id': dl.id,
-                    }])
-
-        # Delete duplicate lines and accumulate all of products required_qty
-        overview_lines = self.env['rm.overview'].search([('planning_id', '=', self.id)])
-        product_use_ids = []
-        overview_to_unlink = []
-        for overview in overview_lines:
-            if not overview.product_id.id in product_use_ids:
-                product_use_ids.append(overview.product_id.id)
-                ov_by_products = overview_lines.filtered(lambda self: self.product_id.id == overview.product_id.id)
-                required_qty = 0
-                for line in ov_by_products:
-                    required_qty += line.required_qty
-
-                overview.bom_ids = [ov.bom_id.id for ov in ov_by_products]
-                overview.required_qty = required_qty
-                overview.missing_qty = overview.required_qty - overview.on_hand_qty if overview.on_hand_qty < overview.required_qty else 0
-            else:
-                overview_to_unlink.append(overview)
-
-        for ov in overview_to_unlink:
-            ov.unlink()
-
-        action["domain"] = [('planning_id', '=', self.id)]
-        return action
-
     def create_overview_wizard(self):
 
         action = {
@@ -480,10 +404,11 @@ class MrpPlanning(models.Model):
 
         # Verif if products of planning have a bill of material
         verif_bom = self.verif_bom()
+        picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.plant_id.id), ('code', '=', 'mrp_operation')])
         if verif_bom:
             raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
-        if not self.plant_id.default_location_src_id or not self.plant_id.default_location_dest_id:
-            raise ValidationError(_(f"Please configure {self.plant_id.name} locations before this action."))
+        if not picking_type_id.default_location_src_id or not picking_type_id.default_location_dest_id:
+            raise ValidationError(_(f"Please configure the picking type '{picking_type_id.name}' locations before this action."))
         # if self.mrp_production_general_state == "draft":
         for line in self.detailed_pl_ids:
             if line.display_type == False:
@@ -503,8 +428,8 @@ class MrpPlanning(models.Model):
                     "detailed_pl_id": line.id,
                     "planning_id": self.id,
                     "plant_id": self.plant_id.id,
-                    "location_src_id": self.plant_id.default_location_src_id.id,
-                    "location_dest_id": self.plant_id.default_location_dest_id.id,
+                    "location_src_id": picking_type_id.default_location_src_id.id,
+                    "location_dest_id": picking_type_id.default_location_dest_id.id,
                     # "state": "confirmed",
                 })
                 production.action_confirm()
@@ -751,37 +676,15 @@ class MrpPlanning(models.Model):
 
         return self.week_days.append(day_name)
 
-    def view_internal_transfer(self):
-        internal_transfer = self.env["stock.picking"].search(
-            [("picking_type_code", "=", "internal"), ("planning_id", "=", self.id)]
-        )
-
-        if internal_transfer:
-            if len(internal_transfer) == 1:
-                return {
-                    "type": "ir.actions.act_window",
-                    "res_model": "stock.picking",
-                    "res_id": internal_transfer.id,
-                    "view_mode": "form",
-                    "target": "current",
-                }
-            else:
-                return {
-                    "type": "ir.actions.act_window",
-                    "res_model": "stock.picking",
-                    "view_mode": "tree,form",
-                    "name": _("List of supply orders"),
-                    "domain": [("id", "in", internal_transfer.ids)],
-                    "target": "current",
-                }
-
     def unlink(self):
 
         records_to_delete = self.filtered(lambda rec: rec.state not in ['confirm', '04_mo_generated'])
         if records_to_delete:
-            super(MrpPlanning, records_to_delete).unlink()
+            res = super(MrpPlanning, records_to_delete).unlink()
         else:
             raise UserError(_("You cannot delete confirmed schedules or generated schedules"))
+
+        return res
 
     def _get_pl_message(self, pls, label):
         if not pls:
@@ -818,7 +721,7 @@ class MrpPlanning(models.Model):
                 'uom_id': pl.uom_id,
             } for pl in rec.planning_line_ids]
             print(f'vals : {vals}')
-            super(MrpPlanning, rec).write(vals)
+            res = super(MrpPlanning, rec).write(vals)
 
             if 'section_ids' in vals:
                 new_sect_id = [sect for val in vals['section_ids'] for sect in val[2]]
@@ -925,6 +828,7 @@ class MrpPlanning(models.Model):
                 if message_to_add_pl:
                     mrp_planning.message_post(body=message_to_add_pl)
 
+        return res
 
 
 class MrpPlanninLine(models.Model):

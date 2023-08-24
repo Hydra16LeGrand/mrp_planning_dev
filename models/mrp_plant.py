@@ -23,17 +23,29 @@ class MrpPlant(models.Model):
 			rec.picking_type_internal = picking_type_internal[0].id if picking_type_internal else False
 			print("le picking", rec.picking_type_internal.id)
 
+	def _compute_plant_mrp_locations(self):
+		for rec in self:
+			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', rec.id), ('code','=', 'mrp_operation')])
+			rec.default_location_src_id = picking_type_id.default_location_src_id.id if picking_type_id else False
+			rec.default_location_dest_id = picking_type_id.default_location_dest_id.id if picking_type_id else False
+
+	def _compute_plant_supply_locations(self):
+		for rec in self:
+			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', rec.id), ('code','=', 'internal')])
+			rec.supply_location_src_id = picking_type_id.default_location_src_id.id if picking_type_id else False
+			rec.supply_location_dest_id = picking_type_id.default_location_dest_id.id if picking_type_id else False
+
 
 	name = fields.Char(_("Name"), required=1)
 	code = fields.Char(_("Short name"), required=1)
 	company_id = fields.Many2one("res.company", _("Company"), default=lambda self: self.env.company, required=1)
 	is_principal = fields.Boolean(_("Principal plant"), unique=True)
-	default_location_src_id = fields.Many2one("stock.location", string=_("Default components location"))
-	default_location_dest_id = fields.Many2one("stock.location", string=_("Default finished products location"))
+	default_location_src_id = fields.Many2one("stock.location", string=_("Default components location"), compute="_compute_plant_mrp_locations")
+	default_location_dest_id = fields.Many2one("stock.location", string=_("Default finished products location"), compute="_compute_plant_mrp_locations")
 	picking_type_id = fields.Many2one('stock.picking.type', 'Type of operation', compute='_compute_picking_type')
 	picking_type_internal = fields.Many2one('stock.picking.type', 'Type of operation', compute='_compute_picking_type_internal')
-	supply_location_src_id = fields.Many2one("stock.location", string=_("Default supply location"))
-	supply_location_dest_id = fields.Many2one("stock.location", string=_("Default supply destination location"))
+	supply_location_src_id = fields.Many2one("stock.location", string=_("Default supply location"), compute="_compute_plant_supply_locations")
+	supply_location_dest_id = fields.Many2one("stock.location", string=_("Default supply destination location"), compute="_compute_plant_supply_locations")
 
 	_sql_constraints = [
         ('warehouse_code_uniq', 'unique(code, company_id)', 'The short name of the plant must be unique per company!'),
@@ -74,69 +86,61 @@ class MrpPlant(models.Model):
 
 
 
-	@api.model
-	def create(self, vals):
+	# @api.model
+	# def create(self, vals):
 
-		# Create a picking type for this plant
-		picking_type = {
-			'name': _(f"{vals.get('name')} manufacturing"),
-			'code': "mrp_operation",
-			'sequence_code': "MO",
-			'default_location_src_id': vals.get('default_location_src_id', False),
-			'default_location_dest_id': vals.get('default_location_dest_id', False),
-		}
+	# 	# Create a picking type for this plant
+	# 	picking_type = {
+	# 		'name': _(f"{vals.get('name')} manufacturing"),
+	# 		'code': "mrp_operation",
+	# 		'sequence_code': "MO",
+	# 		'default_location_src_id': vals.get('default_location_src_id', False),
+	# 		'default_location_dest_id': vals.get('default_location_dest_id', False),
+	# 	}
 
-		# picking_type_internal = {
-		# 	'name': _(f"{vals.get('name')} supply"),
-		# 	'code': "internal",
-		# 	'sequence_code': "IT",
-		# 	'default_location_src_id': vals.get('supply_location_src_id', False),
-		# 	'default_location_dest_id': vals.get('supply_location_desc_id', False),
-		# }
+	# 	res = super().create(vals)
 
-		res = super().create(vals)
+	# 	picking_type['plant_id'] = res.id
+	# 	# picking_type_internal['plant_id'] = res.id
 
-		picking_type['plant_id'] = res.id
-		# picking_type_internal['plant_id'] = res.id
+	# 	picking_type_id = self.env['stock.picking.type'].create(picking_type)
+	# 	# picking_type_id = self.env['stock.picking.type'].create(picking_type_internal)
 
-		picking_type_id = self.env['stock.picking.type'].create(picking_type)
-		# picking_type_id = self.env['stock.picking.type'].create(picking_type_internal)
-
-		return res
+	# 	return res
 
 
-	def write(self, vals):
+	# def write(self, vals):
 
-		res = super(MrpPlant, self).write(vals)
-		if self:
-			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id),('code','=','mrp_operation')])
+	# 	res = super(MrpPlant, self).write(vals)
+	# 	if self:
+	# 		picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id),('code','=','mrp_operation')])
 
-			if picking_type_id:
-				if len(picking_type_id) == 1:
-					if vals.get('default_location_src_id', False):
-						picking_type_id.default_location_src_id = vals.get('default_location_src_id')
-					if vals.get('default_location_dest_id', False):
-						picking_type_id.default_location_dest_id = vals.get('default_location_dest_id')
-				else:
-					raise ValidationError(_(""))
+	# 		if picking_type_id:
+	# 			if len(picking_type_id) == 1:
+	# 				if vals.get('default_location_src_id', False):
+	# 					picking_type_id.default_location_src_id = vals.get('default_location_src_id')
+	# 				if vals.get('default_location_dest_id', False):
+	# 					picking_type_id.default_location_dest_id = vals.get('default_location_dest_id')
+	# 			else:
+	# 				raise ValidationError(_(""))
 
-		if self:
-			picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', self.id), ('code','=','internal')])
-			print("le picking_type_internal", picking_type_internal.name)
-			print("le vals", vals)
-			print("le valget ",vals.get('supply_location_src_id'))
-			if picking_type_internal:
-				if len(picking_type_internal) == 1:
-					if vals.get('supply_location_src_id', False):
-						picking_type_internal.default_location_src_id = vals.get('supply_location_src_id')
+	# 	if self:
+	# 		picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', self.id), ('code','=','internal')])
+	# 		print("le picking_type_internal", picking_type_internal.name)
+	# 		print("le vals", vals)
+	# 		print("le valget ",vals.get('supply_location_src_id'))
+	# 		if picking_type_internal:
+	# 			if len(picking_type_internal) == 1:
+	# 				if vals.get('supply_location_src_id', False):
+	# 					picking_type_internal.default_location_src_id = vals.get('supply_location_src_id')
 
-					if vals.get('supply_location_dest_id', False):
-						picking_type_internal.default_location_dest_id = vals.get('supply_location_dest_id')
+	# 				if vals.get('supply_location_dest_id', False):
+	# 					picking_type_internal.default_location_dest_id = vals.get('supply_location_dest_id')
 
-				else:
-					raise ValidationError(_(""))
+	# 			else:
+	# 				raise ValidationError(_(""))
 
-		return res
+	# 	return res
 
 	def get_mrp_planning_action(self):
 		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]

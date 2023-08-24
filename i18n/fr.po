@@ -1,0 +1,1715 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* mrp_planning
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0+e\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-08-21 17:55+0000\n"
+"PO-Revision-Date: 2023-08-24 15:49+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.3.2\n"
+
+#. module: mrp_planning
+#: model:ir.actions.report,print_report_name:mrp_planning.action_report_planning_details
+msgid "'Planning Details - %s' % (object.reference)"
+msgstr "'Détails de planification - %s' % (objet.référence)"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid ""
+"<br/>\n"
+"                                                Planning :"
+msgstr ""
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
+msgid "<i class=\"fa fa-gear\" role=\"img\" aria-label=\"Manage\" title=\"Manage\"/>"
+msgstr "<i class=\"fa fa-gear\" role=\"img\" aria-label=\"Gérer\" title=\"Gérer\"/>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "<span class=\"o_stat_text\">Mrp orders</span>"
+msgstr "<span class=\"o_stat_text\">Commandes MRP</span>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_production_form_view_inherit
+msgid "<span class=\"o_stat_text\">Planning</span>"
+msgstr "<span class=\"o_stat_text\">Planification</span>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid ""
+"<strong>\n"
+"                                                PROCESSUS PLANNING PRODUCTION\n"
+"                                                <br/>\n"
+"                                                PLANNING PRODUCTION\n"
+"                                            </strong>"
+msgstr ""
+"<strong>\n"
+" PROCESSUS PLANIFICATION PRODUCTION\n"
+" <br/>\n"
+" PLANIFIER LA PRODUCTION\n"
+" </strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Article</strong>"
+msgstr "<strong>Article</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Colis</strong>"
+msgstr "<strong>Colis</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Contenance</strong>"
+msgstr "<strong>Contenance</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Date</strong>"
+msgstr "<strong>Date</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Désignation</strong>"
+msgstr "<strong>Désignation</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>N.E</strong>"
+msgstr "<strong>N.E</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Quantité</strong>"
+msgstr "<strong>Quantité</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>Référence</strong>"
+msgstr "<strong>Référence</strong>"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "<strong>SYSTEME MANAGEMENT QUALITE</strong>"
+msgstr "<strong>QUALITE DE GESTION DU SYSTEME</strong>"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/stock_location.py:0
+#, python-format
+msgid "A Temp location already exists. Uncheck this one before this operation."
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_needaction
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_needaction
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_needaction
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_needaction
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_needaction
+msgid "Action Needed"
+msgstr "Action nécessaire"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_ids
+msgid "Activities"
+msgstr "Activités"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_exception_decoration
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_exception_decoration
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_exception_decoration
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_exception_decoration
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_exception_decoration
+msgid "Activity Exception Decoration"
+msgstr "Décoration d'exception d'activité"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_state
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_state
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_state
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_state
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_state
+msgid "Activity State"
+msgstr "État d'activité"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_type_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_type_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_type_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_type_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_type_icon
+msgid "Activity Type Icon"
+msgstr "Icône du type d'activité"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__scheduled_date
+#, python-format
+msgid "Add a date"
+msgstr "Ajouter une date"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
+msgid "All previous internal transfer will be canceled, are you sure to do this operation ?"
+msgstr ""
+"Tous les transferts internes précédents seront annulés, êtes-vous sûr de le faire opération ?"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "All productions orders will be in confirmed state. Proceed?"
+msgstr "Toutes les commandes de production seront dans un état confirmé. Procéder?"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
+msgid "Annuler"
+msgstr "Cancel"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Are you sure to do this action ?"
+msgstr "Es-tu sûr de faire cette action ?"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_production.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__product_ref
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__product_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__product_ref
+#, python-format
+msgid "Article"
+msgstr "Article"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_attachment_count
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_attachment_count
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_attachment_count
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_attachment_count
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_attachment_count
+msgid "Attachment Count"
+msgstr "Nombre de pièces jointes"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_bom
+msgid "Bill of Material"
+msgstr "Nomenclature"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_bom_line
+msgid "Bill of Material Line"
+msgstr "Ligne de nomenclature"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__bom_id
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__bom_id
+#, python-format
+msgid "Bill of material"
+msgstr "Nomenclature"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__bom_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__bom_ids
+#, python-format
+msgid "Bill of materials"
+msgstr "Nomenclature"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "CONFIRM PRODUCTION ORDERS"
+msgstr "CONFIRMER LES ORDRES DE PRODUCTION"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_search
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
+#: model_terms:ir.ui.view,arch_db:mrp_planning.replace_product_form
+msgid "Cancel"
+msgstr "Annuler"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__cancel
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__mrp_production_general_state__cancel
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__state__cancel
+msgid "Cancelled"
+msgstr "Annulé"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_bom.py:0 code:addons/mrp_planning/models/mrp_production.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_bom__capacity
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__capacity
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__capacity
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__capacity
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#, python-format
+msgid "Capacity"
+msgstr "Capacité"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__uom_category_id
+msgid "Category"
+msgstr "Catégorie"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__code
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__code
+#, python-format
+msgid "Code"
+msgstr "Code"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "Code :"
+msgstr "Code :"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_plant.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__company_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__company_id
+#, python-format
+msgid "Company"
+msgstr "Entreprise"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_search
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
+#: model_terms:ir.ui.view,arch_db:mrp_planning.replace_product_form
+msgid "Confirm"
+msgstr "Confirmer"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__confirmed
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__mrp_production_general_state__confirm
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__state__confirm
+msgid "Confirmed"
+msgstr "Confirmé"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_pp__uom_category_id
+msgid ""
+"Conversion between Units of Measure can only occur if they belong to the same category. The "
+"conversion will be made based on the ratios."
+msgstr ""
+"La conversion entre les unités de mesure ne peut se produire que si elles appartiennent au même "
+"catégorie. La conversion sera faite en fonction des ratios."
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning
+msgid "Count Mrp Planning"
+msgstr "Compter la planification Mrp"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning_cancel
+msgid "Count Mrp Planning Cancel"
+msgstr "Compter Mrp Planning Annuler"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning_confirm
+msgid "Count Mrp Planning Confirm"
+msgstr "Compter Mrp Planning Confirmer"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning_draft
+msgid "Count Mrp Planning Draft"
+msgstr "Compter le projet de planification Mrp"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning_generated
+msgid "Count Mrp Planning Generated"
+msgstr "Compter la planification Mrp générée"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.rm_overview_tree
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
+msgid "Create Internal Transfer"
+msgstr "Créer un transfert interne"
+
+#. module: mrp_planning
+#: model_terms:ir.actions.act_window,help:mrp_planning.stock_picking_type_action_inherit
+msgid "Create a new operation type"
+msgstr "Créer un nouveau type d'opération"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__create_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__create_uid
+msgid "Created by"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__create_date
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__create_date
+msgid "Created on"
+msgstr "Créé sur"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/mrp_immediate_production_inherit.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__date_char
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_immediate_production_line__date_planned_start
+#, python-format
+msgid "Date"
+msgstr "Date"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__name
+msgid "Day"
+msgstr "Jour"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_plant.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__default_location_src_id
+#, python-format
+msgid "Default components location"
+msgstr "Emplacement des composants par défaut"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_plant.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__default_location_dest_id
+#, python-format
+msgid "Default finished products location"
+msgstr "Default finished products location"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__detail_line_id
+msgid "Detail Line"
+msgstr "Ligne de détail"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: code:addons/mrp_planning/models/mrp_production.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__detailed_pl_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__detailed_pl_id
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#, python-format
+msgid "Detailed planning lines"
+msgstr "Lignes de planification détaillées"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__display_name
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__display_name
+msgid "Display Name"
+msgstr "Afficher un nom"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__display_type
+msgid "Display Type"
+msgstr "Type d'affichage"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__done
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__mrp_production_general_state__done
+msgid "Done"
+msgstr "Fait"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__draft
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__mrp_production_general_state__draft
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__state__draft
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_search
+msgid "Draft"
+msgstr "Brouillon"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__product_id
+msgid "Désignation"
+msgstr "Désignation"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: code:addons/mrp_planning/models/mrp_production.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__employee_number
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__employee_number
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__employee_number
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__employee_number
+#, python-format
+msgid "EN"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_hr_employee
+msgid "Employee"
+msgstr "Employé"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Employee Number"
+msgstr "Numéro d'employé"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_team.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__employee_ids
+#, python-format
+msgid "Employees"
+msgstr "Employés"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "Error during Delivery Note creation. Cannot find operation type. Contact support."
+msgstr ""
+"Erreur lors de la création du bon de livraison. Impossible de trouver le type d'opération. Contact "
+"soutien."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "Error during Internal Transfer creation. Cannot find 'Stock tampon' location."
+msgstr "Error during Internal Transfer creation. Cannot find 'Stock tampon' location."
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_follower_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_follower_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_follower_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_follower_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_follower_ids
+msgid "Followers"
+msgstr "Suiveurs"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_partner_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_partner_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_partner_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_partner_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_partner_ids
+msgid "Followers (Partners)"
+msgstr "Abonnés (Partenaires)"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__activity_type_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__activity_type_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__activity_type_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__activity_type_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__activity_type_icon
+msgid "Font awesome icon e.g. fa-tasks"
+msgstr "Icône géniale de police, par ex. fa-tâches"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__date
+msgid "Full Date"
+msgstr "Date complète"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_search
+msgid "Generate"
+msgstr "Générer"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Generate MO"
+msgstr "Générer un ordre de fabrication"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
+msgid "Generated"
+msgstr "Généré"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_detail_planning_line_search
+msgid "Group By"
+msgstr "Par groupe"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_search
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_stock_location_search_inherit
+msgid "Group by"
+msgstr "Par groupe"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__has_message
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__has_message
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__has_message
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__has_message
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__has_message
+msgid "Has Message"
+msgstr "A un message"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__id
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__id
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__id
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__id
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__id
+msgid "ID"
+msgstr "ID"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_exception_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_exception_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_exception_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_exception_icon
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_exception_icon
+msgid "Icon"
+msgstr "Icône"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__activity_exception_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__activity_exception_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__activity_exception_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__activity_exception_icon
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__activity_exception_icon
+msgid "Icon to indicate an exception activity."
+msgstr "Icône pour indiquer une activité d'exception."
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__message_needaction
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__message_needaction
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__message_needaction
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__message_needaction
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__message_needaction
+msgid "If checked, new messages require your attention."
+msgstr "Si cette case est cochée, de nouveaux messages nécessitent votre attention."
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__message_has_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__message_has_sms_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__message_has_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__message_has_sms_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__message_has_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__message_has_sms_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__message_has_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__message_has_sms_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__message_has_error
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__message_has_sms_error
+msgid "If checked, some messages have a delivery error."
+msgstr "Si cette case est cochée, certains messages présentent une erreur de livraison."
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_immediate_production
+msgid "Immediate Production"
+msgstr "Fabrication immédiate"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_immediate_production_line
+msgid "Immediate Production Line"
+msgstr "Ligne de fabrication immédiate"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__progress
+msgid "In progress"
+msgstr "En cours"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__internal_transfer_count
+#, python-format
+msgid "Internal transfer count"
+msgstr "Nombre de transferts internes"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_stock_location
+msgid "Inventory Locations"
+msgstr "Emplacements de stock"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_is_follower
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_is_follower
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_is_follower
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_is_follower
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_is_follower
+msgid "Is Follower"
+msgstr "Est suiveur"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product____last_update
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview____last_update
+msgid "Last Modified on"
+msgstr "Dernière modification le"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__write_uid
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__write_uid
+msgid "Last Updated by"
+msgstr "Dernière mise à jour par"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_days__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__write_date
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__write_date
+msgid "Last Updated on"
+msgstr "Dernière mise à jour le"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "Ligne de Conditionnement :"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__line_domain
+msgid "Line Domain"
+msgstr "Domaine de ligne"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__line
+#, python-format
+msgid "Line to replace"
+msgstr "Ligne à remplacer"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_stock_location_search_inherit
+msgid "Location Type"
+msgstr "Type de lieu"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_form
+msgid "Locations"
+msgstr "Emplacements"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "MARK PO AS DONE"
+msgstr "MARQUER PO COMME FAIT"
+
+#. module: mrp_planning
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_planning
+#: model:ir.ui.menu,name:mrp_planning.mrp_planning_menu
+msgid "MRP Planning"
+msgstr "Planning de fabrication"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_main_attachment_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_main_attachment_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_main_attachment_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_main_attachment_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_main_attachment_id
+msgid "Main Attachment"
+msgstr "Pièce jointe principale"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Manage Production"
+msgstr "Gérer la production"
+
+#. module: mrp_planning
+#: model:ir.actions.act_window,name:mrp_planning.stock_picking_type_action_inherit
+msgid "Manufacturing Overview"
+msgstr "Présentation de la fabrication"
+
+#. module: mrp_planning
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_plant_conf
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_plant_dashboard
+msgid "Manufacturing plant"
+msgstr "Usine de fabrication"
+
+#. module: mrp_planning
+#: model:ir.ui.menu,name:mrp_planning.mrp_plant_menu_conf
+msgid "Manufacturing plants"
+msgstr "Usines de fabrication"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__capacity
+#, python-format
+msgid "Max capacity per day"
+msgstr "Capacité maximale par jour"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_has_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_has_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_has_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_has_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_has_error
+msgid "Message Delivery error"
+msgstr "Erreur de livraison du message"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_ids
+msgid "Messages"
+msgstr "Messages"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__missing_qty
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__missing_qty
+#, python-format
+msgid "Missing qty"
+msgstr "Quantité manquante"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__state__04_mo_generated
+msgid "Mo generate"
+msgstr "Ordre de fabrication généré"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__mrp_days
+msgid "Mrp Days"
+msgstr "Journées de fabrication"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__mrp_production_id
+msgid "Mrp Production"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__mrp_production_general_state
+msgid "Mrp Production General State"
+msgstr "Mrp Production Etat général"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__mrp_production_ids
+#, python-format
+msgid "Mrp orders"
+msgstr "Commandes de fabrication"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_packaging_pp
+msgid "Mrp packaging product proportion"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__my_activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__my_activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__my_activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__my_activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__my_activity_date_deadline
+msgid "My Activity Deadline"
+msgstr "Date limite de mon activité"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: code:addons/mrp_planning/models/mrp_plant.py:0 code:addons/mrp_planning/models/mrp_section.py:0
+#: code:addons/mrp_planning/models/mrp_team.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__name
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__name
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_packaging_line_form
+#, python-format
+msgid "Name"
+msgstr "Nom"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#, python-format
+msgid "New"
+msgstr "Nouveau"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_date_deadline
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_date_deadline
+msgid "Next Activity Deadline"
+msgstr "Date limite de la prochaine activité"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_summary
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_summary
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_summary
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_summary
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_summary
+msgid "Next Activity Summary"
+msgstr "Résumé de l'activité suivante"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_type_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_type_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_type_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_type_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_type_id
+msgid "Next Activity Type"
+msgstr "Type d'activité suivant"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "No bill of material find for %s. Please create a one."
+msgstr "Aucune nomenclature trouvée pour %s. Veuillez en créer un."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "No planning ID found in the context."
+msgstr "Aucun ID de planification trouvé dans le contexte."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "No quantity found for %s in %s"
+msgstr "Aucune quantité trouvée pour %s dans %s"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "No temp location find. Please configure it or contact support."
+msgstr "Aucun emplacement temporaire trouvé. Veuillez le configurer ou contacter le support."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "No temp location found. Please configure it or contact support."
+msgstr "Aucun emplacement temporaire trouvé. Veuillez le configurer ou contacter l'assistance."
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__display_type__line_note
+msgid "Note"
+msgstr "Note"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_team.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__number
+#, python-format
+msgid "Number"
+msgstr "Nombre"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_needaction_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_needaction_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_needaction_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_needaction_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_needaction_counter
+msgid "Number of Actions"
+msgstr "Nombre d'actions"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_has_error_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_has_error_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_has_error_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_has_error_counter
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_has_error_counter
+msgid "Number of errors"
+msgstr "Nombre d'erreurs"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__message_needaction_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__message_needaction_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__message_needaction_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__message_needaction_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__message_needaction_counter
+msgid "Number of messages which requires an action"
+msgstr "Nombre de messages nécessitant une action"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__message_has_error_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__message_has_error_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__message_has_error_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__message_has_error_counter
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__message_has_error_counter
+msgid "Number of messages with delivery error"
+msgstr "Nombre de messages avec erreur de livraison"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__on_hand_qty
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__on_hand_qty
+#, python-format
+msgid "On hand qty"
+msgstr "Quantité en main"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Order"
+msgstr "Commande"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__overview_line_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__overview_id
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
+#, python-format
+msgid "Overview"
+msgstr "Aperçu"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_overview_wizard
+msgid "Overview Wizard"
+msgstr "Assistant de présentation"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_overview_wizard_line
+msgid "Overview Wizard Line"
+msgstr "Vue d'ensemble de la ligne d'assistant"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_production.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__package
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__package
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__package
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#, python-format
+msgid "Package"
+msgstr "Package"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_mrp_production_filter_inherit
+msgid "Package Lines"
+msgstr "Lignes de colis"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/mrp_immediate_production_inherit.py:0
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__packaging_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_immediate_production_line__packaging_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__packaging_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__packaging_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__packaging_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__packaging_line
+#, python-format
+msgid "Packaging Line"
+msgstr "Ligne d'emballage"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__packaging_line_domain
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__packaging_line_domain
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__packaging_line_domain
+msgid "Packaging Line Domain"
+msgstr "Domaine de la ligne d'emballage"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Packaging Line ID"
+msgstr "Identifiant de la ligne d'emballage"
+
+#. module: mrp_planning
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_packaging_line
+msgid "Packaging line"
+msgstr "Ligne de conditionnement"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Packaging line section"
+msgstr "Section ligne de conditionnement"
+
+#. module: mrp_planning
+#: model:ir.ui.menu,name:mrp_planning.mrp_packaging_line_menu
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_detail_planning_line_search
+msgid "Packaging lines"
+msgstr "Lignes de conditionnement"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_bom.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_bom__packing
+#, python-format
+msgid "Packing"
+msgstr "Emballage"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_bom.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_bom_line__percentage
+#, python-format
+msgid "Percentage"
+msgstr "Pourcentage"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_stock_picking_type
+msgid "Picking Type"
+msgstr "Type de transfert"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__planning_id
+#: model:ir.model.fields,field_description:mrp_planning.field_stock_picking__planning_id
+#, python-format
+msgid "Planning"
+msgstr "Planification"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__planning_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__planning_line_id
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__planning_line_id
+msgid "Planning Line"
+msgstr "Ligne de planification"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__picking_ids
+msgid "Planning MRP"
+msgstr "Planification des lignes"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__planning_line_ids
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#, python-format
+msgid "Planning lines"
+msgstr "Planification des lignes"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Planning lines will no longer be editable. Are you sure to do this?"
+msgstr ""
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_mrp_production_filter_inherit
+msgid "Plannings"
+msgstr "Planification"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: code:addons/mrp_planning/models/stock_location.py:0
+#: code:addons/mrp_planning/models/stock_picking.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__plant_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__plant_id
+#: model:ir.model.fields,field_description:mrp_planning.field_stock_location__plant_id
+#: model:ir.model.fields,field_description:mrp_planning.field_stock_picking_type__plant_id
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_stock_picking_type_form_inherit
+#, python-format
+msgid "Plant"
+msgstr "Usine"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_location_form_inherit
+msgid "Plant Information"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.ui.menu,name:mrp_planning.mrp_plant_menu_dashboard
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_search
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_mrp_production_filter_inherit
+msgid "Plants"
+msgstr "Usines"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_plant.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__is_principal
+#, python-format
+msgid "Principal plant"
+msgstr "Usine principale"
+
+#. module: mrp_planning
+#: model:ir.actions.report,name:mrp_planning.action_report_planning_details
+msgid "Print planning(s)"
+msgstr ""
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_immediate_production_line__product_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__product_id
+#, python-format
+msgid "Product"
+msgstr "Produit"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Product ID"
+msgstr "Produit ID"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__product_to_replace_domain
+msgid "Product To Replace Domain"
+msgstr "Produit pour remplacer le domaine"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__product_to_replace
+#, python-format
+msgid "Product to replace"
+msgstr "Produit à remplacer"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_production
+msgid "Production Order"
+msgstr "Ordre de production"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__state
+msgid "Production order state"
+msgstr "État de l'ordre de fabrication"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__ppp_ids
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_packaging_line_form
+#, python-format
+msgid "Products proportions"
+msgstr "Proportions des produits"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__qty
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__qty_compute
+msgid "Qty per day"
+msgstr "Quantité par jour"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_bom_line__product_qty
+msgid "Equivalent Qtye"
+msgstr "Qté équivalent"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: code:addons/mrp_planning/models/mrp_production.py:0
+#: code:addons/mrp_planning/wizard/mrp_immediate_production_inherit.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__qty
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_immediate_production_line__qty
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__qty
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__qty
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+#, python-format
+msgid "Quantity"
+msgstr "Quantité"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "RM Overview"
+msgstr "Aperçu des matières premières"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__product_id
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__product_id
+#, python-format
+msgid "Raw materiel"
+msgstr "Matière première"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Re-draft"
+msgstr ""
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__reference
+#, python-format
+msgid "Reference"
+msgstr "Référence"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Replace product"
+msgstr "Remplacer le produit"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_replace_product
+msgid "Replace product in a planning"
+msgstr "Remplacer produit dans un planning"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__replacement_days_domain
+msgid "Replacement Days Domain"
+msgstr "Domaine des jours de remplacement"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__replacement_days
+#, python-format
+msgid "Replacement days"
+msgstr "Jours de remplacement"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__replacement_product
+#, python-format
+msgid "Replacement product"
+msgstr "Produit de remplacement"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__required_qty
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__required_qty
+#, python-format
+msgid "Required qty"
+msgstr "Quantité requise"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_user_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__activity_user_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__activity_user_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__activity_user_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__activity_user_id
+msgid "Responsible User"
+msgstr "Utilisateur responsable"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_has_sms_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__message_has_sms_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__message_has_sms_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__message_has_sms_error
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__message_has_sms_error
+msgid "SMS Delivery error"
+msgstr "Erreur de livraison SMS"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__week_of
+msgid "Scheduled dates"
+msgstr "Dates prévues"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: code:addons/mrp_planning/wizard/mrp_immediate_production_inherit.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__section_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_immediate_production_line__section_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__section_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__section_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__section_id
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__display_type__line_section
+#, python-format
+msgid "Section"
+msgstr "Section"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
+msgid "Section :"
+msgstr "Section :"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__section_domain
+msgid "Section Domain"
+msgstr "Domaine de section"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__section_first
+msgid "Section First"
+msgstr "Première section"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_replace_product__section
+#, python-format
+msgid "Section to replace"
+msgstr "Section à remplacer"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_section
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__section_ids
+#: model:ir.ui.menu,name:mrp_planning.mrp_section_menu
+#: model_terms:ir.ui.view,arch_db:mrp_planning.view_mrp_production_filter_inherit
+#, python-format
+msgid "Sections"
+msgstr "Sections"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Sections Name"
+msgstr "Nom de la section"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_plant.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__code
+#, python-format
+msgid "Short name"
+msgstr "Nom court"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__state
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "State"
+msgstr "État"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__activity_state
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__activity_state
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__activity_state
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__activity_state
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__activity_state
+msgid ""
+"Status based on activities\n"
+"Overdue: Due date is already passed\n"
+"Today: Activity date is today\n"
+"Planned: Future activities."
+msgstr ""
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/hr_employee.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_hr_employee__team_id
+#, python-format
+msgid "Team"
+msgstr "Équipe"
+
+#. module: mrp_planning
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_team
+#: model:ir.ui.menu,name:mrp_planning.mrp_team_menu
+msgid "Teams"
+msgstr "Équipes"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/stock_location.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_stock_location__temp_stock
+#, python-format
+msgid "Temp location"
+msgstr "Emplacement temporaire"
+
+#. module: mrp_planning
+#: model_terms:ir.actions.act_window,help:mrp_planning.stock_picking_type_action_inherit
+msgid ""
+"The operation type system allows you to assign each stock\n"
+"                operation a specific type which will alter its views accordingly.\n"
+"                On the operation type you could e.g. specify if packing is needed by default,\n"
+"                if it should show the customer."
+msgstr ""
+"Le système de type d'opération permet d'affecter chaque stock\n"
+" opération un type spécifique qui modifiera ses vues en conséquence.\n"
+" Sur le type d'opération, vous pouvez par exemple spécifier si le conditionnement est nécessaire "
+"par défaut,\n"
+" s'il doit montrer au client."
+
+#. module: mrp_planning
+#: model:ir.model.constraint,message:mrp_planning.constraint_mrp_plant_warehouse_code_uniq
+msgid "The short name of the plant must be unique per company!"
+msgstr "Le nom court de l’usine doit être unique par entreprise !"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "The transfer cannot be created. The raw materials are in sufficient quantity in the stock."
+msgstr ""
+"Le transfert ne peut pas être créé. Les matières premières sont en quantité suffisanteen stock."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#, python-format
+msgid "There are no manufacturing orders for this product for these days."
+msgstr "Il n’y a aucune commande de fabrication pour ce produit pour ces jours."
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.replace_product_form
+msgid "This action is irreversible. Validate ?"
+msgstr "Cette action est irréversible. Valider ?"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid ""
+"This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?"
+msgstr ""
+"Cette action annulera tous les ordres de fabrication liés à cette planification.Es-tu sûr de faire "
+"ça ?"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "This action will complete all manufacturing orders process in this planning. Proceed?"
+msgstr ""
+"Cette action complétera tous les processus de commandes de fabrication dans cette planification. "
+"Procéder?"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/stock_picking.py:0
+#, python-format
+msgid "This factory is already selected in other plant. This factory have to be selected only once"
+msgstr ""
+"Cette usine est déjà sélectionnée dans une autre usine. Cette usine doit être sélectionné une "
+"seule fois"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
+msgid "To Process"
+msgstr "Procéder"
+
+#. module: mrp_planning
+#: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__to_close
+msgid "To close"
+msgstr "Fermer"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_bom.py:0
+#, python-format
+msgid "Total percentage don't have to exceed 100%"
+msgstr "Le pourcentage total ne doit pas dépasser 100 %"
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_stock_picking
+msgid "Transfer"
+msgstr "Transfert"
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
+msgid "Transfer(s)"
+msgstr "Transfert(s)"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__picking_type_id
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_form
+msgid "Type of operation"
+msgstr "Type d'opération"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__activity_exception_decoration
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__activity_exception_decoration
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__activity_exception_decoration
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__activity_exception_decoration
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__activity_exception_decoration
+msgid "Type of the exception activity on record."
+msgstr "Type d'activité d'exception enregistrée."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_packaging_line.py:0
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__uom_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_pp__uom_id
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__uom_id
+#: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__uom_id
+#: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__uom_id
+#, python-format
+msgid "Unit of measure"
+msgstr "Unité de mesure"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__uom_domain
+msgid "Uom Domain"
+msgstr "Domaine d'unité de mesure"
+
+#. module: mrp_planning
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__website_message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__website_message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__website_message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_section__website_message_ids
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_team__website_message_ids
+msgid "Website Messages"
+msgstr "Messagerie du site Web"
+
+#. module: mrp_planning
+#: model:ir.model.fields,help:mrp_planning.field_mrp_packaging_line__website_message_ids
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning__website_message_ids
+#: model:ir.model.fields,help:mrp_planning.field_mrp_planning_line__website_message_ids
+#: model:ir.model.fields,help:mrp_planning.field_mrp_section__website_message_ids
+#: model:ir.model.fields,help:mrp_planning.field_mrp_team__website_message_ids
+msgid "Website communication history"
+msgstr "Historique des communications du site Web"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#, python-format
+msgid "You have to give at least one planning line"
+msgstr "Vous devez donner au moins une ligne de planification"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/wizard/replace_product.py:0
+#, python-format
+msgid "You can't select this product as a replacement because it doesn't have a bill of materials"
+msgstr ""
+"Vous ne pouvez pas sélectionner ce produit comme produit de remplacement car il n'a pas de "
+"nomenclature"
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#, python-format
+msgid "You cannot cancel a planning which have one of it's manufacturing order done."
+msgstr ""
+"Vous ne pouvez pas annuler une planification qui possède un de ses ordres de fabricationfait."
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/mrp_planning.py:0
+#, python-format
+msgid "You cannot cancel this planning because some productions are already done."
+msgstr "Vous ne pouvez pas annuler ce planning car certaines productions sont déjà réalisées."
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_detail_planning_line
+msgid "mrp.detail.planning.line"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_packaging_line
+msgid "mrp.packaging.line"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_planning
+msgid "mrp.planning"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_planning_days
+msgid "mrp.planning.days"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_planning_line
+msgid "mrp.planning.line"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_plant
+msgid "mrp.plant"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_section
+msgid "mrp.section"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_mrp_team
+msgid "mrp.team"
+msgstr ""
+
+#. module: mrp_planning
+#: model:ir.model,name:mrp_planning.model_rm_overview
+msgid "rm.overview"
+msgstr ""
+
+#. module: mrp_planning
+#. odoo-python
+#: code:addons/mrp_planning/models/rm_overview.py:0
+#: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
+#, python-format
+msgid "the internal transfer has been successfully completed"
+msgstr "le transfert interne a été effectué avec succès"

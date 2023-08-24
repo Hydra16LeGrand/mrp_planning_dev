@@ -8,7 +8,7 @@
                     <notebook>
                         <page name="overview_page" string="Overview">
                             <field name="overview_line_ids" widget="one2many">
-                                <tree create="false" delete="0">
+                                <tree create="false" delete="0" edit="false">
                                     <field name="product_id" />
                                     <field name="required_qty" />
                                     <field name="on_hand_qty" />
@@ -16,6 +16,20 @@
                                     <field name="uom_id" />
                                     <field name="bom_ids" invisible="1" widget="many2many_tags" />
                                 </tree>
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="product_id" />
+                                                <field name="required_qty" />
+                                            </group>
+                                            <group>
+                                                <field name="on_hand_qty" />
+                                                <field name="missing_qty" />
+                                            </group>
+                                        </group>
+                                    </sheet>
+                                </form>
                             </field>
                         </page>
                     </notebook>
