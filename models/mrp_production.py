@@ -16,7 +16,7 @@ class MrpProductionInherit(models.Model):
 	packaging_line_id = fields.Many2one("mrp.packaging.line")
 	section_id = fields.Many2one("mrp.section")
 	planning_line_id = fields.Many2one("mrp.planning.line")
-	planning_id = fields.Many2one("mrp.planning")
+	planning_id = fields.Many2one("mrp.planning", string="Planning")
 	plant_id = fields.Many2one("mrp.plant", string="Plant")
 
 
@@ -58,7 +58,6 @@ class MrpProductionInherit(models.Model):
 					# 	for old_move in old_move_raw_ids:
 					# 		if move == old_move:
 					# 			move.unlink()
-
 
 
 		return True
