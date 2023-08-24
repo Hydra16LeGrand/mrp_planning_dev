@@ -183,7 +183,7 @@ class WizardOverview(models.TransientModel):
 			[('temp_stock', '=', 'True'), ('plant_id', '=', self.env['mrp.planning'].browse(planning_id).plant_id.id)])
 		if not stock_tampon_location:
 			raise ValidationError(
-				_("Error during Internal Transfer creation. Cannot find 'Stock tampon' location."))
+				_("Error during Internal supply order creation. Cannot find 'Stock tampon' location."))
 
 		# Crée un bon de livraison (stock.picking)
 		stock_picking = self.env['stock.picking'].create({
@@ -197,7 +197,7 @@ class WizardOverview(models.TransientModel):
 		total_missing_qty = sum(self.overview_line_ids.mapped('missing_qty'))
 		if total_missing_qty == 0:
 			raise ValidationError(
-				_("The transfer cannot be created. The raw materials are in sufficient quantity in the stock."))
+				_("The supply order cannot be created. The raw materials are in sufficient quantity in the stock."))
 
 		print("le type de overview_ids", type(overview_ids))
 
@@ -230,7 +230,7 @@ class WizardOverview(models.TransientModel):
 			'tag': 'display_notification',
 			'params': {
 				'type': 'success',
-				'message': _("the internal transfer has been successfully created"),
+				'message': _("the supply order has been successfully created"),
 				'next': {'type': 'ir.actions.act_window_close'},
 			}
 		}

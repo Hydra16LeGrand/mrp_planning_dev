@@ -24,9 +24,9 @@
 
                 <footer>
                     <button name="create_internal_transfer" type="object"
-                        string="Create Internal Transfer"
+                        string="Create supply order"
                         invisible="context.get('total_missing_qty') == 0"
-                        confirm="All previous internal transfer will be canceled, are you sure to do this operation ?"
+                        confirm="All previous supply orders will be canceled, are you sure to do this operation ?"
                         class="oe_highlight" />
                     <button string="Annuler" special="cancel"
                         invisible="context.get('total_missing_qty') == 0" />
