@@ -23,7 +23,8 @@
         <field name="arch" type="xml">
             <xpath expr="//search/filter[@name='inactive']" position="after">
                 <group string="Group by">
-                    <filter string="Location Type" name="usage" context="{'group_by': 'usage'}"/>
+                    <filter string="Category of Location" name="storage_category"
+                            context="{'group_by': 'storage_category_id'}"/>
                 </group>
             </xpath>
         </field>
@@ -34,9 +35,11 @@
         <field name="context">
             {
             'search_default_in_location':1,
-            'search_default_usage': 1,
+            'group_by': 'storage_category_id',
             }
         </field>
     </record>
+
+
 
 </odoo>

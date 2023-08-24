@@ -31,15 +31,21 @@
                             <!--							<field name="default_location_src_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />-->
                             <!--							<field name="default_location_dest_id" domain="[('plant_id', '=', id)]" options="{'no_create': 1, 'no_open': 1}" />-->
                         </group>
-                        <group string="Locations" name="locations">
+                        <group string="Stock supply" name="stock_supply">
+                            <field name="picking_type_internal"/>
+                            <field name="supply_location_src_id"
+                                   options="{'no_create': 1, 'no_open': 1}" />
+                            <field name="supply_location_dest_id"
+                                   options="{'no_create': 1, 'no_open': 1}" />
+
+                        </group>
+
+                        <group string="Manufacturing" name="manufacturing">
+                            <field name="picking_type_id"/>
                             <field name="default_location_src_id" domain="[('plant_id', '=', id)]"
                                    options="{'no_create': 1, 'no_open': 1}"/>
                             <field name="default_location_dest_id" domain="[('plant_id', '=', id)]"
                                    options="{'no_create': 1, 'no_open': 1}"/>
-                        </group>
-
-                        <group string="Type of operation" name="type_of_operation">
-                            <field name="picking_type_id"/>
                         </group>
                     </group>
                 </sheet>
