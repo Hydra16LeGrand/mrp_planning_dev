@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_create_picking_finished_product_form" model="ir.ui.view">
+        <field name="name">create.picking.finished.product.form</field>
+        <field name="model">create.picking.finished.product</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <notebook>
+                        <page name="cp_finished_product_page" string="Picking Finished Product">
+                            <field name="cp_finished_line_ids" widget="section_and_note_one2many" mode="tree">
+                                <tree create="false" editable="1">
+                                    <field name="product_domain" invisible="1"/>
+                                    <field name="product_id" options="{'no_open': True, 'no_create':True}" domain="[('id', '=', product_domain)]"/>
+                                    <field name="location_domain" invisible="1"/>
+                                    <field name="location_id" options="{'no_open': True, 'no_create':True}" domain="[('id', '=', location_domain)]"/>
+                                    <field name="old_quantity" readonly="1"/>
+                                    <field name="quantity"/>
+                                    <field name="product_uom_domain" invisible="1"/>
+                                    <field name="product_uom_id" options="{'no_open': True, 'no_create':True}" domain="[('id', '=', product_uom_domain)]"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <footer>
+                    <button name="action_send" type="object"
+                        string="Apply"
+                        class="btn-primary" />
+                    <button string="Annuler" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_picking_finished_product">
+        <field name="name">Picking Finished Product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">create.picking.finished.product</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_create_picking_finished_product_form"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

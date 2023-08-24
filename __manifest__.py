@@ -39,6 +39,7 @@
         'wizard/replace_product_views.xml',
         'wizard/create_overview_wizard_view.xml',
         'wizard/mrp_immediate_production_inherit.xml',
+        'wizard/create_picking_finished_product.xml',
 
         'views/mrp_planning.xml',
         'views/mrp_section.xml',

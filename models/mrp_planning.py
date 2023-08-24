@@ -28,8 +28,7 @@ class MrpPlanning(models.Model):
     ]
 
     def _get_default_week_of(self):
-        today_date = fields.Date.today()
-        iso = today_date.isocalendar()
+        iso = self.today_date.isocalendar()
         monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
         tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
         wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
