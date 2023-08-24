@@ -6,7 +6,7 @@
 		<field name="arch" type="xml">
 			<tree>
 				<header>
-			        <button name="create_internal_transfer" string="Create Internal Transfer" type="object" class="oe_highlight"/>
+			        <button name="create_internal_transfer" string="Create supply orders" type="object" class="oe_highlight"/>
 			    </header>
 				<field name="product_id" />
 				<field name="required_qty" />

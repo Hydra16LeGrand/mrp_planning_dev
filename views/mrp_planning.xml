@@ -33,7 +33,7 @@
                         <button name="view_internal_transfer" type="object"
                             attrs="{'invisible': [('picking_ids', '=', [])]}" icon="fa-cubes"
                             class="oe_stat_button" position="before">
-                            <field string="Transfer(s)" name="internal_transfer_count"
+                            <field string="Supply order(s)" name="internal_transfer_count"
                                 widget="statinfo" />
                         </button>
 

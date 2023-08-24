@@ -51,7 +51,7 @@ class RM_Overview(models.Model):
 			[('temp_stock', '=', 'True')], limit=1)
 		if not stock_tampon_location:
 			raise ValidationError(
-				_("Error during Internal Transfer creation. Cannot find 'Stock tampon' location."))
+				_("Error during supply order creation. Cannot find 'Stock tampon' location."))
 
 		stock_picking = self.env['stock.picking'].create({
 			'location_id': picking_type.default_location_src_id.id,
@@ -89,6 +89,6 @@ class RM_Overview(models.Model):
 			'tag': 'display_notification',
 			'params': {
 					'type': 'success',
-					'message': _("the internal transfer has been successfully completed"),
+					'message': _("the supply order has been successfully created!"),
 			}
 		}

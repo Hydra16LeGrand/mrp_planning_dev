@@ -95,7 +95,7 @@ class MrpPlanning(models.Model):
     mrp_production_ids = fields.One2many("mrp.production", "planning_id", string=_("Mrp orders"), copy=False,
                                          tracking=4)
     picking_ids = fields.One2many('stock.picking', 'planning_id', string='Planning MRP', tracking=True)
-    internal_transfer_count = fields.Integer(string=_("Internal transfer count"),
+    internal_transfer_count = fields.Integer(string=_("Supply count"),
                                              compute='_compute_internal_transfer_count')
     plant_id = fields.Many2one("mrp.plant", string=_("Plant"), default=_get_default_plant, tracking=2)
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
@@ -562,7 +562,7 @@ class MrpPlanning(models.Model):
                     'type': 'ir.actions.act_window',
                     'res_model': 'stock.picking',
                     'view_mode': 'tree,form',
-                    'name': 'List of internal transfers',
+                    'name': _('List of supply orders'),
                     'domain': [('id', 'in', internal_transfer.ids)],
                     'target': 'current',
                 }
@@ -771,7 +771,7 @@ class MrpPlanning(models.Model):
                     "type": "ir.actions.act_window",
                     "res_model": "stock.picking",
                     "view_mode": "tree,form",
-                    "name": "List of internal transfers",
+                    "name": _("List of supply orders"),
                     "domain": [("id", "in", internal_transfer.ids)],
                     "target": "current",
                 }
