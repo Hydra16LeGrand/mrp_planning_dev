@@ -7,6 +7,7 @@ class WizardOverview(models.TransientModel):
 
 	planning_id = fields.Many2one("mrp.planning", string=_("Planning"))
 	overview_line_ids = fields.One2many("overview.wizard.line", "overview_id", string=_("Overview"))
+	plant_id = fields.Many2one("mrp.plant")
 
 
 	@api.model
@@ -163,7 +164,7 @@ class WizardOverview(models.TransientModel):
 
 		# Recherche le type de transfert 'internal'
 		picking_type = self.env['stock.picking.type'].search(
-			[('code', '=', 'internal')], order="id desc", limit=1)
+			[('code', '=', 'internal')], order="id desc")
 		print('le picking ', picking_type.name)
 
 		# Recherche des bons de livraison existants liés au planning

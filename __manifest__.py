@@ -21,11 +21,11 @@
 
     # any module necessary for this one to work correctly
     'depends': [
-                'base',
-                'mrp',
-                'hr',
-                'stock_manager',
-                ],
+        'base',
+        'mrp',
+        'hr',
+        'stock_manager',
+    ],
 
     # always loaded
     'data': [

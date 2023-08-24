@@ -25,7 +25,7 @@
         <field name="inherit_id" ref="stock.view_picking_type_form"/>
         <field name="arch" type="xml">
             <xpath expr="//sheet/group/group[@name='locations']" position="after">
-                <group string="Plant" groups="stock.group_stock_multi_locations" name="plant" attrs="{'invisible': [('code', '!=', 'mrp_operation')]}">
+                <group string="Plant" groups="stock.group_stock_multi_locations" name="plant" attrs="{'invisible': [('code', 'not in', ('mrp_operation','internal'))]}">
                     <field name="plant_id" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
                 </group>
             </xpath>

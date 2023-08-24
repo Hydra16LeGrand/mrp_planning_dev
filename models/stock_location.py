@@ -9,6 +9,7 @@ class StockLocationInherit(models.Model):
 	plant_id = fields.Many2one("mrp.plant", string=_("Plant"))
 	packaged_finished_product = fields.Boolean(string=_("Packaged finished product"))
 
+
 	@api.onchange('temp_stock')
 	def _onchange_temp_stock(self):
 		print("Onchange temp", self.temp_stock, self.env['stock.location'].search_count([('temp_stock', '=', 1)]))

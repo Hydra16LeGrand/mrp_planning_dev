@@ -7,8 +7,21 @@ class MrpPlant(models.Model):
 
 	@api.depends('picking_type_id')
 	def _compute_picking_type(self):
-		self.picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id)]).name
-		print("le picking", self.picking_type_id)
+		for rec in self:
+			print("le self", self)
+			print("rec1------------------->", rec)
+			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', rec.id), ('code','=', 'mrp_operation')])
+			rec.picking_type_id = picking_type_id[0].id if picking_type_id else False
+			print("le picking", rec.picking_type_id)
+
+	@api.depends('picking_type_internal')
+	def _compute_picking_type_internal(self):
+		for rec in self:
+			print("le self", self)
+			print("rec2------------------->", rec)
+			picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', rec.id), ('code', '=', 'internal')])
+			rec.picking_type_internal = picking_type_internal[0].id if picking_type_internal else False
+			print("le picking", rec.picking_type_internal.id)
 
 
 	name = fields.Char(_("Name"), required=1)
@@ -17,7 +30,10 @@ class MrpPlant(models.Model):
 	is_principal = fields.Boolean(_("Principal plant"), unique=True)
 	default_location_src_id = fields.Many2one("stock.location", string=_("Default components location"))
 	default_location_dest_id = fields.Many2one("stock.location", string=_("Default finished products location"))
-	picking_type_id = fields.Char('Type of operation', compute='_compute_picking_type')
+	picking_type_id = fields.Many2one('stock.picking.type', 'Type of operation', compute='_compute_picking_type')
+	picking_type_internal = fields.Many2one('stock.picking.type', 'Type of operation', compute='_compute_picking_type_internal')
+	supply_location_src_id = fields.Many2one("stock.location", string=_("Default supply location"))
+	supply_location_dest_id = fields.Many2one("stock.location", string=_("Default supply destination location"))
 
 	_sql_constraints = [
         ('warehouse_code_uniq', 'unique(code, company_id)', 'The short name of the plant must be unique per company!'),
@@ -70,11 +86,21 @@ class MrpPlant(models.Model):
 			'default_location_dest_id': vals.get('default_location_dest_id', False),
 		}
 
+		# picking_type_internal = {
+		# 	'name': _(f"{vals.get('name')} supply"),
+		# 	'code': "internal",
+		# 	'sequence_code': "IT",
+		# 	'default_location_src_id': vals.get('supply_location_src_id', False),
+		# 	'default_location_dest_id': vals.get('supply_location_desc_id', False),
+		# }
+
 		res = super().create(vals)
 
 		picking_type['plant_id'] = res.id
+		# picking_type_internal['plant_id'] = res.id
 
 		picking_type_id = self.env['stock.picking.type'].create(picking_type)
+		# picking_type_id = self.env['stock.picking.type'].create(picking_type_internal)
 
 		return res
 
@@ -83,7 +109,7 @@ class MrpPlant(models.Model):
 
 		res = super(MrpPlant, self).write(vals)
 		if self:
-			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id)])
+			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id),('code','=','mrp_operation')])
 
 			if picking_type_id:
 				if len(picking_type_id) == 1:
@@ -91,6 +117,22 @@ class MrpPlant(models.Model):
 						picking_type_id.default_location_src_id = vals.get('default_location_src_id')
 					if vals.get('default_location_dest_id', False):
 						picking_type_id.default_location_dest_id = vals.get('default_location_dest_id')
+				else:
+					raise ValidationError(_(""))
+
+		if self:
+			picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', self.id), ('code','=','internal')])
+			print("le picking_type_internal", picking_type_internal.name)
+			print("le vals", vals)
+			print("le valget ",vals.get('supply_location_src_id'))
+			if picking_type_internal:
+				if len(picking_type_internal) == 1:
+					if vals.get('supply_location_src_id', False):
+						picking_type_internal.default_location_src_id = vals.get('supply_location_src_id')
+
+					if vals.get('supply_location_dest_id', False):
+						picking_type_internal.default_location_dest_id = vals.get('supply_location_dest_id')
+
 				else:
 					raise ValidationError(_(""))
 
