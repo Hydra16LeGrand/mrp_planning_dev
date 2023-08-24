@@ -33,6 +33,8 @@ class CreatePickingFinishedProduct(models.TransientModel):
                 )
 
             print(f"group_list : {group_list}")
+            if not group_list:
+                raise UserError(_("There can be no transfer when there is no quantity."))
             res['cp_finished_line_ids'] = group_list
         return res
 
