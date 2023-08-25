@@ -40,7 +40,6 @@ class MrpProductionInherit(models.Model):
 			old_product_id = rec.product_id
 			old_state = rec.state
 			res = super(MrpProductionInherit, rec).write(vals)
-			print(f'self.env.context : {self.env.context}')
 			if rec.planning_id:
 				if 'product_id' in vals:
 					product_id = self.env['product.product'].search([('id', '=', vals['product_id'])])

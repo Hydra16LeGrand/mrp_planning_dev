@@ -12,7 +12,6 @@ class CreatePickingFinishedProduct(models.TransientModel):
     def default_get(self, fields_list):
         res = super(CreatePickingFinishedProduct, self).default_get(fields_list)
         group_list = []
-        print(f'self.env.context : {self.env.context}')
         if self.env.context.get('quant_line'):
             quant_line = self.env.context.get('quant_line')
             for elm in quant_line:
@@ -32,7 +31,6 @@ class CreatePickingFinishedProduct(models.TransientModel):
                     })
                 )
 
-            print(f"group_list : {group_list}")
             if not group_list:
                 raise UserError(_("There can be no transfer when there is no quantity."))
             res['cp_finished_line_ids'] = group_list
@@ -42,7 +40,6 @@ class CreatePickingFinishedProduct(models.TransientModel):
                                            string='CP Finished Product Line')
 
     def action_send(self):
-        print(f'self.env.context : {self.env.context}')
         # Créez un dictionnaire pour regrouper les lignes par location
         lines_by_location = {}
 
@@ -59,7 +56,6 @@ class CreatePickingFinishedProduct(models.TransientModel):
 
             picking_type = self.env['stock.picking.type'].search(
                 [('code', '=', 'internal')], limit=1)
-            print("Le picking type", picking_type)
             location_dest_id = self.env['stock.location'].search([
                 ('plant_id.is_principal', '!=', False),
                 ('packaged_finished_product', '=', True)

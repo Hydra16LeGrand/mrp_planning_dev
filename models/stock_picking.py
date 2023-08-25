@@ -40,7 +40,6 @@ class StockPickingTypeInherit(models.Model):
         if self.plant_id:
             # Empêcher toute modification future du champ plant_id
             plant_id = self.search([('plant_id', '=', self.plant_id.id), ('code', '=', self.code)])
-            print("Plant", plant_id)
             if plant_id:
                 raise ValidationError(
                     _(f"This factory is already selected in other plant. This factory have to be selected only once"))
@@ -52,8 +51,6 @@ class StockPickingTypeInherit(models.Model):
 
     def write(self, vals):
 
-        print("valsget",vals.get('default_location_src_id'))
-        print("le valse",vals)
         if self.code == 'internal':  # Vérifier le type d'opération
             if vals.get('default_location_src_id'):
                 self.plant_id.supply_location_src_id = vals.get('default_location_src_id')

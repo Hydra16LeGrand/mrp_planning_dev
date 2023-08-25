@@ -35,7 +35,6 @@ class RM_Overview(models.Model):
 
 		picking_type = self.env['stock.picking.type'].search(
 			[('code', '=', 'internal')], order="id desc", limit=1)
-		print('le picking ', picking_type.name)
 
 		existing_pickings = self.env['stock.picking'].search([
 			('state', 'not in', ['cancel']),
@@ -62,8 +61,6 @@ class RM_Overview(models.Model):
 		})
 
 		# Effectuer d'autres opérations spécifiques au transfert interne
-		print("Transfert interne créé pour les éléments :",
-			  [data.product_id.name for data in self])
 
 		stock_move = []
 
@@ -82,7 +79,6 @@ class RM_Overview(models.Model):
 								'picking_id': stock_picking.id,
 					})
 				)
-		print('Transfert de produits effectué')
 
 		return {
 			'type': 'ir.actions.client',

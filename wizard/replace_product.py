@@ -17,59 +17,12 @@ class ReplaceProduct(models.TransientModel):
                     product_ids.append(lines.product_id.id)
                 rec.product_to_replace_domain = list(set(product_ids))
 
-    # @api.depends("product_to_replace", "line")
-    # def _compute_product_to_replace_domain(self):
-    # 	for rec in self:
-    # 		if rec.planning_id:
-    # 			product_ids = []
-    # 			detail_lst = []
-    # 			product_ids_final = []
-    # 			end_line_id = self.env['mrp.detail.planning.line'].search([
-    # 				('id', '>', rec.line.id),
-    # 				('display_type', '=', 'line_note'),
-    # 				('planning_id', '=', rec.planning_id.id)
-    # 			], limit=1)
-    # 			# print(f'end_line_id : {end_line_id}')
-    #
-    # 			if end_line_id:
-    # 				mrp_detail_line = self.env['mrp.detail.planning.line'].search([
-    # 					('display_type', 'not in', ['line_section', 'line_note']),
-    # 					('planning_id', '=', rec.planning_id.id),
-    # 					('id', '>', rec.line.id),
-    # 					('id', '<', end_line_id.id),
-    # 				])
-    # 				# print(f'mrp_detail_line : {mrp_detail_line}')
-    # 			else:
-    # 				mrp_detail_line = self.env['mrp.detail.planning.line'].search([
-    # 					('display_type', 'not in', ['line_section', 'line_note']),
-    # 					('planning_id', '=', rec.planning_id.id),
-    # 					('id', '>', rec.line.id),
-    # 				])
-    # 				# print(f'mrp_detail_line : {mrp_detail_line}')
-    #
-    # 			for detail in mrp_detail_line:
-    # 				detail_lst.append(detail.product_id.id)
-    # 			details_lst = list(set(detail_lst))
-    # 			# print(f'details_lst : {details_lst}')
-    #
-    # 			production_ids = self.get_draft_production_orders()
-    # 			for lines in production_ids:
-    # 				product_ids.append(lines.product_id.id)
-    # 			products_ids = list(set(product_ids))
-    #
-    # 			for elm in products_ids:
-    # 				if elm in details_lst:
-    # 					product_ids_final.append(elm)
-    #
-    # 			rec.product_to_replace_domain = list(set(product_ids_final))
-
     @api.depends("product_to_replace", 'line', 'planning_id', 'section')
     def _compute_replacement_days(self):
         for rec in self:
             if rec.planning_id:
                 days = []
                 production_ids = self.get_draft_production_order()
-                # # print(f'production_ids : {production_ids}')
                 for production in production_ids:
                     days.append(rec.get_day_from_date(production.date_planned_start.date()))
                 rec.replacement_days_domain = list(set(days))
@@ -95,20 +48,17 @@ class ReplaceProduct(models.TransientModel):
                         ('id', '>', rec.line.id),
                         ('id', '<', end_line_id.id),
                     ])
-                    # # print(f'mrp_detail_line : {mrp_detail_line}')
                 else:
                     mrp_detail_line = self.env['mrp.detail.planning.line'].search([
                         ('display_type', 'not in', ['line_section', 'line_note']),
                         ('planning_id', '=', rec.planning_id.id),
                         ('id', '>', rec.line.id),
                     ])
-                    # # print(f'mrp_detail_line : {mrp_detail_line}')
             else:
                 mrp_detail_line = self.env['mrp.detail.planning.line'].search([
                     ('display_type', 'not in', ['line_section', 'line_note']),
                     ('planning_id', '=', rec.planning_id.id),
                 ])
-                # # print(f'mrp_detail_line : {mrp_detail_line}')
 
             mrp_detail_lst = [mrp.id for mrp in mrp_detail_line]
             mrp_production = self.env['mrp.production'].sudo().search([
@@ -132,18 +82,6 @@ class ReplaceProduct(models.TransientModel):
                 )
             ]
 
-            # mrp_list = []
-            # for mrp in mrp_production:
-            #     if mrp.detailed_pl_id.product_id.id == rec.product_to_replace.id:
-            #         if end_section_id:
-            #             # print(f"{rec.section.id} < {mrp.detailed_pl_id.id} < {end_section_id.id}")
-            #             if rec.section.id < mrp.detailed_pl_id.id < end_section_id.id:
-            #                 mrp_list.append(mrp)
-            #         else:
-            #             # print(f"{mrp.detailed_pl_id.id} > {rec.section.id}")
-            #             if mrp.detailed_pl_id.id > rec.section.id:
-            #                 mrp_list.append(mrp)
-
             return mrp_list
 
     def get_day_from_date(self, production_date):
@@ -151,97 +89,10 @@ class ReplaceProduct(models.TransientModel):
         day = self.env['mrp.planning.days'].search([('date', '=', production_date)])
         return day.id
 
-    # @api.depends('section', 'product_to_replace')
-    # def _compute_line_to_replace_domain(self):
-    #     for rec in self:
-    #         # if not rec.section:
-    #         # 	raise UserError(_("Please select the section before selecting the line."))
-    #
-    #         section_ids = self.env['mrp.detail.planning.line'].search(
-    #             [('display_type', '=', 'line_section'), ('planning_id', '=', rec.planning_id.id)])
-    #         # end_section_id = None
-    #         # # print(f"section_ids : {section_ids}")
-    #         # # print(f"rec.section : {rec.section}")
-    #         # for section_id in section_ids:
-    #         #     if section_id > rec.section:
-    #         #         end_section_id = section_id
-    #         #         # # print(f'end_section_id : {end_section_id}')
-    #         #         break
-    #         end_section_id = self.env['mrp.detail.planning.line'].search([
-    #             ('id', '>', rec.section.id),
-    #             ('display_type', '=', 'line_section'),
-    #             ('planning_id', '=', rec.planning_id.id)
-    #         ], limit=1)
-    #
-    #         if end_section_id:
-    #             # print('if end_section_id')
-    #             sect = []
-    #             line_ids = self.get_planning_line()
-    #             for line in line_ids:
-    #                 if rec.section.id < line.id < end_section_id.id:
-    #                     sect.append(line.id)
-    #             mrp_detail = self.env['mrp.detail.planning.line'].search(
-    #                 [('display_type', 'not in', ['line_section', 'line_note']),
-    #                  ('planning_id', '=', rec.planning_id.id),
-    #                  ('product_id', '=', rec.product_to_replace.id),
-    #                  ('id', '>', rec.section.id),
-    #                  ('id', '<', end_section_id.id),
-    #             ])
-    #         else:
-    #             mrp_detail = self.env['mrp.detail.planning.line'].search(
-    #                 [('display_type', 'not in', ['line_section', 'line_note']),
-    #                  ('planning_id', '=', rec.planning_id.id),
-    #                  ('product_id', '=', rec.product_to_replace.id),
-    #                  ('id', '<', rec.section.id),
-    #             ])
-    #             # print('else')
-    #             sect = []
-    #             line_ids = self.get_planning_line()
-    #             if len(section_ids) == 1:
-    #                 for line in line_ids:
-    #                     if line.id > rec.section.id:
-    #                         sect.append(line.id)
-    #             else:
-    #                 section = [sect.id for sect in section_ids]
-    #                 # # print(f"section : {section}")
-    #                 position = section.index(rec.section.id)
-    #                 for line in line_ids:
-    #                     if section[position] != section[-1]:
-    #                         if section[position] < line.id < section[position + 1]:
-    #                             sect.append(line.id)
-    #                     else:
-    #                         if line.id > section[position]:
-    #                             sect.append(line.id)
-    #         line_lst = list(set(sect))
-    #         # print(f'line_lst : {line_lst}')
-    #         # rec.line_domain = [(6, 0, line_lst)]
-    #
-    #         # print(f'mrp_detail : {mrp_detail}')
-    #         product = [prod.id for prod in mrp_detail if prod.state not in ['done']]
-    #         # print(f"product : {product}")
-    #
-    #         if len(line_lst) == 1:
-    #             # print(f"line_lst : {line_lst}")
-    #             rec.line_domain = line_lst
-    #         else:
-    #             lst = []
-    #             ls = sorted(line_lst)
-    #             # print(f"ls : {ls}")
-    #             for i in range(len(ls) - 1):
-    #                 for p in product:
-    #                     if ls[i] < p < ls[i + 1]:
-    #                         # print(f"{ls[i]} < {p} < {ls[i + 1]}")
-    #                         lst.append(ls[i])
-    #                     if p > ls[-1]:
-    #                         # print(f"{p} > {ls[-1]}")
-    #                         lst.append(ls[-1])
-    #             # print(f"list(set(lst)) : {list(set(lst))}")
-    #             rec.line_domain = list(set(lst))
 
     @api.depends('section', 'product_to_replace')
     def _compute_line_domain(self):
         for rec in self:
-            # print(f"rec.section : {rec.section}")
             if rec.section:
                 end_section_id = self.env['mrp.detail.planning.line'].search([
                     ('id', '>', rec.section.id),
@@ -250,7 +101,6 @@ class ReplaceProduct(models.TransientModel):
                 ], limit=1)
 
                 if end_section_id:
-                    # print('if end_section_id')
                     mrp_detail = self.env['mrp.detail.planning.line'].search(
                         [('display_type', 'not in', ['line_section', 'line_note']),
                          ('planning_id', '=', rec.planning_id.id),
@@ -265,7 +115,6 @@ class ReplaceProduct(models.TransientModel):
                          ('id', '<', end_section_id.id),
                     ])
                 else:
-                    # print('else de if end_section_id')
                     mrp_detail = self.env['mrp.detail.planning.line'].search(
                         [('display_type', 'not in', ['line_section', 'line_note']),
                          ('planning_id', '=', rec.planning_id.id),
@@ -277,28 +126,20 @@ class ReplaceProduct(models.TransientModel):
                          ('planning_id', '=', rec.planning_id.id),
                          ('id', '>', rec.section.id),
                     ])
-                # print(f'mrp_detail : {mrp_detail}')
-                # print(f'line_ids : {line_ids}')
                 product = [prod.id for prod in mrp_detail if prod.state not in ['done']]
-                # print(f"product : {product}")
                 line_lst = [line.id for line in line_ids]
-                # print(f"line_lst : {line_lst}")
 
                 if len(line_lst) == 1:
                     rec.line_domain = line_lst
                 else:
                     ls = sorted(line_lst)
-                    # print(f"ls : {ls}")
                     lst = []
                     for i in range(len(ls) - 1):
                         for p in product:
                             if ls[i] < p < ls[i + 1]:
-                                # print(f"{ls[i]} < {p} < {ls[i + 1]}")
                                 lst.append(ls[i])
                             if p > ls[-1]:
-                                # print(f"{p} > {ls[-1]}")
                                 lst.append(ls[-1])
-                    # print(f"list(set(lst)) : {list(set(lst))}")
                     rec.line_domain = list(set(lst))
             else:
                 rec.line_domain = False
@@ -314,10 +155,7 @@ class ReplaceProduct(models.TransientModel):
 
     @api.depends('section', 'packaging_line', 'product_to_replace')
     def _compute_line(self):
-        # # print("_compute_line")
         for rec in self:
-            # # print(f'rec.packaging_line : {rec.packaging_line}')
-            # # print(f'rec.section : {rec.section}')
             if rec.packaging_line:
                 end_section_id = self.env['mrp.detail.planning.line'].search([
                     ('id', '>', rec.section.id),
@@ -343,12 +181,9 @@ class ReplaceProduct(models.TransientModel):
                         ('id', '>', rec.section.id),
                     ])
                 mrp_detail_lst = [mrp.id for mrp in mrp_detail if mrp.state not in ['done', 'cancel']]
-                # # print(f"mrp_detail_lst : {mrp_detail_lst}")
-                # # print(f"line_ids : {line_ids}")
                 line_lst = [line.id for line in line_ids]
                 if len(line_lst) == 1:
                     rec.line = line_lst
-                    # # print(f"rec.line de line_lst : {rec.line}")
                 else:
                     lst = []
                     ls = sorted(line_lst)
@@ -359,13 +194,10 @@ class ReplaceProduct(models.TransientModel):
                             if p > ls[-1]:
                                 lst.append(ls[-1])
                     lst2 = list(set(lst))
-                    # # print(f"lst2 : {lst2}")
                     rec.line = self.env['mrp.detail.planning.line'].search([
                         ('id', '=', lst2)
                     ])
-                    # # print(f'lines : {lines}')
                     # rec.line = lines.id
-                    # print(f"rec.line de lst2 : {rec.line}")
 
             else:
                 rec.line = False
@@ -376,18 +208,14 @@ class ReplaceProduct(models.TransientModel):
         for rec in self:
             section_ids = self.env['mrp.detail.planning.line'].search(
                 [('display_type', '=', 'line_section'), ('planning_id', '=', rec.planning_id.id)])
-            # # print(f'section_ids : {section_ids}')
             mrp_detail = self.env['mrp.detail.planning.line'].search(
                 [('display_type', 'not in', ['line_section', 'line_note']),
                  ('planning_id', '=', rec.planning_id.id),
                  ('product_id', '=', rec.product_to_replace.id),
             ])
-            # # print(f'mrp_detail : {mrp_detail}')
 
             product = [prod.id for prod in mrp_detail if prod.state not in ['done']]
-            # # print(f"product : {product}")
             section = [sect.id for sect in section_ids]
-            # # print(f"section : {section}")
 
             if len(section) == 1:
                 rec.section_domain = section
@@ -399,7 +227,6 @@ class ReplaceProduct(models.TransientModel):
                             sect_lst.append(section[i])
                         if p > section[-1]:
                             sect_lst.append(section[-1])
-                # # print(f"sect_lst : {sect_lst}")
                 rec.section_domain = list(set(sect_lst))
 
     def get_planning_line(self):
@@ -409,8 +236,6 @@ class ReplaceProduct(models.TransientModel):
     @api.depends("product_to_replace", 'line', 'planning_id', 'section')
     def _compute_packaging_line(self):
         for rec in self:
-            # # print('yes')
-            # # print(f'rec.line : {rec.line}')
             if rec.line and rec.line.packaging_line_id:
                 rec.packaging_line = rec.line.packaging_line_id
             else:
@@ -452,7 +277,6 @@ class ReplaceProduct(models.TransientModel):
     def action_replace_product(self):
         for rec in self:
             day_list = [day.name for day in rec.replacement_days]
-            # print(f'rec.qty : {rec.qty}')
             if rec.line:
                 end_line_id = self.env['mrp.detail.planning.line'].search([
                     ('id', '>', rec.line.id),
@@ -466,14 +290,12 @@ class ReplaceProduct(models.TransientModel):
                         ('id', '>', rec.line.id),
                         ('id', '<', end_line_id.id),
                     ])
-                    # # print(f'mrp_detail_line : {mrp_detail_line}')
                 else:
                     mrp_detail_line = self.env['mrp.detail.planning.line'].search([
                         ('display_type', 'not in', ['line_section', 'line_note']),
                         ('planning_id', '=', rec.planning_id.id),
                         ('id', '>', rec.line.id),
                     ])
-                    # # print(f'mrp_detail_line : {mrp_detail_line}')
 
                 mrp_detail_lst = [mrp.id for mrp in mrp_detail_line]
                 mrp_production = self.env['mrp.production'].sudo().search([
@@ -484,7 +306,6 @@ class ReplaceProduct(models.TransientModel):
                 mrp_list = [mrp for mrp in mrp_production.detailed_pl_id if any(
                     day in mrp.date_char and mrp.product_id.id == rec.product_to_replace.id for day in day_list)]
                 production_list = [mrp for mrp in mrp_production if mrp.detailed_pl_id in mrp_list]
-                print(f'production_list : {production_list}')
 
                 if production_list:
                     for production in production_list:
@@ -492,11 +313,8 @@ class ReplaceProduct(models.TransientModel):
                             for line in production.detailed_pl_id:
                                 if any(day in line.date_char for day in day_list):
                                     line.product_id = rec.replacement_product.id
-                                    print(f'rec.qty : {rec.qty}')
                                     if rec.qty:
-                                        print(f"line.qty before : {line.qty}")
                                         line.qty = rec.qty
-                                        print(f"line.qty after : {line.qty}")
 
                             bom_id = self.env["mrp.bom"].search(
                                 [('product_tmpl_id', '=', rec.replacement_product.product_tmpl_id.id)])
@@ -512,7 +330,6 @@ class ReplaceProduct(models.TransientModel):
                                 for move in production.move_raw_ids:
                                     for old_move in old_move_raw_ids:
                                         if move == old_move:
-                                            # # print(f"move.state replace product : {move.state}")
                                             if move.state in ['draft', 'cancel']:
                                                 move.unlink()
                             else:
@@ -570,11 +387,8 @@ class ReplaceProduct(models.TransientModel):
                         if production.state not in ['done', 'cancel']:
                             for line in production.detailed_pl_id:
                                 line.product_id = rec.replacement_product.id
-                                print(f'rec.qty : {rec.qty}')
                                 if rec.qty:
-                                    print(f"line.qty before : {line.qty}")
                                     line.qty = rec.qty
-                                    print(f"line.qty after : {line.qty}")
 
                             bom_id = self.env["mrp.bom"].search(
                                 [('product_tmpl_id', '=', rec.replacement_product.product_tmpl_id.id)])
@@ -590,7 +404,6 @@ class ReplaceProduct(models.TransientModel):
                                 for move in production.move_raw_ids:
                                     for old_move in old_move_raw_ids:
                                         if move == old_move:
-                                            # # print(f"move.state replace product : {move.state}")
                                             if move.state in ['draft', 'cancel']:
                                                 move.unlink()
                             else:

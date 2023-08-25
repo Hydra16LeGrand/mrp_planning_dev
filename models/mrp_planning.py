@@ -664,7 +664,6 @@ class MrpPlanning(models.Model):
                 'packaging_line_id': dl.packaging_line_id,
                 'section_id': dl.section_id.id,
             } for dl in rec.detailed_pl_ids]
-            print(f'vals : {vals}')
             res = super(MrpPlanning, rec).write(vals)
 
             if 'section_ids' in vals:

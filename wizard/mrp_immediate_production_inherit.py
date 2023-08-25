@@ -17,8 +17,6 @@ class MrpImmediateProductionInherit(models.TransientModel):
 
     @api.model
     def default_get(self, fields):
-        # res = super().default_get(fields)
-        print(f'self.env.context : {self.env.context}')
         res = super().default_get(fields)
         if 'immediate_production_line_ids' in fields:
             if self.env.context.get('default_mo_ids'):

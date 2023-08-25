@@ -8,20 +8,14 @@ class MrpPlant(models.Model):
 	@api.depends('picking_type_id')
 	def _compute_picking_type(self):
 		for rec in self:
-			print("le self", self)
-			print("rec1------------------->", rec)
 			picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', rec.id), ('code','=', 'mrp_operation')])
 			rec.picking_type_id = picking_type_id[0].id if picking_type_id else False
-			print("le picking", rec.picking_type_id)
 
 	@api.depends('picking_type_internal')
 	def _compute_picking_type_internal(self):
 		for rec in self:
-			print("le self", self)
-			print("rec2------------------->", rec)
 			picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', rec.id), ('code', '=', 'internal')])
 			rec.picking_type_internal = picking_type_internal[0].id if picking_type_internal else False
-			print("le picking", rec.picking_type_internal.id)
 
 	def _compute_plant_mrp_locations(self):
 		for rec in self:
@@ -80,7 +74,6 @@ class MrpPlant(models.Model):
 
 		if self.is_principal:
 			plant_id = self.search([('is_principal', '=', True)])
-			print("Plant", plant_id)
 			if plant_id:
 				raise ValidationError(_(f"This field is already checked in other plant ({plant_id}). This field have to be checked only once"))
 
@@ -126,9 +119,6 @@ class MrpPlant(models.Model):
 
 	# 	if self:
 	# 		picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', self.id), ('code','=','internal')])
-	# 		print("le picking_type_internal", picking_type_internal.name)
-	# 		print("le vals", vals)
-	# 		print("le valget ",vals.get('supply_location_src_id'))
 	# 		if picking_type_internal:
 	# 			if len(picking_type_internal) == 1:
 	# 				if vals.get('supply_location_src_id', False):

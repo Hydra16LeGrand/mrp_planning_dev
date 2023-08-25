@@ -14,7 +14,6 @@ class WizardOverview(models.TransientModel):
 	def default_get(self, fields_list):
 		res = super(WizardOverview, self).default_get(fields_list)
 
-		print("le res", res)
 		# On récupère le contexte actuel ainsi que les éléments dans le contexte
 		context = self.env.context
 		overview_ids = context.get("overview_ids", [])
@@ -24,13 +23,11 @@ class WizardOverview(models.TransientModel):
 		if self.env.context.get('active_id'):
 			# Récupère l'enregistrement du modèle 'mrp.planning' correspondant à l'ID actif
 			planning = self.env['mrp.planning'].browse(self.env.context.get('active_id'))
-			print("le planning:", planning.id)
 
 			# Verif if products of planning have a bill of material
 			verif_bom = planning.verif_bom()
 			# Verif if products of planning have all qty informations necessary
 			verif_product_proportion = planning.verif_product_proportion()
-			print("verif_product_proportion", verif_product_proportion)
 			if verif_bom:
 				raise ValidationError(
 					_(
@@ -100,7 +97,6 @@ class WizardOverview(models.TransientModel):
 				for line in ov_by_products:
 					required_qty += line['required_qty']
 
-				# print("required qty", ov_by_products[0].bom_id)
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
 				overview['required_qty'] = required_qty
 				overview['missing_qty'] = (
@@ -117,8 +113,6 @@ class WizardOverview(models.TransientModel):
 		filtered_overview_line = [overview for overview in overview_line if overview]
 		overview_line = filtered_overview_line
 
-		print("overviewline", overview_line)
-		# print("le repeteux",existing_lines)
 
 		overview_lines = []
 		for element in overview_line:
@@ -130,7 +124,6 @@ class WizardOverview(models.TransientModel):
 				'uom_id': element['uom_id'],
 				'bom_id': element['bom_id'],
 			}))
-		print("overview_linessssss", overview_lines)
 
 		total_missing_qty = (line['missing_qty'] for line in self.overview_line_ids)
 
@@ -143,7 +136,6 @@ class WizardOverview(models.TransientModel):
 
 
 	def create_internal_transfer(self):
-		print("debut de la fonction appeler")
 
 		context = self.env.context
 		overview_ids = context.get("overview_ids", [])
@@ -157,15 +149,10 @@ class WizardOverview(models.TransientModel):
 		planning = self.env["mrp.planning"].browse(planning_id)
 
 		# On peut maintenant accéder aux informations du planning
-		print("Planning ID:", planning.id)
-		print("Planning Reference:", planning.reference)
-		print("le overview_ids: ", overview_ids, type(overview_ids))
-		print("le total_missing_qty: ", total_missing_qty)
 
 		# Recherche le type de transfert 'internal'
 		picking_type = self.env['stock.picking.type'].search(
 			[('code', '=', 'internal'), ('plant_id', '=', planning.plant_id.id)])
-		print('le picking ', picking_type)
 
 		# Recherche des bons de livraison existants liés au planning
 		existing_pickings = self.env['stock.picking'].search([
@@ -200,18 +187,13 @@ class WizardOverview(models.TransientModel):
 			raise ValidationError(
 				_("The supply order cannot be created. The raw materials are in sufficient quantity in the stock."))
 
-		print("le type de overview_ids", type(overview_ids))
 
 		# Parcourt les IDs des éléments d'overview pour créer les mouvements de stock
 		for data in self.overview_line_ids:
 			if not data.exists():
-				print('Data:', data)
-				print("L'enregistrement avec l'ID", data, "n'existe pas ou a été supprimé.")
 				continue
 
-			print('Missing_qty', data.missing_qty)
 			if data.missing_qty != 0:
-				print("dans le if")
 				# Crée un mouvement de stock (stock.move)
 				stock_move = self.env['stock.move'].create({
 					'name': f'Send {data.product_id.name}',
@@ -223,8 +205,6 @@ class WizardOverview(models.TransientModel):
 					'picking_type_id': picking_type.id,
 					'picking_id': stock_picking.id,
 				})
-				print("Le stock_move :", stock_move)
-				print("le dico ", stock_move["name"])
 
 		return {
 			'type': 'ir.actions.client',

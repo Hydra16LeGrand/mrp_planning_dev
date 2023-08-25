@@ -26,10 +26,8 @@ class StockLocationInherit(models.Model):
 
 	@api.onchange('packaged_finished_product')
 	def _onchange_packaged_finished_product(self):
-		print("Seeeef", self.packaged_finished_product)
 		if self.packaged_finished_product:
 			all_packaged_finished_product = self.search_count([('packaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
-			print("Alll loc", all_packaged_finished_product)
 			if all_packaged_finished_product != 0:
 				raise ValidationError(_("A packaged finished product location already exists for this plant. Uncheck this one before this operation."))
 			else:
