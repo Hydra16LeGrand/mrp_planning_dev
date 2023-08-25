@@ -40,7 +40,7 @@ class MrpProductionInherit(models.Model):
 			old_product_id = rec.product_id
 			old_state = rec.state
 			res = super(MrpProductionInherit, rec).write(vals)
-			print(f'vals : {vals}')
+			print(f'self.env.context : {self.env.context}')
 			if rec.planning_id:
 				if 'product_id' in vals:
 					product_id = self.env['product.product'].search([('id', '=', vals['product_id'])])
@@ -49,8 +49,9 @@ class MrpProductionInherit(models.Model):
 						rec.detailed_pl_id.write({'product_id': vals['product_id']})
 						rec.product_qty = old_qty
 						rec.bom_id = bom_id
-						message = f"<p><b> <em> (Detailed planning lines)</em> {old_product_id.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{product_id.name}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
-						rec.planning_id.message_post(body=message)
+						if self.env.context.get('active_model') != 'mrp.planning':
+							message = f"<p><b> <em> (Detailed planning lines)</em> {old_product_id.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{product_id.name}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
+							rec.planning_id.message_post(body=message)
 				# if 'state' in vals:
 				# 	message = f"<p><b> <em> (Detailed planning lines)</em> {old_state} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{vals['state']}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
 				# 	rec.planning_id.message_post(body=message)

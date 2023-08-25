@@ -18,6 +18,7 @@
 						<group>
 							<field name="packaging_line_domain" widget="many2many_tags" invisible="1" />
 							<field name="packaging_line" domain="[('id', 'in', packaging_line_domain)]" attrs="{'readonly': [('section', '=', False)]}"/>
+							<field name="qty" attrs="{'readonly': [('section', '=', False)]}"/>
 <!--								<field name="packaging_line"/>-->
 <!--							</field>-->
 							<field name="line_domain" widget="many2many_tags" invisible="1" />
