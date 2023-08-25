@@ -117,7 +117,7 @@
 									<field name="packaging_line_domain" invisible="1"/>
 									<field name="packaging_line_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', packaging_line_domain)]" />
 									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
-									<field name="mrp_production_id" string="Order" optional="hide" />
+									<field name="mrp_production_id" string="Order" optional="hide" attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated')]}"/>
 									<field name="package" />
 									<field name="qty" />
 									<field name="capacity" />
