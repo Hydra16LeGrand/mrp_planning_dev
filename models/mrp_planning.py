@@ -138,6 +138,50 @@ class MrpPlanning(models.Model):
 
         return res
 
+    def create_detail_planning_line(self, element):
+        ppp_id = self.env['mrp.packaging.pp'].search(
+            [('packaging_line_id', '=', element['packaging_line_id'].id),
+             ('product_id', '=', element['product_id'].id)], limit=1)
+
+        self.env['mrp.detail.planning.line'].create([
+            {
+                'date_char': day['name'],
+                'date': day['date'],
+                'product_id': element['product_id'].id,
+                'package': element['package'],
+                'qty': element['qty'],
+                'capacity': ppp_id.capacity if ppp_id else 0,
+                'packaging_line_id': element['packaging_line_id'].id,
+                'planning_line_id': element['planning_line_id'],
+                'section_id': element['section_id'].id,
+                'planning_id': element['planning_id'],
+                'employee_number': ppp_id.employee_number if ppp_id else 0,
+            } for day in element['mrp_days']])
+
+    def create_lines_or_sections(self, element, dt):
+        name = '       ' + element['packaging_line_id'].name if dt == 'line_note' else element['section_id'].name
+        self.env['mrp.detail.planning.line'].create([{
+            'display_type': dt,
+            'name': name,
+            'product_id': element['product_id'].id,
+            'planning_line_id': element['planning_line_id'],
+            'section_id': element['section_id'].id,
+            'planning_id': element['planning_id'],
+            'qty': element['qty'],
+            'packaging_line_id': element['packaging_line_id'].id,
+            'date': date.today(),
+        }])
+
+    def group_by_key(self, list_of_dicts, key):
+        dict_of_lists = {}
+        for dictionary in list_of_dicts:
+            dict_key = dictionary.get(key)
+            if dict_key in dict_of_lists:
+                dict_of_lists[dict_key].append(dictionary)
+            else:
+                dict_of_lists[dict_key] = [dictionary]
+        return dict_of_lists
+
     def action_confirm(self):
 
         if not self.planning_line_ids:
@@ -165,14 +209,8 @@ class MrpPlanning(models.Model):
                 }
                 value_planning_line.append(val)
 
-            dict_dictionnaires = {}
             if value_planning_line:
-                for dictionnaire in value_planning_line:
-                    section_id = dictionnaire.get('section_id')
-                    if section_id in dict_dictionnaires:
-                        dict_dictionnaires[section_id].append(dictionnaire)
-                    else:
-                        dict_dictionnaires[section_id] = [dictionnaire]
+                dict_dictionnaires = self.group_by_key(value_planning_line, 'section_id')
 
                 # Extraction des dictionnaires avec la même section_id
                 liste_meme_section_id = [dictionnaires for dictionnaires in dict_dictionnaires.values() if
@@ -185,25 +223,8 @@ class MrpPlanning(models.Model):
                 if liste_meme_section_id:
                     for element in liste_meme_section_id:
                         section_element = element[0]
-                        self.env['mrp.detail.planning.line'].create([{
-                            'display_type': 'line_section',
-                            'name': section_element['section_id'].name,
-                            'product_id': section_element['product_id'].id,
-                            'planning_line_id': section_element['planning_line_id'],
-                            'planning_id': section_element['planning_id'],
-                            'section_id': section_element['section_id'].id,
-                            'qty': section_element['qty'],
-                            'packaging_line_id': section_element['packaging_line_id'].id,
-                            'date': date.today(),
-                        }])
-
-                        dico = {}
-                        for dictionnaire in element:
-                            packaging_line_id = dictionnaire.get('packaging_line_id')
-                            if packaging_line_id in dico:
-                                dico[packaging_line_id].append(dictionnaire)
-                            else:
-                                dico[packaging_line_id] = [dictionnaire]
+                        self.create_lines_or_sections(section_element, 'line_section')
+                        dico = self.group_by_key(element, 'packaging_line_id')
 
                         # Extraction des dictionnaires avec le même packaging line
                         liste_meme_packaging_line_id = [dictionnaires for dictionnaires in dico.values() if
@@ -218,117 +239,20 @@ class MrpPlanning(models.Model):
                             for elm in liste_meme_packaging_line_id:
 
                                 packaging_element = elm[0]
-
-                                self.env['mrp.detail.planning.line'].create([{
-                                    'display_type': 'line_note',
-                                    'name': '       ' + packaging_element['packaging_line_id'].name,
-                                    'product_id': packaging_element['product_id'].id,
-                                    'planning_line_id': packaging_element['planning_line_id'],
-                                    'section_id': packaging_element['section_id'].id,
-                                    'planning_id': packaging_element['planning_id'],
-                                    'qty': packaging_element['qty'],
-                                    'packaging_line_id': packaging_element['packaging_line_id'].id,
-                                    'date': date.today(),
-                                }])
+                                self.create_lines_or_sections(packaging_element, 'line_note')
                                 for value in elm:
-                                    ppp_id = self.env['mrp.packaging.pp'].search(
-                                        [('packaging_line_id', '=', value['packaging_line_id'].id),
-                                         ('product_id', '=', value['product_id'].id)], limit=1)
-
-                                    self.env['mrp.detail.planning.line'].create([{
-                                        'date_char': day['name'],
-                                        'date': day['date'],
-                                        'product_id': value['product_id'].id,
-                                        'package': value['package'],
-                                        # 'qty': bom_id.packing * pline.package if bom_id else pline.package,
-                                        # 'capacity': bom_id.capacity * pline.package if bom_id else pline.package,
-                                        'qty': value['qty'],
-                                        'capacity': ppp_id.capacity if ppp_id else 0,
-                                        'packaging_line_id': value['packaging_line_id'].id,
-                                        'planning_line_id': value['planning_line_id'],
-                                        'section_id': value['section_id'].id,
-                                        'planning_id': value['planning_id'],
-                                        'employee_number': ppp_id.employee_number if ppp_id else 0,
-                                    } for day in value['mrp_days']])
+                                    self.create_detail_planning_line(value)
 
                         if liste_autres_dico:
                             for value in liste_autres_dico:
-                                self.env['mrp.detail.planning.line'].create([{
-                                    'display_type': 'line_note',
-                                    'name': '       ' + value['packaging_line_id'].name,
-                                    'product_id': value['product_id'].id,
-                                    'planning_line_id': value['planning_line_id'],
-                                    'section_id': value['section_id'].id,
-                                    'planning_id': value['planning_id'],
-                                    'qty': value['qty'],
-                                    'packaging_line_id': value['packaging_line_id'].id,
-                                    'date': date.today(),
-                                }])
-
-                                ppp_id = self.env['mrp.packaging.pp'].search(
-                                    [('packaging_line_id', '=', value['packaging_line_id'].id),
-                                     ('product_id', '=', value['product_id'].id)], limit=1)
-
-                                self.env['mrp.detail.planning.line'].create([{
-                                    'date_char': day['name'],
-                                    'date': day['date'],
-                                    'product_id': value['product_id'].id,
-                                    'package': value['package'],
-                                    # 'qty': bom_id.packing * pline.package if bom_id else pline.package,
-                                    # 'capacity': bom_id.capacity * pline.package if bom_id else pline.package,
-                                    'qty': value['qty'],
-                                    'capacity': ppp_id.capacity if ppp_id else 0,
-                                    'packaging_line_id': value['packaging_line_id'].id,
-                                    'planning_line_id': value['planning_line_id'],
-                                    'section_id': value['section_id'].id,
-                                    'planning_id': value['planning_id'],
-                                    'employee_number': ppp_id.employee_number if ppp_id else 0,
-                                } for day in value['mrp_days']])
+                                self.create_lines_or_sections(value, 'line_note')
+                                self.create_detail_planning_line(value)
 
                 if liste_autres_dictionnaires:
                     for element in liste_autres_dictionnaires:
-                        self.env['mrp.detail.planning.line'].create([{
-                            'display_type': 'line_section',
-                            'name': element['section_id'].name,
-                            'product_id': element['product_id'].id,
-                            'planning_line_id': element['planning_line_id'],
-                            'section_id': element['section_id'].id,
-                            'planning_id': element['planning_id'],
-                            'qty': element['qty'],
-                            'packaging_line_id': element['packaging_line_id'].id,
-                            'date': date.today(),
-                        }])
-
-                        self.env['mrp.detail.planning.line'].create([{
-                            'display_type': 'line_note',
-                            'name': '       ' + element['packaging_line_id'].name,
-                            'product_id': element['product_id'].id,
-                            'planning_line_id': element['planning_line_id'],
-                            'section_id': element['section_id'].id,
-                            'planning_id': element['planning_id'],
-                            'qty': element['qty'],
-                            'packaging_line_id': element['packaging_line_id'].id,
-                            'date': date.today(),
-                        }])
-
-                        ppp_id = self.env['mrp.packaging.pp'].search(
-                            [('packaging_line_id', '=', element['packaging_line_id'].id),
-                             ('product_id', '=', element['product_id'].id)], limit=1)
-                        self.env['mrp.detail.planning.line'].create([{
-                            'date_char': day['name'],
-                            'date': day['date'],
-                            'product_id': element['product_id'].id,
-                            'package': element['package'],
-                            # 'qty': bom_id.packing * pline.package if bom_id else pline.package,
-                            # 'capacity': bom_id.capacity * pline.package if bom_id else pline.package,
-                            'qty': element['qty'],
-                            'capacity': ppp_id.capacity if ppp_id else 0,
-                            'packaging_line_id': element['packaging_line_id'].id,
-                            'planning_line_id': element['planning_line_id'],
-                            'section_id': element['section_id'].id,
-                            'planning_id': element['planning_id'],
-                            'employee_number': ppp_id.employee_number if ppp_id else 0,
-                        } for day in element['mrp_days']])
+                        self.create_lines_or_sections(element, 'line_section')
+                        self.create_lines_or_sections(element, 'line_note')
+                        self.create_detail_planning_line(element)
         except Exception as e:
             raise e
         else:
@@ -705,9 +629,9 @@ class MrpPlanning(models.Model):
 
     def print_message(self, mrp_planning, env, dl_id, detail, format_string, extra_info):
         line_dl_id = self.get_line_dl_id(env, dl_id)
-        message = (f"<li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style = 'color: #0182b6;' > {line_dl_id.name} </span></b><em> {extra_info} </em></p></li>")
+        message = (
+            f"<ul><li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style = 'color: #0182b6;' > {line_dl_id.name} </span></b><em> {extra_info} </em></p></li>")
         mrp_planning.message_post(body=message)
-
 
     def write(self, vals):
         for rec in self:
@@ -861,17 +785,19 @@ class MrpPlanning(models.Model):
                         for detail in old_detail_planning_line:
                             if dl['id'] == detail['id']:
                                 if dl['id'] in section_dls:
-                                    self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "", " (Detailed planning lines Large Sections)")
+                                    self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "",
+                                                       " (Detailed planning lines Large Sections)")
 
                                 elif dl['id'] in line_dls:
-                                    self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "", " (Detailed planning lines Large Line)")
+                                    self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "",
+                                                       " (Detailed planning lines Large Line)")
 
                                 else:
                                     # Récupérer la lign et la section de l'éléments modifié
                                     sect_dl = max([sect_id for sect_id in section_dls if sect_id < dl['id']],
-                                                            default=None)
+                                                  default=None)
                                     line_dl = max([line_id for line_id in line_dls if line_id < dl['id']],
-                                                            default=None)
+                                                  default=None)
 
                                     large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
                                     large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
@@ -915,9 +841,9 @@ class MrpPlanning(models.Model):
                                 if dl in section_dls:
                                     new_sect = self.env['mrp.detail.planning.line'].browse(dl['id'])
                                     message_to_delete_dl += (f"<li><p><b>"
-                                                            f"{detail['name']} <span style='font-size: "
-                                                            f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
-                                                            f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
+                                                             f"{detail['name']} <span style='font-size: "
+                                                             f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
+                                                             f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
                                     mrp_planning.message_post(body=message_to_delete_dl)
 
                                 elif dl in line_dls:
@@ -945,9 +871,9 @@ class MrpPlanning(models.Model):
                                 if dl in section_dls:
                                     new_sect = self.env['mrp.detail.planning.line'].browse(dl['id'])
                                     message_to_add_dl += (f"<li><p><b>"
-                                                            f"{detail['name']} <span style='font-size: "
-                                                            f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
-                                                            f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
+                                                          f"{detail['name']} <span style='font-size: "
+                                                          f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
+                                                          f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
                                     mrp_planning.message_post(body=message_to_add_dl)
 
                                 elif dl in line_dls:
