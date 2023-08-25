@@ -64,7 +64,7 @@
                         <div>
                             <div t-attf-class="o_kanban_card_header">
                                 <div class="d-flex justify-content-end">
-                                    <a type="object" name="get_plant_configuration">
+                                    <a type="object" name="picking_type_form_view">
                                         <i class="fa fa-gear" role="img" aria-label="Manage" title="Manage"></i>
                                     </a>
                                 </div>
