@@ -768,9 +768,7 @@ class MrpPlanning(models.Model):
                     mrp_planning.message_post(body=message_to_add_pl)
 
             if 'detailed_pl_ids' in vals:
-                new_dl_id = [val[1] for val in vals['detailed_pl_ids']]
-
-                add_dl = [val[2] for val in vals['detailed_pl_ids'] if val[0] == 0]
+                new_dl_id = [val[1] for val in vals['detailed_pl_ids'] if val[0] > 2]
                 delete_dl = [val[1] for val in vals['detailed_pl_ids'] if val[0] == 2]
                 update_dl = [{'id': val[1], 'value': val[2]} for val in vals['detailed_pl_ids'] if val[0] == 1]
                 ids = self.env['mrp.detail.planning.line'].browse(new_dl_id)
@@ -862,37 +860,6 @@ class MrpPlanning(models.Model):
 
                                     message_to_delete_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
                                     mrp_planning.message_post(body=message_to_delete_dl)
-
-                if add_dl:
-                    message_to_add_dl = "<p><em>Detailed planning lines removed are :</em></p><ul>"
-                    for dl in add_dl:
-                        for detail in old_detail_planning_line:
-                            if dl == detail['id']:
-                                if dl in section_dls:
-                                    new_sect = self.env['mrp.detail.planning.line'].browse(dl['id'])
-                                    message_to_add_dl += (f"<li><p><b>"
-                                                          f"{detail['name']} <span style='font-size: "
-                                                          f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
-                                                          f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
-                                    mrp_planning.message_post(body=message_to_add_dl)
-
-                                elif dl in line_dls:
-                                    new_line = self.env['mrp.detail.planning.line'].browse(dl['id'])
-                                    message_to_add_dl += f"<li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_line.name}</span></b><em>(Large Line)</em></p></li>"
-                                    mrp_planning.message_post(body=message_to_add_dl)
-
-                                else:
-                                    sect_dl = max([sect_id for sect_id in section_dls if sect_id < dl],
-                                                  default=None)
-                                    line_dl = max([line_id for line_id in line_dls if line_id < dl],
-                                                  default=None)
-
-                                    large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
-                                    large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
-
-                                    message_to_add_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
-                                    mrp_planning.message_post(body=message_to_add_dl)
-
         return res
 
 
