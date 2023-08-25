@@ -14,7 +14,7 @@
                          attrs="{'invisible': [('state','not in',('04_mo_generated','confirm'))]}" />
 					<button name="action_product_replacement" type="object" string="Replace product" attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary" />
 <!--					<button name="action_confirm_productions" type="object" string="CONFIRM PRODUCTION ORDERS" class="btn-success" confirm="All productions orders will be in confirmed state. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('mrp_production_general_state', '!=', 'draft')]}" />-->
-					<button name="action_mark_productions_as_done" type="object" string="MARK PO AS DONE"  class="btn-warning" confirm="This action will complete all manufacturing orders process in this planning. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}" />
+					<button name="action_mark_productions_as_done" type="object" string="FINALIZE PRODUCTION"  class="btn-warning" confirm="This action will complete all manufacturing orders process in this planning. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}" />
 					<field name="state" widget="statusbar" statusbar_visible="draft,confirm,04_mo_generated" statusbar_invisible="cancel" attrs="{'invisible': [('state', '=', '0')]}"/>
 <!--					<field name="mrp_production_general_state" invisible="1" />-->
 					<field name="detailed_pl_done_state" invisible="1" />
@@ -113,15 +113,15 @@
 									<field name="display_type" invisible="1"/>
                                     <field name="name" />
 									<field name="product_ref" />
-									<field name="product_id" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" />
+									<field name="product_id" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" optional="show" />
 									<field name="packaging_line_domain" invisible="1"/>
 									<field name="packaging_line_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', packaging_line_domain)]" />
 									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
-									<field name="mrp_production_id" string="Order" />
+									<field name="mrp_production_id" string="Order" optional="hide" />
 									<field name="package" />
 									<field name="qty" />
 									<field name="capacity" />
-									<field name="employee_number" />
+									<field name="employee_number" optional="hide" />
 									<field name="date" />
 									<field name="state" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-bf="state == 'confirmed'" decoration-warning="state == 'progress'" decoration-success="state == 'done'" />
 									<button name="action_manage_production" type="object" title="Manage Production"  icon="fa-flask" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" />

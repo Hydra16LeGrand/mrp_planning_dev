@@ -775,7 +775,7 @@ msgstr "Ligne à remplacer"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
-msgid "MARK PO AS DONE"
+msgid "FINALIZE PRODUCTION"
 msgstr "MARQUER PO COMME FAIT"
 
 #. module: mrp_planning
