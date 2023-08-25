@@ -522,12 +522,21 @@ class ReplaceProduct(models.TransientModel):
                     raise UserError(_("There are no manufacturing orders for this product for these days."))
 
                 # post message at chatter
-                message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}, line {rec.packaging_line.name} and days : </b></p><ul>"
-                msg = ""
-                for day in rec.replacement_days:
-                    msg += f"<li><p><b>{day.name}</b></p></li>"
-                message += msg
-                rec.planning_id.message_post(body=message)
+                if rec.qty:
+                    message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}, line {rec.packaging_line.name} and days : </b></p><ul>"
+                    msg = ""
+                    for day in rec.replacement_days:
+                        msg += f"<li><p><b>{day.name}</b></p></li>"
+                    message += msg
+                    message += f"<li><p><b>new quantity <span style='color: #0182b6;'>{rec.qty}</span></b></p></li>"
+                    rec.planning_id.message_post(body=message)
+                else:
+                    message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}, line {rec.packaging_line.name} and days : </b></p><ul>"
+                    msg = ""
+                    for day in rec.replacement_days:
+                        msg += f"<li><p><b>{day.name}</b></p></li>"
+                    message += msg
+                    rec.planning_id.message_post(body=message)
             else:
                 end_section_id = self.env['mrp.detail.planning.line'].search([
                     ('id', '>', rec.section.id),
@@ -591,6 +600,10 @@ class ReplaceProduct(models.TransientModel):
                     raise UserError(_("There are no manufacturing orders for this product"))
 
                 # post message at chatter
-                message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}</b></p><ul>"
-                rec.planning_id.message_post(body=message)
+                if not rec.qty:
+                    message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name}</b></p><ul>"
+                    rec.planning_id.message_post(body=message)
+                else:
+                    message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name} with new quantity <span style='color: #0182b6;'>{rec.qty}</span></b></p><ul>"
+                    rec.planning_id.message_post(body=message)
 
