@@ -700,6 +700,14 @@ class MrpPlanning(models.Model):
 
         return message
 
+    def get_line_dl_id(self, env, dl_id):
+        return self.env[env].browse(dl_id)
+
+    def print_message(self, mrp_planning, env, dl_id, detail, format_string, extra_info):
+        line_dl_id = self.get_line_dl_id(env, dl_id)
+        message = (f"<li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style = 'color: #0182b6;' > {line_dl_id.name} </span></b><em> {extra_info} </em></p></li>")
+        mrp_planning.message_post(body=message)
+
 
     def write(self, vals):
         for rec in self:
@@ -840,45 +848,23 @@ class MrpPlanning(models.Model):
 
                 add_dl = [val[2] for val in vals['detailed_pl_ids'] if val[0] == 0]
                 delete_dl = [val[1] for val in vals['detailed_pl_ids'] if val[0] == 2]
-                update_dl = [{
-                    'id': val[1],
-                    'value': val[2]
-                } for val in vals['detailed_pl_ids'] if val[0] == 1]
-
-                # Récupérer les lignes et les sections
-                section_dl = []
-                line_dl = []
-                for dl_id in new_dl_id:
-                    detail = self.env['mrp.detail.planning.line'].browse(dl_id)
-                    if detail.display_type == 'line_section':
-                        section_dl.append(dl_id)
-                    elif detail.display_type == 'line_note':
-                        line_dl.append(dl_id)
-
-                # ordonnez les listes des lignes et celle des sections
+                update_dl = [{'id': val[1], 'value': val[2]} for val in vals['detailed_pl_ids'] if val[0] == 1]
+                ids = self.env['mrp.detail.planning.line'].browse(new_dl_id)
+                section_dl = [dl.id for dl in ids if dl.display_type == 'line_section']
+                line_dl = [dl.id for dl in ids if dl.display_type == 'line_note']
                 section_dls = sorted(section_dl)
                 line_dls = sorted(line_dl)
+                update_dl_id = [dl['id'] for dl in update_dl if update_dl]
 
                 if update_dl:
-                    update_dl_id = [dl['id'] for dl in update_dl]
-
                     for dl in update_dl:
-
                         for detail in old_detail_planning_line:
-
                             if dl['id'] == detail['id']:
                                 if dl['id'] in section_dls:
-                                    new_sect = self.env['mrp.detail.planning.line'].browse(dl['id'])
-                                    message_to_update_dl = (f"<ul><li><p><b>{detail['name']} <span style='font-size: "
-                                                            f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
-                                                            f"{new_sect.name}</span></b><em> (Detailed planning lines Large "
-                                                            f"Sections)</em> </p></li>")
-                                    mrp_planning.message_post(body=message_to_update_dl)
+                                    self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "", " (Detailed planning lines Large Sections)")
 
                                 elif dl['id'] in line_dls:
-                                    new_line = self.env['mrp.detail.planning.line'].browse(dl['id'])
-                                    message_to_update_dl = f"<ul><li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_line.name}</span></b><em> (Detailed planning lines Large Line)</em> </p></li>"
-                                    mrp_planning.message_post(body=message_to_update_dl)
+                                    self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "", " (Detailed planning lines Large Line)")
 
                                 else:
                                     # Récupérer la lign et la section de l'éléments modifié
@@ -903,9 +889,7 @@ class MrpPlanning(models.Model):
                                     message_to_update_dl = f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name}, Date {detail['date'].strftime('%d/%m/%Y')} : </b></p><ul>" if 'date' not in value else f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name}, Date {dl['date']} : </b></p><ul>"
                                     msg = ""
                                     if 'product_id' in value:
-                                        print(f"value['product_id'] : {value['product_id']}")
                                         new_prod = self.env['product.product'].browse(value['product_id'])
-                                        print(f"new_prod : {new_prod}")
                                         msg += f"<li><p><b>{detail['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
 
                                     if 'packaging_line_id' in value:
