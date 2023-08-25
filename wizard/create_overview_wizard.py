@@ -77,6 +77,7 @@ class WizardOverview(models.TransientModel):
 				product_id = line.product_id.id
 				required_qty = dl.qty * line.product_qty
 				on_hand_qty = on_hand_qty
+				print("la valeur du champ ordered_qty:",self.overview_line_ids.ordered_qty)
 
 				dico = {
 					'product_id': product_id,
@@ -84,9 +85,9 @@ class WizardOverview(models.TransientModel):
 					'on_hand_qty': on_hand_qty,
 					'uom_id': line.product_uom_id.id,
 					'bom_id': line.bom_id.id,
-
 				}
 				overview_line.append(dico)
+
 
 		# Delete duplicate lines and accumulate all of products required_qty
 		product_use_ids = []
@@ -129,8 +130,10 @@ class WizardOverview(models.TransientModel):
 				'missing_qty': element['missing_qty'],
 				'uom_id': element['uom_id'],
 				'bom_id': element['bom_id'],
+				# 'ordered_qty': element['missing_qty'],
 			}))
 		print("overview_linessssss", overview_lines)
+		print("le ordered qty")
 
 		total_missing_qty = (line['missing_qty'] for line in self.overview_line_ids)
 
@@ -164,7 +167,7 @@ class WizardOverview(models.TransientModel):
 
 		# Recherche le type de transfert 'internal'
 		picking_type = self.env['stock.picking.type'].search(
-			[('code', '=', 'internal')], order="id desc")
+			[('code', '=', 'internal'), ('plant_id', '=', planning.plant_id.id)], order="id desc")
 		print('le picking ', picking_type.name)
 
 		# Recherche des bons de livraison existants liés au planning
@@ -216,7 +219,7 @@ class WizardOverview(models.TransientModel):
 				stock_move = self.env['stock.move'].create({
 					'name': f'Send {data.product_id.name}',
 					'product_id': data.product_id.id,
-					'product_uom_qty': data.missing_qty,  # Quantité à transférer
+					'product_uom_qty': data.ordered_qty,  # Quantité à transférer
 					'product_uom': data.uom_id.id,
 					'location_id': picking_type.default_location_src_id.id,
 					'location_dest_id': stock_tampon_location.id,
@@ -242,15 +245,16 @@ class WizardOverviewLine(models.TransientModel):
 	_description = 'Overview Wizard Line'
 	
 	product_id = fields.Many2one("product.product", string=_("Raw materiel"))
-	required_qty = fields.Integer(_("Required qty"))
-	on_hand_qty = fields.Integer(
-		_("On hand qty"), compute="_compute_on_hand_qty_count")
-	missing_qty = fields.Integer(_("Missing qty"))
+	required_qty = fields.Float(_("Required qty"), digits=(16, 0))
+	on_hand_qty = fields.Float(
+		_("On hand qty"), compute="_compute_on_hand_qty_count", digits=(16, 0))
+	missing_qty = fields.Float(_("Missing qty"), digits=(16, 0))
 	uom_id = fields.Many2one("uom.uom", string=_("Unit of measure"))
 
 	bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
 	bom_ids = fields.Many2many("mrp.bom", string=_("Bill of materials"))
 	overview_id = fields.Many2one("overview.wizard", string=_("Overview"))
+	ordered_qty = fields.Float(_("Ordered Quantity"), default=lambda self: self.missing_qty, digits=(16, 0))
 	
 	def _compute_on_hand_qty_count(self):
 		temp_stock = self.env['stock.location'].search(

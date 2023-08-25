@@ -13,6 +13,7 @@
                                     <field name="required_qty" />
                                     <field name="on_hand_qty" />
                                     <field name="missing_qty" />
+                                     <field name="ordered_qty" />
                                     <field name="uom_id" />
                                     <field name="bom_ids" invisible="1" widget="many2many_tags" />
                                 </tree>
@@ -20,12 +21,13 @@
                                     <sheet>
                                         <group>
                                             <group>
-                                                <field name="product_id" />
-                                                <field name="required_qty" />
+                                                <field name="product_id" readonly="1"/>
+                                                <field name="required_qty" readonly="1"/>
                                             </group>
                                             <group>
                                                 <field name="on_hand_qty" />
-                                                <field name="missing_qty" />
+                                                <field name="missing_qty" readonly="1"/>
+                                                <field name="ordered_qty" />
                                             </group>
                                         </group>
                                     </sheet>

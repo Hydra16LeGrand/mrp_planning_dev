@@ -297,7 +297,7 @@ msgstr "Entreprise"
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
 #: model_terms:ir.ui.view,arch_db:mrp_planning.replace_product_form
 msgid "Confirm"
-msgstr "Confirmer"
+msgstr "Confirmé"
 
 #. module: mrp_planning
 #: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__confirmed
@@ -322,7 +322,7 @@ msgstr "Nombre de planification de fabrication"
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning_cancel
 msgid "Count Mrp Planning Cancel"
-msgstr "Nombre la planification de fabrication Annuler"
+msgstr "Nombre de planification de fabrication Annuler"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__count_mrp_planning_confirm
@@ -347,12 +347,12 @@ msgstr "Créer un nouveau type d'opération"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
 msgid "Create supply order"
-msgstr "Créer un ordre d'approvisionnement"
+msgstr "Créer un ordre de ravitaillement"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.rm_overview_tree
 msgid "Create supply orders"
-msgstr "Créer des ordres d'approvisionnement"
+msgstr "Créer des ordres de ravitaillement"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__create_uid
@@ -391,7 +391,7 @@ msgstr "Créé sur"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "DETAILED THE PLANNING"
-msgstr "DÉTAILLÉ LA PLANIFICATION"
+msgstr "DÉTAILLÉ LE PLANNING"
 
 #. module: mrp_planning
 #. odoo-python
@@ -438,7 +438,7 @@ msgstr "Emplacement par défaut de la destination d'approvisionement"
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__supply_location_src_id
 #, python-format
 msgid "Default supply location"
-msgstr "Lieu d'approvisionnement par défaut"
+msgstr "Lieu de ravitaillement par défaut"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__detail_line_id
@@ -508,7 +508,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__employee_number
 #, python-format
 msgid "EN"
-msgstr ""
+msgstr "NE"
 
 #. module: mrp_planning
 #: model:ir.model,name:mrp_planning.model_hr_employee
@@ -541,14 +541,14 @@ msgstr "Erreur lors de la création du bon de livraison. Impossible de trouver l
 #, python-format
 msgid "Error during Internal supply order creation. Cannot find 'Stock tampon' location."
 msgstr ""
-"Erreur lors de la création d'un ordre d'approvisionnement interne. Impossible de trouver 'Stock tampon' l'emplacement."
+"Erreur lors de la création d'un ordre de ravitaillement interne. Impossible de trouver 'Stock tampon' l'emplacement."
 
 #. module: mrp_planning
 #. odoo-python
 #: code:addons/mrp_planning/models/rm_overview.py:0
 #, python-format
 msgid "Error during supply order creation. Cannot find 'Stock tampon' location."
-msgstr "Erreur lors de la création d'un ordre de d'approvisionnement. Impossible de trouver l'emplacement 'Stock tampon'."
+msgstr "Erreur lors de la création d'un ordre de de ravitaillement. Impossible de trouver l'emplacement 'Stock tampon'."
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__message_follower_ids
@@ -590,7 +590,7 @@ msgstr "Générer"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "Generate MO"
-msgstr "Générer un ordre de fabrication"
+msgstr "GÉNERER ORDRES DE FABRICATIONS"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
@@ -776,7 +776,7 @@ msgstr "Ligne à remplacer"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "MARK PO AS DONE"
-msgstr "MARQUER PO COMME FAIT"
+msgstr "FINALISER LA FABRICATION"
 
 #. module: mrp_planning
 #: model:ir.actions.act_window,name:mrp_planning.action_mrp_planning model:ir.ui.menu,name:mrp_planning.mrp_planning_menu
@@ -1029,7 +1029,7 @@ msgstr "Nombre de messages avec erreur de livraison"
 #: model:ir.model.fields,field_description:mrp_planning.field_rm_overview__on_hand_qty
 #, python-format
 msgid "On hand qty"
-msgstr "Quantité en main"
+msgstr "Quantité disponible"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
@@ -1109,7 +1109,7 @@ msgstr ""
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "Packaging Line ID"
-msgstr "Identifiant de la ligne d'emballage"
+msgstr "Identifiant de la ligne de conditionnement"
 
 #. module: mrp_planning
 #: model:ir.actions.act_window,name:mrp_planning.action_mrp_packaging_line
@@ -1313,13 +1313,13 @@ msgstr "Aperçu des matières premières"
 #: model:ir.actions.act_window,name:mrp_planning.action_rm_main_factory
 #: model:ir.ui.menu,name:mrp_planning.menu_mrp_rm_main_factory
 msgid "RM main factory"
-msgstr "Usine principale de matières premières"
+msgstr "Usine principale MP"
 
 #. module: mrp_planning
 #: model:ir.actions.act_window,name:mrp_planning.action_rm_plastic_factory
 #: model:ir.ui.menu,name:mrp_planning.menu_mrp_rm_plastic_factory
 msgid "RM plastic factory"
-msgstr "Usine de matières premières en plastique"
+msgstr "Usine de plstique MP"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1346,7 +1346,7 @@ msgstr "Référence"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "Replace product"
-msgstr "Remplacer le produit"
+msgstr "Remplacer un produit"
 
 #. module: mrp_planning
 #: model:ir.model,name:mrp_planning.model_replace_product
@@ -1441,7 +1441,7 @@ msgstr "Première section"
 #: model:ir.model.fields,field_description:mrp_planning.field_replace_product__section
 #, python-format
 msgid "Section to replace"
-msgstr "Section à remplacer"
+msgstr "Section de remplacement"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1491,7 +1491,7 @@ msgstr ""
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_form
 msgid "Stock supply"
-msgstr "Approvisionnement de stock"
+msgstr "RAVITAILLEMENT de stock"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1499,12 +1499,12 @@ msgstr "Approvisionnement de stock"
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__internal_transfer_count
 #, python-format
 msgid "Supply count"
-msgstr "Nombre d'approvisionnement"
+msgstr "Nombre de RAVITAILLEMENT"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "Supply order(s)"
-msgstr "Ordre(s) d'approvisionnement"
+msgstr "Ordre(s) de ravitaillement"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1551,7 +1551,7 @@ msgstr "Le nom court de l’usine doit être unique par entreprise !"
 #, python-format
 msgid "The supply order cannot be created. The raw materials are in sufficient quantity in the stock."
 msgstr ""
-"La commande d'approvisionnement ne peut pas être créée. Les matières premières sont en quantité suffisanteen stock."
+"La commande de ravitaillement ne peut pas être créée. Les matières premières sont en quantité suffisanteen stock."
 
 #. module: mrp_planning
 #. odoo-python
@@ -1580,7 +1580,7 @@ msgstr "Cette action annulera tous les ordres de fabrication liés à cette plan
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "This action will complete all manufacturing orders process in this planning. Proceed?"
-msgstr "Cette action complétera tous les processus de commandes de fabrication dans cette planification. Procéder?"
+msgstr "Cette action validera tous les processus de commandes de fabrication dans cette planification. Procéder?"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1747,11 +1747,11 @@ msgstr ""
 #: code:addons/mrp_planning/wizard/create_overview_wizard.py:0
 #, python-format
 msgid "the supply order has been successfully created"
-msgstr ""
+msgstr "l'ordre de ravitaillement a été créée avec succès"
 
 #. module: mrp_planning
 #. odoo-python
 #: code:addons/mrp_planning/models/rm_overview.py:0
 #, python-format
 msgid "the supply order has been successfully created!"
-msgstr ""
+msgstr "l'ordre de ravitaillement a été créée avec succès"
