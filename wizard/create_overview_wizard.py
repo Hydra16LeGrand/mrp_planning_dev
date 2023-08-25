@@ -164,8 +164,8 @@ class WizardOverview(models.TransientModel):
 
 		# Recherche le type de transfert 'internal'
 		picking_type = self.env['stock.picking.type'].search(
-			[('code', '=', 'internal')], order="id desc")
-		print('le picking ', picking_type.name)
+			[('code', '=', 'internal'), ('plant_id', '=', planning.plant_id.id)])
+		print('le picking ', picking_type)
 
 		# Recherche des bons de livraison existants liés au planning
 		existing_pickings = self.env['stock.picking'].search([

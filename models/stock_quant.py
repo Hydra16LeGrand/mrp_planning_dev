@@ -14,10 +14,14 @@ class StockQuantInherit(models.Model):
         for rec in self:
             print(f"rec.location_id.temp_stock : {rec.location_id.temp_stock}")
             # quant_lst = []
-            if not rec.location_id.temp_stock:
+            if rec.location_id.unpackaged_finished_product:
                 quant_lst.append(rec.id)
+            elif rec.location_id.temp_stock:
+                raise UserError(_("You cannot create a transfer from a Raw Material location."))
+            elif rec.location_id.packaged_finished_product:
+                raise UserError(_("You cannot create a transfer from a finished product location."))
             else:
-                raise UserError(_("You cannot create a transfer from the packed stock to itself."))
+                raise UserError(_("You cannot create a transfer from this location."))
 
         if quant_lst:
             # print(f"quant_lst : {quant_lst}")

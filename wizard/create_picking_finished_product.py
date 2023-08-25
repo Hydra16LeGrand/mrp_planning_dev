@@ -59,11 +59,14 @@ class CreatePickingFinishedProduct(models.TransientModel):
 
             picking_type = self.env['stock.picking.type'].search(
                 [('code', '=', 'internal')], order="id desc", limit=1)
-
+            print("Le picking type", picking_type)
             location_dest_id = self.env['stock.location'].search([
                 ('plant_id.is_principal', '!=', False),
-                ('temp_stock', '=', True)
+                ('packaged_finished_product', '=', True)
             ])
+
+            if not location_dest_id:
+                raise ValidationError(_("No packaged finished product location found. Check location configurations please."))
 
             # Créez le picking pour cette location
             stock_picking = self.env['stock.picking'].create({
@@ -107,7 +110,7 @@ class WizardFinishedProductLine(models.TransientModel):
 
     product_id = fields.Many2one('product.product', string='Product', required=True)
     product_domain = fields.Many2one('product.product')
-    location_id = fields.Many2one('stock.location', string='Location', required=True)
+    location_id = fields.Many2one('stock.location', string='Source location', required=True)
     location_domain = fields.Many2one('stock.location')
     quantity = fields.Float(string='Quantity')
     old_quantity = fields.Float(string='Current quantity in stock')
