@@ -43,35 +43,49 @@ class CreatePickingFinishedProduct(models.TransientModel):
 
     def action_send(self):
         print(f'self.env.context : {self.env.context}')
-        # print(f'self.cp_finished_line_ids : {self.cp_finished_line_ids}')
+        # Créez un dictionnaire pour regrouper les lignes par location
+        lines_by_location = {}
+
         for line in self.cp_finished_line_ids:
-            # for line in rec.cp_finished_line_ids:
+            location_id = line.location_id.id
+
+            # Si la location n'est pas encore dans le dictionnaire, créez-la avec une liste vide
+            if location_id not in lines_by_location:
+                lines_by_location[location_id] = []
+
+            lines_by_location[location_id].append(line)
+
+        for location_id, lines in lines_by_location.items():
+
             picking_type = self.env['stock.picking.type'].search(
                 [('code', '=', 'internal')], order="id desc", limit=1)
+
             location_dest_id = self.env['stock.location'].search([
                 ('plant_id.is_principal', '!=', False),
                 ('temp_stock', '=', True)
             ])
-            print(f"line.product_id : {line.product_id.id}")
-            print(f"line.location_id : {line.location_id.id}")
-            print(f"line.product_uom_id : {line.product_uom_id}")
-            print(f"line.quantity : {line.quantity}")
+
+            # Créez le picking pour cette location
             stock_picking = self.env['stock.picking'].create({
-                'location_id': line.location_id.id,
+                'location_id': location_id,
                 'location_dest_id': location_dest_id.id,
                 'picking_type_id': picking_type.id,
             })
 
-            stock_move = self.env['stock.move'].create({
-                'name': f'Send {line.product_id.name}',
-                'product_id': line.product_id.id,
-                'product_uom_qty': line.quantity,  # Quantité à transférer
-                'product_uom': line.product_uom_id.id,
-                'location_id': line.location_id.id,
-                'location_dest_id': location_dest_id.id,
-                'picking_type_id': picking_type.id,
-                'picking_id': stock_picking.id,
-            })
+            for line in lines:
+                # Créez un mouvement de stock pour chaque ligne
+                stock_move = self.env['stock.move'].create({
+                    'name': f'Send {line.product_id.name}',
+                    'product_id': line.product_id.id,
+                    'product_uom_qty': line.quantity,
+                    'product_uom': line.product_uom_id.id,
+                    'location_id': line.location_id.id,
+                    'location_dest_id': location_dest_id.id,
+                    'picking_type_id': picking_type.id,
+                    'picking_id': stock_picking.id,
+                })
+
+            # Confirmez et validez le picking
             stock_picking.sudo().action_confirm()
             stock_picking.sudo().action_set_quantities_to_reservation()
             stock_picking.sudo().button_validate()

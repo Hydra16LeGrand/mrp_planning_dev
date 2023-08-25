@@ -720,6 +720,23 @@ class MrpPlanning(models.Model):
                 'mrp_days': pl.mrp_days,
                 'uom_id': pl.uom_id,
             } for pl in rec.planning_line_ids]
+
+            old_detail_planning_line = [{
+                'id': dl.id,
+                'display_type':dl.display_type,
+                'name': dl.name,
+                'date_char': dl.name,
+                'date': dl.date,
+                'product_id': dl.product_id.id,
+                'package': dl.package,
+                'qty': dl.qty,
+                'capacity': dl.capacity,
+                'packaging_line_id': dl.packaging_line_id.id,
+                'planning_line_id': dl.planning_line_id,
+                'section_id': dl.section_id.id,
+                'planning_id': dl.planning_id,
+                'employee_number': dl.employee_number,
+            } for dl in rec.detailed_pl_ids]
             print(f'vals : {vals}')
             res = super(MrpPlanning, rec).write(vals)
 
