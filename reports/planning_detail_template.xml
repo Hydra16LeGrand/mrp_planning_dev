@@ -14,7 +14,7 @@
                                             <img src="/mrp_planning/static/src/img/logo_sivop_planning.png" style="max-width: 100%; max-height: 100%;"/>
                                         </th>
                                         <th style="border: 1px solid black; width: 60%;">
-                                            <strong>SYSTEME MANAGEMENT QUALITE</strong>
+                                            <strong>SYSTEME MANAGEMENT QUALITY</strong>
                                         </th>
                                         <th rowspan="2" style="border: 1px solid black; width: 20%; text-align: center; vertical-align: middle;">
                                             <strong>
@@ -29,7 +29,7 @@
                                     <tr>
                                         <th style="border: 1px solid black;">
                                             <strong>
-                                                PROCESSUS PLANNING PRODUCTION
+                                                PLANNING PRODUCTION PROCESS
                                                 <br/>
                                                 PLANNING PRODUCTION
                                             </strong>
@@ -39,24 +39,12 @@
 
                             </table>
                         </div>
-
-<!--                        <style>-->
-<!--                            .no-header-repeat thead {-->
-<!--                                display: table-header-group;-->
-<!--                            }-->
-<!--                            .no-header-repeat:not(:first-child) thead {-->
-<!--                                display: none;-->
-<!--                            }-->
-<!--                        </style>-->
-
                         <div style="width: 100%;">
                             <t t-set="result_dict" t-value="o.regroup_for_report()"/>
                             <t t-foreach="result_dict.items()" t-as="grouped_line">
                                 <div style="page-break-after:always;">
-<!--                                <div>-->
                                     <t t-set="packaging_lines" t-value="grouped_line[1]"/>
                                     <t t-foreach="packaging_lines.items()" t-as="packaging">
-<!--                                        <div style="border: 1px solid black; page-break-inside: avoid">-->
                                         <div style="border: 1px solid black;">
                                             <t t-set="packaging_line" t-value="packaging[0]"/>
                                             <t t-set="section" t-value="grouped_line[0]"/>
@@ -65,28 +53,10 @@
                                                 <span t-field="section.name"/>
                                             </div>
                                             <br/>
-                                            <div style="margin-left: 5px;">Ligne de Conditionnement :
+                                            <div style="margin-left: 5px;">Packaging line :
                                                 <span t-field="packaging_line.name"/>
                                             </div>
                                             <br/>
-<!--                                            <style>-->
-<!--                                                /* Masque l'en-tête du tableau sur toutes les pages sauf la première */-->
-<!--                                                .no-header-repeat thead {-->
-<!--                                                    display: none;-->
-<!--                                                }-->
-
-<!--                                                /* Affiche l'en-tête du tableau sur la première page */-->
-<!--                                                @media print {-->
-<!--                                                    .no-header-repeat thead:first-of-type {-->
-<!--                                                        display: table-header-group;-->
-<!--                                                    }-->
-<!--                                                }-->
-<!--                                            </style>-->
-
-
-<!--                                            <table class="table table-sm no-header-repeat"-->
-<!--                                                   name="detailled_planning"-->
-<!--                                            >-->
                                             <table class="table table-sm"
                                                    name="detailled_planning"
                                             >

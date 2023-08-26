@@ -77,61 +77,6 @@ class MrpPlant(models.Model):
 			if plant_id:
 				raise ValidationError(_(f"This field is already checked in other plant ({plant_id}). This field have to be checked only once"))
 
-
-
-	# @api.model
-	# def create(self, vals):
-
-	# 	# Create a picking type for this plant
-	# 	picking_type = {
-	# 		'name': _(f"{vals.get('name')} manufacturing"),
-	# 		'code': "mrp_operation",
-	# 		'sequence_code': "MO",
-	# 		'default_location_src_id': vals.get('default_location_src_id', False),
-	# 		'default_location_dest_id': vals.get('default_location_dest_id', False),
-	# 	}
-
-	# 	res = super().create(vals)
-
-	# 	picking_type['plant_id'] = res.id
-	# 	# picking_type_internal['plant_id'] = res.id
-
-	# 	picking_type_id = self.env['stock.picking.type'].create(picking_type)
-	# 	# picking_type_id = self.env['stock.picking.type'].create(picking_type_internal)
-
-	# 	return res
-
-
-	# def write(self, vals):
-
-	# 	res = super(MrpPlant, self).write(vals)
-	# 	if self:
-	# 		picking_type_id = self.env['stock.picking.type'].search([('plant_id', '=', self.id),('code','=','mrp_operation')])
-
-	# 		if picking_type_id:
-	# 			if len(picking_type_id) == 1:
-	# 				if vals.get('default_location_src_id', False):
-	# 					picking_type_id.default_location_src_id = vals.get('default_location_src_id')
-	# 				if vals.get('default_location_dest_id', False):
-	# 					picking_type_id.default_location_dest_id = vals.get('default_location_dest_id')
-	# 			else:
-	# 				raise ValidationError(_(""))
-
-	# 	if self:
-	# 		picking_type_internal = self.env['stock.picking.type'].search([('plant_id', '=', self.id), ('code','=','internal')])
-	# 		if picking_type_internal:
-	# 			if len(picking_type_internal) == 1:
-	# 				if vals.get('supply_location_src_id', False):
-	# 					picking_type_internal.default_location_src_id = vals.get('supply_location_src_id')
-
-	# 				if vals.get('supply_location_dest_id', False):
-	# 					picking_type_internal.default_location_dest_id = vals.get('supply_location_dest_id')
-
-	# 			else:
-	# 				raise ValidationError(_(""))
-
-	# 	return res
-
 	def get_mrp_planning_action(self):
 		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
 		action['context'] = {

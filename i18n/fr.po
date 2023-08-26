@@ -48,15 +48,15 @@ msgstr "<span class=\"o_stat_text\">Planification</span>"
 #: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
 msgid ""
 "<strong>\n"
-"                                                PROCESSUS PLANNING PRODUCTION\n"
+"                                                PLANNING PRODUCTION PROCESS\n"
 "                                                <br/>\n"
 "                                                PLANNING PRODUCTION\n"
 "                                            </strong>"
 msgstr ""
 "<strong>\n"
-" PROCESSUS PLANIFICATION PRODUCTION\n"
+" PROCESSUS DE PLANIFICATION PRODUCTION\n"
 " <br/>\n"
-" PLANIFIER LA PRODUCTION\n"
+" PLANIFICATION DE PRODUCTION\n"
 " </strong>"
 
 #. module: mrp_planning
@@ -101,7 +101,7 @@ msgstr ""
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
-msgid "<strong>SYSTEME MANAGEMENT QUALITE</strong>"
+msgid "<strong>SYSTEME MANAGEMENT QUALITY</strong>"
 msgstr "<strong>QUALITE DE GESTION DU SYSTEME</strong>"
 
 #. module: mrp_planning
@@ -757,8 +757,8 @@ msgstr "Dernière mise à jour le"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail
-msgid "Ligne de Conditionnement :"
-msgstr ""
+msgid "Packaging line :"
+msgstr "Ligne de Conditionnement"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_replace_product__line_domain

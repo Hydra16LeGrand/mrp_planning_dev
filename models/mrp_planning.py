@@ -19,6 +19,7 @@ class MrpPlanning(models.Model):
     thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
     friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
 
+    # Global variable for date format (Eg: monday 14/08)
     week_days = [
         'monday {}/{}'.format(monday.strftime('%d'), monday.month),
         'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month),
@@ -78,13 +79,6 @@ class MrpPlanning(models.Model):
 
     company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
                                  default=lambda self: self.env.company.id)
-    # mrp_production_general_state = fields.Selection([
-    #     ['draft', "Draft"],
-    #     # ['confirm', "Confirmed"],
-    #     ['done', "Done"],
-    #     ['cancel', "Cancelled"],
-    # ], default="draft", copy=False)
-
     section_ids = fields.Many2many("mrp.section", string=_("Sections"), required=True, tracking=5)
     # team_ids = fields.Many2many("mrp.team", string=_("Teams"), tracking=True, required=True)
 
@@ -182,15 +176,15 @@ class MrpPlanning(models.Model):
                 dict_of_lists[dict_key] = [dictionary]
         return dict_of_lists
 
+    # This function generate detailed planning lines and regroup them by sections and by packaging line. 
+    # Each detailed planning line will be related to a production order
     def action_confirm(self):
 
         if not self.planning_line_ids:
             raise ValidationError(_("Yo have to give at least one planning line"))
 
         detailed_lines_to_delete = self.env['mrp.detail.planning.line'].search([('planning_id', '=', self.id)]).unlink()
-
         section_id_lst = []
-
         value_planning_line = []
 
         try:
@@ -237,7 +231,6 @@ class MrpPlanning(models.Model):
 
                         if liste_meme_packaging_line_id:
                             for elm in liste_meme_packaging_line_id:
-
                                 packaging_element = elm[0]
                                 self.create_lines_or_sections(packaging_element, 'line_note')
                                 for value in elm:
@@ -276,14 +269,12 @@ class MrpPlanning(models.Model):
             production_ids.action_cancel()
 
         self.state = "cancel"
-        # self.mrp_production_general_state = "cancel"
 
         return True
 
     def action_draft(self):
 
         self.state = "draft"
-        # self.mrp_production_general_state = "draft"
         return True
 
     def create_overview_wizard(self):
@@ -298,14 +289,11 @@ class MrpPlanning(models.Model):
             "context": {
                 "planning_id": self.id,
                 "overview_ids": self.env["overview.wizard"].search([("planning_id", "=", self.id)]).ids,
-                # "total_missing_qty": sum(
-                # 	self.env['rm.overview'].search([("planning_id", "=", self.id)]).mapped('missing_qty'))
             },
         }
         return action
 
     def verif_bom(self):
-
         for pl in self.planning_line_ids:
             if not self.env["mrp.bom"].search([('product_tmpl_id', '=', pl.product_id.product_tmpl_id.id)]):
                 return pl.product_id
@@ -313,15 +301,14 @@ class MrpPlanning(models.Model):
         return False
 
     def verif_product_proportion(self):
-
         for pl in self.planning_line_ids:
-
             if not self.env["mrp.packaging.pp"].search(
                     [('packaging_line_id', '=', pl.packaging_line_id.id), ('product_id', '=', pl.product_id.id)]):
                 return pl.product_id, pl.packaging_line_id
 
         return False
 
+    # Generate a manufacturing order for each detailed planning line
     def generate_mo(self):
 
         # Verif if products of planning have a bill of material
@@ -330,10 +317,11 @@ class MrpPlanning(models.Model):
             [('plant_id', '=', self.plant_id.id), ('code', '=', 'mrp_operation')])
         if verif_bom:
             raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
+
         if not picking_type_id.default_location_src_id or not picking_type_id.default_location_dest_id:
             raise ValidationError(
                 _(f"Please configure the picking type '{picking_type_id.name}' locations before this action."))
-        # if self.mrp_production_general_state == "draft":
+
         for line in self.detailed_pl_ids:
             if line.display_type == False:
                 bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
@@ -354,12 +342,8 @@ class MrpPlanning(models.Model):
                     "plant_id": self.plant_id.id,
                     "location_src_id": picking_type_id.default_location_src_id.id,
                     "location_dest_id": picking_type_id.default_location_dest_id.id,
-                    # "state": "confirmed",
                 })
                 production.action_confirm()
-
-        # else:
-        # 	raise ValidationError(_(""))
 
         # Update state
         self.state = "04_mo_generated"
@@ -384,14 +368,14 @@ class MrpPlanning(models.Model):
             "domain": [('planning_id', '=', self.id), ('state', '!=', "cancel")],
             "context": {
                 'search_default_todo': True,
-                'search_default_group_by_planning': 1,
+                # 'search_default_group_by_planning': 1,
                 'search_default_group_by_section': 1,
                 'search_default_group_by_packaging_line_id': 1,
             },
         }
 
+    # Action for supply orders checking
     def view_internal_transfer(self):
-
         internal_transfer = self.env['stock.picking'].search([
             ('picking_type_code', '=', 'internal'), ('planning_id', '=', self.id)
         ])
@@ -415,8 +399,8 @@ class MrpPlanning(models.Model):
                     'target': 'current',
                 }
 
+    # Action for replace a product into another in a planning
     def action_product_replacement(self):
-
         if self.state != '04_mo_generated':
             raise ValidationError(_("You cannot replace a product when mrp orders are not generated."))
         if self.detailed_pl_done_state:
@@ -433,8 +417,8 @@ class MrpPlanning(models.Model):
 
         return action
 
+    # Prepare printing data
     def regroup_for_report(self):
-
         if self.state == 'draft':
             raise ValidationError(_("You cannot print a planning in draft state. Confirm it before."))
         grouped_lines = defaultdict(lambda: defaultdict(list))
@@ -478,7 +462,7 @@ class MrpPlanning(models.Model):
     #         }
     #     }
 
-    # Finish products manufacturing action
+    # Action to finalize planning's products manufacturing
     def action_mark_productions_as_done(self):
         if self.detailed_pl_ids.filtered(lambda self: self.state == 'progress'):
             raise ValidationError(_("You have to manage line(s) in progress state before this action."))
@@ -491,13 +475,10 @@ class MrpPlanning(models.Model):
                 productions.append(production_id.id)
 
         production_ids = self.env['mrp.production'].browse(productions)
-
         result = production_ids.button_mark_done()
-
-        # self.mrp_production_general_state = "done"
         return result
 
-    # Dupliquer le modele avec toutes les données qu'il contient
+    # Dupliquer le formulaire de planning avec les données qui doivent etre gardé dans le nouveau
     def copy(self, default=None):
         if default is None:
             default = {}
@@ -521,6 +502,7 @@ class MrpPlanning(models.Model):
 
         return super().copy(default)
 
+    # Function to add a date in scheduled dates
     @api.onchange('scheduled_date')
     def _onchange_scheduled_date(self):
 
@@ -585,13 +567,10 @@ class MrpPlanning(models.Model):
                     'name': day_name,
                     'date': self.scheduled_date
                 })
-
                 # Récupérer les valeurs actuelles du champ Many2many self.week_of
                 existing_week_of = self.week_of.ids
-
                 # Ajouter l'ID de day_record à la liste des valeurs existantes
                 existing_week_of.append(day_record.id)
-
                 # Écrire la liste mise à jour dans le champ Many2many self.week_of
                 self.week_of = [(6, 0, existing_week_of)]
                 self._get_week_of_domain(day_name)
@@ -633,6 +612,7 @@ class MrpPlanning(models.Model):
             f"<ul><li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style = 'color: #0182b6;' > {line_dl_id.name} </span></b><em> {extra_info} </em></p></li>")
         mrp_planning.message_post(body=message)
 
+    # Optimize tracking during planning edition
     def write(self, vals):
         for rec in self:
 
@@ -853,10 +833,8 @@ class MrpPlanning(models.Model):
                                                   default=None)
                                     line_dl = max([line_id for line_id in line_dls if line_id < dl],
                                                   default=None)
-
                                     large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
                                     large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
-
                                     message_to_delete_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
                                     mrp_planning.message_post(body=message_to_delete_dl)
         return res
@@ -910,18 +888,6 @@ class MrpPlanninLine(models.Model):
         ppp_id = self.env['mrp.packaging.pp'].search([('product_id', '=', self.product_id.id)], limit=1)
         self.packaging_line_id = ppp_id.id if ppp_id else False
 
-    # @api.depends('product_id')
-    # def _default_packaging_line_id(self):
-    # 	# Obtenez le premier élément de packaging_line_domain
-    # 	for rec in self:
-
-    # 		if rec.product_id:
-    # 			ppp_ids = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
-    # 			l = [ppp_id.packaging_line_id.id for ppp_id in ppp_ids]
-    # 			rec.packaging_line_id = l[0]
-    # 		else:
-    # 			pass
-
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
     qty = fields.Integer(_("Qty per day"))
@@ -934,16 +900,9 @@ class MrpPlanninLine(models.Model):
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     packaging_line_first = fields.Many2one("mrp.packaging.line")
     packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
-    # team_id = fields.Many2one("mrp.team", tracking=True)
     section_id = fields.Many2one("mrp.section", required=1)
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
-
     planning_id = fields.Many2one("mrp.planning")
-
-
-# first_packaging_line = rec.packaging_line_domain[0] if rec.packaging_line_domain else False
-
-# return first_packaging_line
 
 
 class MrpDetailPlanningLine(models.Model):
@@ -953,30 +912,6 @@ class MrpDetailPlanningLine(models.Model):
         for rec in self:
             production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', rec.id)])
             rec.state = production_id.state
-
-            # if rec.state == 'done':
-            #     mrp = self.env['mrp.planning'].search([
-            #         ('id', '=', rec.planning_id.id)
-            #     ])
-            #     mrp_detail_states = [detail.state for detail in mrp.detailed_pl_ids if
-            #                          detail.display_type == False]
-            #
-            #     mrp_state = list(set(mrp_detail_states))
-            #
-            #     if len(mrp_state) == 1:
-            # rec.planning_id.mrp_production_general_state = "done"
-
-            # rec.planning_id.write({
-            # 	'change_mrp_production_general_state_in_done': True
-            # })
-            # rec.planning_id._compute_detailed_pl_done_state(mrp_state[0])
-            # rec.planning_id.detailed_pl_done_state = True
-            # rec.planning_id.write({
-            #     'detailed_pl_done_state': True
-            # })
-
-            # print(
-            #     f"rec.planning_id.mrp_production_general_state after : {rec.planning_id.change_mrp_production_general_state_in_done}")
 
     @api.depends('product_id')
     def _compute_packaging_line_domain(self):
@@ -1028,18 +963,6 @@ class MrpDetailPlanningLine(models.Model):
     name = fields.Text()
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
 
-    # @api.onchange('state')
-    # def mark_done(self):
-    # 	for rec in self:
-
-    # 		if rec.state == 'done':
-    # 			mrp = self.env['mrp.planning'].search([
-    # 				('id', '=', rec.planning_id)
-    # 			])
-    # 			mrp_detail_states = [detail.state for detail in mrp.detailed_pl_ids if mrp.detailed_pl_ids.display_type == False]
-
-    # 			mrp_state = list(set(mrp_detail_states))
-
     def action_manage_production(self):
         production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
         action = {
@@ -1050,9 +973,7 @@ class MrpDetailPlanningLine(models.Model):
             "res_id": production_id.id,
             "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
             "target": "new",
-
         }
-
         return action
 
     def unlink(self):

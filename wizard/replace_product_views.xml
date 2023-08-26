@@ -19,16 +19,11 @@
 							<field name="packaging_line_domain" widget="many2many_tags" invisible="1" />
 							<field name="packaging_line" domain="[('id', 'in', packaging_line_domain)]" attrs="{'readonly': [('section', '=', False)]}"/>
 							<field name="qty" attrs="{'readonly': [('section', '=', False)]}"/>
-<!--								<field name="packaging_line"/>-->
-<!--							</field>-->
 							<field name="line_domain" widget="many2many_tags" invisible="1" />
-<!--							<field name="line" domain="[('id', 'in', line_domain)]" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('section', '=', False)], 'required': [('section', '!=', False)]}"/>-->
 							<field name="line" invisible="1"/>
 							<field name="replacement_days_domain" widget="many2many_tags" invisible="1" />
 							<field name="replacement_days" widget="many2many_tags" domain="[('id', 'in', replacement_days_domain)]" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('line', '=', False)]}" />
 							<field name="planning_id" readonly="true" />
-<!--							<field name="line" domain="[('display_type', '=', 'line_note'), ('planning_id','=',planning_id)]" />-->
-
 						</group>
 					</group>
 				</sheet>
@@ -39,9 +34,4 @@
 			</form>
 		</field>
 	</record>
-
-	<!-- <record name="action_replace_product" model="ir.actions.act_window">
-		<field name="name"></field>
-		<field name="res_model">replace.product</field>
-	</record> -->
 </odoo>

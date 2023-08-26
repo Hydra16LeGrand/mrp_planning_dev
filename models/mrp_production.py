@@ -5,11 +5,6 @@ from odoo.exceptions import ValidationError
 class MrpProductionInherit(models.Model):
 	_inherit = "mrp.production"
 
-	package = fields.Float(_("Package"))
-	qty = fields.Integer(_("Quantity"))
-	capacity = fields.Integer(_("Capacity"))
-	employee_number = fields.Integer(_("EN"))
-
 	product_ref = fields.Char(string=_("Article"))
 
 	detailed_pl_id = fields.Many2one("mrp.detail.planning.line", string=_("Detailed planning lines"))
@@ -51,20 +46,6 @@ class MrpProductionInherit(models.Model):
 						if self.env.context.get('active_model') != 'mrp.planning':
 							message = f"<p><b> <em> (Detailed planning lines)</em> {old_product_id.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{product_id.name}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
 							rec.planning_id.message_post(body=message)
-				# if 'state' in vals:
-				# 	message = f"<p><b> <em> (Detailed planning lines)</em> {old_state} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{vals['state']}</span> for section {rec.section_id.name}, line {rec.packaging_line_id.name} and day {rec.detailed_pl_id.date_char} </b></p><ul>"
-				# 	rec.planning_id.message_post(body=message)
-					# for move in rec.move_raw_ids:
-					# 	for old_move in old_move_raw_ids:
-					# 		if move == old_move:
-					# 			move.unlink()
 
 
 		return True
-
-
-	# def _compute_state(self):
-
-	# 	for rec in self:
-	# 		super(MrpProductionInherit, rec)._compute_state()
-	# 		rec.detailed_pl_id.state = rec.state

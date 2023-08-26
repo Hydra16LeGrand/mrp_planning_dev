@@ -19,7 +19,6 @@ class StockPickingTypeInherit(models.Model):
                 'search_default_todo': True,
                 'default_company_id': self.env.company.id,
 
-                # 'search_default_by_plants': 1,
                 'search_default_group_by_planning': 1,
                 'search_default_group_by_section': 1,
                 'search_default_group_by_packaging_line_id': 1,
@@ -43,10 +42,6 @@ class StockPickingTypeInherit(models.Model):
             if plant_id:
                 raise ValidationError(
                     _(f"This factory is already selected in other plant. This factory have to be selected only once"))
-
-    # self.update({
-    # 	'plant_id': self.plant_id.id,
-    # })
 
 
     def write(self, vals):

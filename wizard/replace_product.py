@@ -197,7 +197,6 @@ class ReplaceProduct(models.TransientModel):
                     rec.line = self.env['mrp.detail.planning.line'].search([
                         ('id', '=', lst2)
                     ])
-                    # rec.line = lines.id
 
             else:
                 rec.line = False

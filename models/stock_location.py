@@ -6,9 +6,9 @@ class StockLocationInherit(models.Model):
 	_inherit = "stock.location"
 
 	temp_stock = fields.Boolean(_("Raw material location"))
+	packaged_finished_product = fields.Boolean(string=_("Packaged products location"))
+	unpackaged_finished_product = fields.Boolean(string=_("Unpackaged product location"))
 	plant_id = fields.Many2one("mrp.plant", string=_("Plant"))
-	packaged_finished_product = fields.Boolean(string=_("Packaged finished product"))
-	unpackaged_finished_product = fields.Boolean(string=_("Unpackaged finished product"))
 
 	@api.onchange('temp_stock')
 	def _onchange_temp_stock(self):

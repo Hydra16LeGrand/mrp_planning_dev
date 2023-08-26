@@ -39,6 +39,7 @@ class CreatePickingFinishedProduct(models.TransientModel):
     cp_finished_line_ids = fields.One2many('wizard.finished.product.line', inverse_name='cp_finished_product_id',
                                            string='CP Finished Product Line')
 
+    # Function for packaging of products from a location to another
     def action_send(self):
         # Créez un dictionnaire pour regrouper les lignes par location
         lines_by_location = {}

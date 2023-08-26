@@ -5,17 +5,6 @@
         <field name="model">mrp.bom</field>
         <field name="inherit_id" ref="mrp.mrp_bom_form_view" />
         <field name="arch" type="xml">
-        	<!-- <div class="o_row" position="after">
-        		<field name="capacity" />
-        		<field name="packing" />
-        	</div>
-        	<xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_qty']" position="attributes">
-        		<attribute name="sum">Total</attribute>
-        	</xpath>
-	        <xpath expr="//field[@name='bom_line_ids']/tree/field[@name='product_qty']" position="after">
-	        	<field name="percentage" sum="Total(%)" />
-	        </xpath> -->
-
             <xpath expr="//sheet/group/group/field[@name='product_tmpl_id']" position="attributes">
                 <attribute name="options">{'no_create': 1, 'no_open': 1}</attribute>
                 <attribute name="domain">[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]</attribute>

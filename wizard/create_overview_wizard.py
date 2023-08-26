@@ -136,7 +136,7 @@ class WizardOverview(models.TransientModel):
 
 		return res
 
-
+	# Function to create supply order from raw material necessary for a planning
 	def create_internal_transfer(self):
 
 		context = self.env.context

@@ -22,16 +22,6 @@ class StockQuantInherit(models.Model):
                 raise UserError(_("You cannot create a transfer from this location."))
 
         if quant_lst:
-            # action_context = []
-            # for elm in quant_lst:
-            #     quant = self.env['stock.quant'].browse(elm)
-            #     val =
-            #     action_context.append((0, 0, {
-            #         'product_id': quant.product_id,
-            #         'location_id': quant.location_id,
-            #         'quantity': quant.quantity,
-            #         'product_uom_id': quant.product_uom_id,
-            #     }))
             action = self.env.ref('mrp_planning.action_picking_finished_product').read()[0]
             action['context'] = {
                 'quant_line': quant_lst
