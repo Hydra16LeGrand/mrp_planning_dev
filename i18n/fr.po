@@ -20,7 +20,7 @@ msgstr ""
 #. module: mrp_planning
 #: model:ir.actions.report,print_report_name:mrp_planning.action_report_planning_details
 msgid "'Planning Details - %s' % (object.reference)"
-msgstr "'Détails de planification - %s' % (objet.référence)"
+msgstr "'Détails de planification - %s' % (object.reference)"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.report_planning_detail

@@ -419,26 +419,29 @@ class MrpPlanning(models.Model):
 
     # Prepare printing data
     def regroup_for_report(self):
-        if self.state == 'draft':
-            raise ValidationError(_("You cannot print a planning in draft state. Confirm it before."))
-        grouped_lines = defaultdict(lambda: defaultdict(list))
+        for rec in self:
+            print(f"rec.state : {rec.state}")
+            if rec.state == 'draft':
+                raise ValidationError(_("You cannot print a planning in draft state. Confirm it before."))
+            else:
+                grouped_lines = defaultdict(lambda: defaultdict(list))
 
-        for detailed_planning_line in self.detailed_pl_ids:
-            if detailed_planning_line.display_type == False:
-                section = detailed_planning_line.section_id
-                packaging_line = detailed_planning_line.packaging_line_id
+                for detailed_planning_line in rec.detailed_pl_ids:
+                    if detailed_planning_line.display_type == False:
+                        section = detailed_planning_line.section_id
+                        packaging_line = detailed_planning_line.packaging_line_id
 
-                grouped_lines[section][packaging_line].append(detailed_planning_line)
+                        grouped_lines[section][packaging_line].append(detailed_planning_line)
 
-        # Convertir le résultat en un dictionnaire Python
-        result_dict = {}
-        for section, packaging_lines in grouped_lines.items():
-            section_dict = {}
-            for packaging_line, detailed_planning_lines in packaging_lines.items():
-                section_dict[packaging_line] = detailed_planning_lines
-            result_dict[section] = section_dict
+                # Convertir le résultat en un dictionnaire Python
+                result_dict = {}
+                for section, packaging_lines in grouped_lines.items():
+                    section_dict = {}
+                    for packaging_line, detailed_planning_lines in packaging_lines.items():
+                        section_dict[packaging_line] = detailed_planning_lines
+                    result_dict[section] = section_dict
 
-        return result_dict
+                return result_dict
 
     # Action to confirm productions orders of current planning
     # def action_confirm_productions(self):
