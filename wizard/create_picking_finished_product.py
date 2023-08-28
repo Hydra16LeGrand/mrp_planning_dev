@@ -63,7 +63,7 @@ class CreatePickingFinishedProduct(models.TransientModel):
             ])
 
             if not location_dest_id:
-                raise ValidationError(_("No packaged finished product location found. Check location configurations please."))
+                raise UserError(_("No packaged finished product location found. Check location configurations please."))
 
             # Créez le picking pour cette location
             stock_picking = self.env['stock.picking'].create({

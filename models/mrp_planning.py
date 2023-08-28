@@ -422,7 +422,7 @@ class MrpPlanning(models.Model):
         for rec in self:
             print(f"rec.state : {rec.state}")
             if rec.state == 'draft':
-                raise ValidationError(_("You cannot print a planning in draft state. Confirm it before."))
+                raise UserError(_("You cannot print a planning in draft state. Confirm it before."))
             else:
                 grouped_lines = defaultdict(lambda: defaultdict(list))
 
@@ -841,7 +841,6 @@ class MrpPlanning(models.Model):
                                     message_to_delete_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
                                     mrp_planning.message_post(body=message_to_delete_dl)
         return res
-
 
 class MrpPlanninLine(models.Model):
     _name = "mrp.planning.line"

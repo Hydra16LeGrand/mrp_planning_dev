@@ -22,7 +22,7 @@
 							<field name="line_domain" widget="many2many_tags" invisible="1" />
 							<field name="line" invisible="1"/>
 							<field name="replacement_days_domain" widget="many2many_tags" invisible="1" />
-							<field name="replacement_days" widget="many2many_tags" domain="[('id', 'in', replacement_days_domain)]" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('line', '=', False)]}" />
+							<field name="replacement_days" widget="many2many_tags" domain="[('id', 'in', replacement_days_domain)]" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('packaging_line', '=', False)]}" />
 							<field name="planning_id" readonly="true" />
 						</group>
 					</group>
