@@ -94,6 +94,7 @@ class MrpPlanning(models.Model):
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
     detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
 
+
     @api.depends('section_ids')
     def _compute_section_first(self):
         for rec in self:
@@ -888,6 +889,27 @@ class MrpPlanninLine(models.Model):
         ppp_id = self.env['mrp.packaging.pp'].search([('product_id', '=', self.product_id.id)], limit=1)
         self.packaging_line_id = ppp_id.id if ppp_id else False
 
+    @api.depends('product_id')
+    def _compute_bill_of_material_domain(self):
+        for rec in self:
+            if rec.product_id:
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.id)])
+                rec.bom_domain = [bom.id for bom in boms]
+                print("le boms", rec.bom_domain)
+            else:
+                rec.bom_domain = []
+
+    # @api.onchange('product_id')
+    # def _compute_bill_of_material_domain(self):
+    #     for rec in self:
+    #         if rec.product_id:
+    #             boms = self.env['mrp.bom'].search([('product_id', '=', rec.product_id.id)])
+    #             rec.bom_domain = [(6, 0, [rec.product_id.id])]
+    #             print("le boms",boms)
+    #             rec.bom_domain = boms
+    #         else:
+    #             rec.bom_domain = []
+
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
     qty = fields.Integer(_("Qty per day"))
@@ -903,6 +925,8 @@ class MrpPlanninLine(models.Model):
     section_id = fields.Many2one("mrp.section", required=1)
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
     planning_id = fields.Many2one("mrp.planning")
+    bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
 
 
 class MrpDetailPlanningLine(models.Model):

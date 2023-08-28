@@ -236,6 +236,7 @@ class WizardOverviewLine(models.TransientModel):
 	overview_id = fields.Many2one("overview.wizard", string=_("Overview"))
 	qty_to_order = fields.Float(_("Quantity to order"), default=lambda self: self.missing_qty, digits=(16, 0))
 	required_capacity = fields.Float(string=_("Required capacity"), compute="_compute_required_capacity_count",digits=(16, 0))
+
 	
 	def _compute_on_hand_qty_count(self):
 		temp_stock = self.env['stock.location'].search(

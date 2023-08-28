@@ -241,7 +241,7 @@ msgstr "Nomenclature"
 #: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__bom_ids
 #, python-format
 msgid "Bill of materials"
-msgstr "Nomenclature"
+msgstr "Nomenclatures"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_create_picking_finished_product__cp_finished_line_ids
