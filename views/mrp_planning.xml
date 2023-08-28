@@ -120,6 +120,7 @@
 									<field name="date" />
 									<field name="state" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-bf="state == 'confirmed'" decoration-warning="state == 'progress'" decoration-success="state == 'done'" />
 									<button name="action_manage_production" type="object" title="Manage Production"  icon="fa-flask" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" />
+									<button name="action_replace_product_from_planning" type="object" title="Replace Product"  icon="fa-retweet" attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}" />
 								</tree>
 							</field>
 						</page>

@@ -34,4 +34,13 @@
 			</form>
 		</field>
 	</record>
+
+	<record model="ir.actions.act_window" id="action_replace_product">
+        <field name="name">Replace Product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">replace.product</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="replace_product_form"/>
+        <field name="target">new</field>
+    </record>
 </odoo>
