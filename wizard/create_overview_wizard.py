@@ -74,7 +74,7 @@ class WizardOverview(models.TransientModel):
 				product_id = line.product_id.id
 				required_qty = dl.qty * line.product_qty
 				on_hand_qty = on_hand_qty
-				print("la valeur du champ ordered_qty:",self.overview_line_ids.ordered_qty)
+				print("la valeur du champ qty_to_order:",self.overview_line_ids.qty_to_order)
 
 				dico = {
 					'product_id': product_id,
@@ -201,7 +201,7 @@ class WizardOverview(models.TransientModel):
 				stock_move = self.env['stock.move'].create({
 					'name': f'Send {data.product_id.name}',
 					'product_id': data.product_id.id,
-					'product_uom_qty': data.ordered_qty,  # Quantité à transférer
+					'product_uom_qty': data.qty_to_order,  # Quantité à transférer
 					'product_uom': data.uom_id.id,
 					'location_id': picking_type.default_location_src_id.id,
 					'location_dest_id': stock_tampon_location.id,
@@ -234,7 +234,8 @@ class WizardOverviewLine(models.TransientModel):
 	bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
 	bom_ids = fields.Many2many("mrp.bom", string=_("Bill of materials"))
 	overview_id = fields.Many2one("overview.wizard", string=_("Overview"))
-	ordered_qty = fields.Float(_("Ordered Quantity"), default=lambda self: self.missing_qty, digits=(16, 0))
+	qty_to_order = fields.Float(_("Quantity to order"), default=lambda self: self.missing_qty, digits=(16, 0))
+	required_capacity = fields.Float(string=_("Required capacity"), compute="_compute_required_capacity_count",digits=(16, 0))
 	
 	def _compute_on_hand_qty_count(self):
 		temp_stock = self.env['stock.location'].search(
@@ -250,4 +251,10 @@ class WizardOverviewLine(models.TransientModel):
 			])
 			on_hand_qty = sum(quant.mapped('quantity'))
 			overview.on_hand_qty = on_hand_qty
-			
+
+	@api.depends('required_qty', 'product_id.net_weight')
+	def _compute_required_capacity_count(self):
+		for overview in self:
+			required_capacity = overview.required_qty * overview.product_id.net_weight
+			print("required_capacity",required_capacity)
+			overview.required_capacity = required_capacity

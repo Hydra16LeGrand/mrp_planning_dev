@@ -536,18 +536,18 @@ class MrpPlanning(models.Model):
                 if day_name in day.name:
                     raise UserError(_("This day already exists in the week"))
 
-                day_iso = day.date.isocalendar()
+                # day_iso = day.date.isocalendar()
 
-                if iso.year < day_iso.year:
-
-                    raise UserError(_("The date must not be less than the current week's dates."))
-                elif self.scheduled_date.month < day.date.month:
-
-                    raise UserError(_("The date must not be less than the current week's dates."))
-                elif iso.week < day_iso.week:
-                    if self.scheduled_date.month <= day.date.month:
-                        if iso.year <= day_iso.year:
-                            raise UserError(_("The date must not be less than the current week's dates."))
+                # if iso.year < day_iso.year:
+                #
+                #     raise UserError(_("The date must not be less than the current week's dates."))
+                # elif self.scheduled_date.month < day.date.month:
+                #
+                #     raise UserError(_("The date must not be less than the current week's dates."))
+                # elif iso.week < day_iso.week:
+                #     if self.scheduled_date.month <= day.date.month:
+                #         if iso.year <= day_iso.year:
+                #             raise UserError(_("The date must not be less than the current week's dates."))
 
             day_in_week_of = self.env['mrp.planning.days'].search([
                 ('name', '=', day_name)
