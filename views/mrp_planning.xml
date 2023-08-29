@@ -65,7 +65,9 @@
 									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
 									<field name="package" invisible="1" />
 									<field name="qty_compute" invisible="1" />
+									<field name="packing"/>
 									<field name="qty" />
+									<field name="capacity"/>
 									<field name="uom_domain" invisible="1" />
 									<field name="uom_id" optional="hide" domain="[('id', 'in', uom_domain)]" options="{'no_create': 1, 'no_open': 1}" />
 									<!-- <field name="qty" /> -->

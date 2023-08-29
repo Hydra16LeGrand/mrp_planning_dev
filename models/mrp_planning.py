@@ -94,7 +94,6 @@ class MrpPlanning(models.Model):
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
     detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
 
-
     @api.depends('section_ids')
     def _compute_section_first(self):
         for rec in self:
@@ -899,21 +898,55 @@ class MrpPlanninLine(models.Model):
             else:
                 rec.bom_domain = []
 
-    # @api.onchange('product_id')
-    # def _compute_bill_of_material_domain(self):
-    #     for rec in self:
-    #         if rec.product_id:
-    #             boms = self.env['mrp.bom'].search([('product_id', '=', rec.product_id.id)])
-    #             rec.bom_domain = [(6, 0, [rec.product_id.id])]
-    #             print("le boms",boms)
-    #             rec.bom_domain = boms
-    #         else:
-    #             rec.bom_domain = []
+    @api.onchange('product_id')
+    def _get_default_bill_of_material(self):
+        boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)], limit=1)
+        self.bom_id = boms.id if boms else False
+
+    @api.onchange('product_id')
+    def _get_default_values(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id:
+                qty_id = self.env['mrp.packaging.pp'].search(
+                    [('product_id', '=', rec.product_id.id), ('packaging_line_id', '=', rec.packaging_line_id.id)],
+                    limit=1)
+                rec.qty = qty_id.capacity
+                # rec.qty_compute = rec.qty
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+                packing = self.qty * boms.product_qty
+                rec.packing = packing
+
+                capacity = self.qty * boms.net_weight
+                rec.capacity = capacity
+                # rec.qty_compute = rec.qty
+
+    @api.onchange('qty')
+    def _get_quantity_record(self):
+
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id:
+                qty_id = self.env['mrp.packaging.pp'].search(
+                    [('product_id', '=', rec.product_id.id), ('packaging_line_id', '=', rec.packaging_line_id.id)],
+                    limit=1)
+                rec.qty = qty_id.capacity
+                # rec.qty_compute = rec.qty
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+                print("le bomsssssss", boms)
+                packing = self.qty * boms.product_qty
+                print("le packing", packing)
+                rec.packing = packing
+
+                capacity = self.qty * boms.net_weight
+                print("le capacity", capacity)
+                rec.capacity = capacity
+                # rec.qty_compute = rec.qty
+
+
 
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
-    qty = fields.Integer(_("Qty per day"))
-    capacity = fields.Integer(_("Capacity"))
+    qty = fields.Integer(_("Qty per day"),default=_get_quantity_record)
+    capacity = fields.Integer(_("Capacity"), default=_get_default_values)
     employee_number = fields.Integer(_("EN"))
 
     product_id = fields.Many2one("product.product", string=_("Article"), required=True)
@@ -927,7 +960,7 @@ class MrpPlanninLine(models.Model):
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
-
+    packing = fields.Float(string="Packing", default=_get_default_values)
 
 class MrpDetailPlanningLine(models.Model):
     _name = "mrp.detail.planning.line"
