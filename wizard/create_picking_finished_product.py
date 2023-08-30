@@ -105,13 +105,13 @@ class WizardFinishedProductLine(models.TransientModel):
     _name = 'wizard.finished.product.line'
     _description = 'Wizard Finished Product Line'
 
-    product_id = fields.Many2one('product.product', string='Product', required=True)
+    product_id = fields.Many2one('product.product', string='Product')
     product_domain = fields.Many2one('product.product')
-    location_id = fields.Many2one('stock.location', string='Source location', required=True)
+    location_id = fields.Many2one('stock.location', string='Source location')
     location_domain = fields.Many2one('stock.location')
-    quantity = fields.Float(string='Quantity')
+    quantity = fields.Float(string='Quantity', required=True)
     old_quantity = fields.Float(string='Current quantity in stock')
-    product_uom_id = fields.Many2one('uom.uom', string='Unit', required=True)
+    product_uom_id = fields.Many2one('uom.uom', string='Unit')
     product_uom_domain = fields.Many2one('uom.uom')
     cp_finished_product_id = fields.Many2one('create.picking.finished.product', string='Create Picking Finished Product')
 
