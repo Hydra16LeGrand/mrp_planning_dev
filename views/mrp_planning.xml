@@ -12,6 +12,7 @@
 					<button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight" confirm="Are you sure to do this action ?" />
 					<button name="create_overview_wizard" type="object" string="RM Overview"
                          attrs="{'invisible': [('state','not in',('04_mo_generated','confirm'))]}" />
+					<button name="%(mrp_planning.action_report_planning_details)d" string="Print Planning" type="action" attrs="{'invisible': [('state', '=', 'draft')]}"/>
 					<button name="action_product_replacement" type="object" string="Replace product" attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary" />
 					<button name="action_mark_productions_as_done" type="object" string="FINALIZE PRODUCTION"  class="btn-warning" confirm="This action will complete all manufacturing orders process in this planning. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}" />
 					<field name="state" widget="statusbar" statusbar_visible="draft,confirm,04_mo_generated" statusbar_invisible="cancel" attrs="{'invisible': [('state', '=', '0')]}"/>
@@ -119,6 +120,7 @@
 									<field name="date" />
 									<field name="state" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-bf="state == 'confirmed'" decoration-warning="state == 'progress'" decoration-success="state == 'done'" />
 									<button name="action_manage_production" type="object" title="Manage Production"  icon="fa-flask" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}" />
+									<button name="action_replace_product_from_planning" type="object" title="Replace Product"  icon="fa-retweet" attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}" />
 								</tree>
 							</field>
 						</page>

@@ -7,6 +7,62 @@ class ReplaceProduct(models.TransientModel):
     _name = "replace.product"
     _description = "Replace product in a planning"
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super(ReplaceProduct, self).default_get(fields_list)
+        if self.env.context.get('replace_product_from_detailed_planning'):
+            rpf_detailed_planning = self.env.context.get('replace_product_from_detailed_planning')
+            print(f"rpf_detailed_planning : {rpf_detailed_planning}")
+
+            detail_line = self.env['mrp.detail.planning.line'].browse(rpf_detailed_planning)
+            print(f"detail_line.section_id : {detail_line.section_id}")
+            section_ids = self.env['mrp.detail.planning.line'].search(
+                [('display_type', '=', 'line_section'), ('planning_id', '=', detail_line.planning_id.id),
+                 ('id', '<', rpf_detailed_planning)])
+
+            sect_id = [sect.id for sect in section_ids]
+
+            section = None
+            min_diff = float('inf')
+
+            for element in sect_id:
+                difference = abs(element - rpf_detailed_planning)
+                if difference < min_diff:
+                    min_diff = difference
+                    section = element
+
+            print(f"section : {self.env['mrp.detail.planning.line'].browse(section)}")
+
+            res['default_get_infos'] = True
+            res['planning_id'] = detail_line.planning_id
+            res['product_to_replace'] = detail_line.product_id
+            res['section'] = self.env['mrp.detail.planning.line'].browse(section)
+            res['packaging_line'] = detail_line.packaging_line_id
+            replacement_days = self.env['mrp.planning.days'].search([
+                ('date', '=', detail_line.date)
+            ])
+            res['replacement_days'] = [(6, 0, replacement_days.ids)]
+            print(f"res : {res}")
+
+        return res
+
+    product_to_replace = fields.Many2one("product.product", string=_("Product to replace"), required=True)
+    product_to_replace_domain = fields.Many2many("product.product", compute="_compute_product_to_replace_domain")
+    replacement_product = fields.Many2one("product.product", string=_("Replacement product"), required=True)
+    replacement_days_domain = fields.Many2many("mrp.planning.days", compute="_compute_replacement_days")
+    replacement_days = fields.Many2many("mrp.planning.days", string=_("Replacement days"))
+    line = fields.Many2one('mrp.detail.planning.line', string=_('Line to replace'), compute="_compute_line")
+    line_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_line_domain")
+    # line_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_line_to_replace_domain")
+    packaging_line = fields.Many2one('mrp.packaging.line', string=_('Packaging Line'))
+    packaging_line_domain = fields.Many2many('mrp.packaging.line', compute="_compute_packaging_line_domain")
+    section = fields.Many2one('mrp.detail.planning.line', string=_('Section to replace'), required=True)
+    section_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_section_to_replace_domain")
+    qty = fields.Integer(string=_("Quantity"))
+    default_get_infos = fields.Boolean(default=False)
+
+    planning_id = fields.Many2one("mrp.planning", string=_("Planning"))
+
     @api.depends("product_to_replace")
     def _compute_product_to_replace_domain(self):
         for rec in self:
@@ -73,7 +129,6 @@ class ReplaceProduct(models.TransientModel):
                 ('planning_id', '=', rec.planning_id.id)
             ], limit=1)
 
-
             mrp_list = [
                 mrp for mrp in mrp_production
                 if mrp.detailed_pl_id.product_id.id == rec.product_to_replace.id and (
@@ -88,7 +143,6 @@ class ReplaceProduct(models.TransientModel):
         # iso = production_date.isocalendar()
         day = self.env['mrp.planning.days'].search([('date', '=', production_date)])
         return day.id
-
 
     @api.depends('section', 'product_to_replace')
     def _compute_line_domain(self):
@@ -107,25 +161,25 @@ class ReplaceProduct(models.TransientModel):
                          ('product_id', '=', rec.product_to_replace.id),
                          ('id', '>', rec.section.id),
                          ('id', '<', end_section_id.id),
-                    ])
+                         ])
                     line_ids = self.env['mrp.detail.planning.line'].search(
                         [('display_type', '=', 'line_note'),
                          ('planning_id', '=', rec.planning_id.id),
                          ('id', '>', rec.section.id),
                          ('id', '<', end_section_id.id),
-                    ])
+                         ])
                 else:
                     mrp_detail = self.env['mrp.detail.planning.line'].search(
                         [('display_type', 'not in', ['line_section', 'line_note']),
                          ('planning_id', '=', rec.planning_id.id),
                          ('product_id', '=', rec.product_to_replace.id),
                          ('id', '>', rec.section.id),
-                    ])
+                         ])
                     line_ids = self.env['mrp.detail.planning.line'].search(
                         [('display_type', '=', 'line_note'),
                          ('planning_id', '=', rec.planning_id.id),
                          ('id', '>', rec.section.id),
-                    ])
+                         ])
                 product = [prod.id for prod in mrp_detail if prod.state not in ['done']]
                 line_lst = [line.id for line in line_ids]
 
@@ -201,7 +255,6 @@ class ReplaceProduct(models.TransientModel):
             else:
                 rec.line = False
 
-
     @api.depends('product_to_replace')
     def _compute_section_to_replace_domain(self):
         for rec in self:
@@ -211,7 +264,7 @@ class ReplaceProduct(models.TransientModel):
                 [('display_type', 'not in', ['line_section', 'line_note']),
                  ('planning_id', '=', rec.planning_id.id),
                  ('product_id', '=', rec.product_to_replace.id),
-            ])
+                 ])
 
             product = [prod.id for prod in mrp_detail if prod.state not in ['done']]
             section = [sect.id for sect in section_ids]
@@ -235,26 +288,30 @@ class ReplaceProduct(models.TransientModel):
     @api.depends("product_to_replace", 'line', 'planning_id', 'section')
     def _compute_packaging_line(self):
         for rec in self:
-            if rec.line and rec.line.packaging_line_id:
-                rec.packaging_line = rec.line.packaging_line_id
-            else:
-                rec.packaging_line = False
+            if not rec.default_get_infos:
+                if rec.line and rec.line.packaging_line_id:
+                    rec.packaging_line = rec.line.packaging_line_id
+                else:
+                    rec.packaging_line = False
 
     @api.onchange('product_to_replace')
     def _onchange_product_to_replace(self):
         for rec in self:
-            rec.replacement_product = False
-            rec.section = False
+            if not rec.default_get_infos:
+                rec.replacement_product = False
+                rec.section = False
 
     @api.onchange('section')
     def _onchange_section(self):
         for rec in self:
-            rec.packaging_line = False
+            if not rec.default_get_infos:
+                rec.packaging_line = False
 
     @api.onchange('packaging_line')
     def _onchange_line(self):
         for rec in self:
-            rec.replacement_days = False
+            if not rec.default_get_infos:
+                rec.replacement_days = False
 
 
     product_to_replace = fields.Many2one("product.product", string=_("Product to replace"), required=True)
@@ -379,7 +436,8 @@ class ReplaceProduct(models.TransientModel):
                     ('detailed_pl_id', 'in', mrp_detail_lst),
                     ('state', 'not in', ['done', 'cancel'])
                 ])
-                mrp_list = [mrp for mrp in mrp_production.detailed_pl_id if mrp.product_id.id == rec.product_to_replace.id]
+                mrp_list = [mrp for mrp in mrp_production.detailed_pl_id if
+                            mrp.product_id.id == rec.product_to_replace.id]
                 production_list = [mrp for mrp in mrp_production if mrp.detailed_pl_id in mrp_list]
                 if production_list:
                     for production in production_list:
@@ -418,4 +476,3 @@ class ReplaceProduct(models.TransientModel):
                 else:
                     message = f"<p><b> <em> (Detailed planning lines)</em> {rec.product_to_replace.name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{rec.replacement_product.name}</span> for section {rec.section.name} with new quantity <span style='color: #0182b6;'>{rec.qty}</span></b></p><ul>"
                     rec.planning_id.message_post(body=message)
-

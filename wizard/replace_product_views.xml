@@ -22,7 +22,7 @@
 							<field name="line_domain" widget="many2many_tags" invisible="1" />
 							<field name="line" invisible="1"/>
 							<field name="replacement_days_domain" widget="many2many_tags" invisible="1" />
-							<field name="replacement_days" widget="many2many_tags" domain="[('id', 'in', replacement_days_domain)]" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('line', '=', False)]}" />
+							<field name="replacement_days" widget="many2many_tags" domain="[('id', 'in', replacement_days_domain)]" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('packaging_line', '=', False)]}" />
 							<field name="planning_id" readonly="true" />
 						</group>
 					</group>
@@ -34,4 +34,13 @@
 			</form>
 		</field>
 	</record>
+
+	<record model="ir.actions.act_window" id="action_replace_product">
+        <field name="name">Replace Product</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">replace.product</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="replace_product_form"/>
+        <field name="target">new</field>
+    </record>
 </odoo>
