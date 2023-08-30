@@ -900,53 +900,80 @@ class MrpPlanninLine(models.Model):
 
     @api.onchange('product_id')
     def _get_default_bill_of_material(self):
-        boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)], limit=1)
-        self.bom_id = boms.id if boms else False
+        bomss = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+        self.bom_id = bomss.id if bomss else False
 
     @api.onchange('product_id')
     def _get_default_values(self):
         for rec in self:
-            if rec.product_id and rec.packaging_line_id:
-                qty_id = self.env['mrp.packaging.pp'].search(
-                    [('product_id', '=', rec.product_id.id), ('packaging_line_id', '=', rec.packaging_line_id.id)],
-                    limit=1)
-                rec.qty = qty_id.capacity
-                # rec.qty_compute = rec.qty
-                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-                packing = self.qty * boms.product_qty
-                rec.packing = packing
+            if rec.product_id:
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                if bom_ids:
+                    rec.bom_id = bom_ids[0]
 
-                capacity = self.qty * boms.net_weight
-                rec.capacity = capacity
-                # rec.qty_compute = rec.qty
+
+    @api.onchange('packing')
+    def _get_packing_record(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.packing != 0 and rec.bom_id:
+                rec.qty = rec.packing / rec.bom_id.product_qty
+                rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.qty, rec.capacity = 0, 0
+                # packing = boms.product_qty
+                # capacity = boms.net_weight
+                #
+                # rec.qty = rec.packing / packing
+                # rec.capacity = rec.qty * capacity
+
+    @api.onchange('capacity')
+    def _get_capacity_record(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.capacity != 0 and rec.bom_id:
+                rec.qty = rec.capacity / rec.bom_id.net_weight
+                rec.packing = rec.qty * rec.bom_id.product_qty
+            else:
+                rec.packing, rec.qty = 0, 0
+
+            # capacity = boms.net_weight
+            # packing = boms.product_qty
+            #
+            # rec.qty = (rec.capacity / capacity)
+            # rec.packing = (rec.qty * packing)
 
     @api.onchange('qty')
     def _get_quantity_record(self):
-
         for rec in self:
-            if rec.product_id and rec.packaging_line_id:
-                qty_id = self.env['mrp.packaging.pp'].search(
-                    [('product_id', '=', rec.product_id.id), ('packaging_line_id', '=', rec.packaging_line_id.id)],
-                    limit=1)
-                rec.qty = qty_id.capacity
-                # rec.qty_compute = rec.qty
-                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-                print("le bomsssssss", boms)
-                packing = self.qty * boms.product_qty
-                print("le packing", packing)
-                rec.packing = packing
+            print("origin", rec._origin.qty,rec.qty)
+            if rec.product_id and rec.packaging_line_id and rec.qty != rec._origin.qty and rec.bom_id:
+                rec.packing = rec.qty * rec.bom_id.product_qty
+                rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.packing, rec.capacity = 0, 0
 
-                capacity = self.qty * boms.net_weight
-                print("le capacity", capacity)
-                rec.capacity = capacity
-                # rec.qty_compute = rec.qty
-
-
+    # @api.onchange('product_id', 'packing', 'capacity', 'qty')
+    # def _update_calculated_fields(self):
+    #     if self.product_id and self.packaging_line_id:
+    #         qty_id = self.env['mrp.packaging.pp'].search(
+    #             [('product_id', '=', self.product_id.id), ('packaging_line_id', '=', self.packaging_line_id.id)])
+    #         boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+    #         packing = self.qty * boms.product_qty
+    #         capacity = self.qty * boms.net_weight
+    #
+    #         if self._origin.packing != self.packing:
+    #             self.qty = self.packing / packing
+    #             self.capacity = self.qty * capacity
+    #         elif self._origin.capacity != self.capacity:
+    #             self.qty = self.capacity / capacity
+    #             self.packing = self.qty * packing
+    #         elif self._origin.qty != self.qty:
+    #             self.packing = packing
+    #             self.capacity = self.qty * capacity
 
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
-    qty = fields.Integer(_("Qty per day"),default=_get_quantity_record)
-    capacity = fields.Integer(_("Capacity"), default=_get_default_values)
+    qty = fields.Integer(_("Qty per day"))
+    capacity = fields.Integer(_("Capacity"))
     employee_number = fields.Integer(_("EN"))
 
     product_id = fields.Many2one("product.product", string=_("Article"), required=True)
@@ -960,7 +987,7 @@ class MrpPlanninLine(models.Model):
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
-    packing = fields.Float(string="Packing", default=_get_default_values)
+    packing = fields.Float(string="Packing")
 
 class MrpDetailPlanningLine(models.Model):
     _name = "mrp.detail.planning.line"
@@ -985,6 +1012,52 @@ class MrpDetailPlanningLine(models.Model):
         for line in self:
             mrp_productions = self.env['mrp.production'].search([('detailed_pl_id', '=', line.id)]).id
             line.mrp_production_id = mrp_productions
+
+    # @api.onchange('product_id')
+    # def _get_default_values(self):
+    #     for rec in self:
+    #         if rec.product_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+    #             package = self.qty * boms.product_qty
+    #             rec.packing = package
+    #
+    #             capacity = self.qty * boms.net_weight
+    #             rec.capacity = capacity
+    #
+    # @api.onchange('package')
+    # def _get_package_record(self):
+    #     for rec in self:
+    #         if rec.product_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.planning.line'].search([('product_id', '=', self.product_id.id)])
+    #             self.qty = boms.qty
+    #             self.capacity = boms.capacity
+    #
+    # @api.onchange('capacity')
+    # def _get_capacity_record(self):
+    #     for rec in self:
+    #         if rec.product_id and rec.packaging_line_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search(
+    #                 [('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.planning.line'].search([('product_id', '=', self.product_id.id)])
+    #
+    #             self.qty = boms.qty
+    #             self.package = boms.packing
+    #
+    # @api.onchange('qty')
+    # def _get_quantity_record(self):
+    #
+    #     for rec in self:
+    #         if rec.product_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search(
+    #                 [('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.planning.line'].search([('product_id', '=', self.product_id.id), ('product_id','=',self.planning_line_id.bom_id.product_tmpl_id.id)])
+    #             print("le bomsssssssssss",boms)
+    #             self.package = boms.packing
+    #             self.capacity = boms.capacity
+
+
 
     date_char = fields.Char(_("Date"))
     date = fields.Date(_("Date"), required=1)
