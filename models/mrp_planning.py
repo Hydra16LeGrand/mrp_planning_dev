@@ -920,11 +920,6 @@ class MrpPlanninLine(models.Model):
                 rec.capacity = rec.qty * rec.bom_id.net_weight
             else:
                 rec.qty, rec.capacity = 0, 0
-                # packing = boms.product_qty
-                # capacity = boms.net_weight
-                #
-                # rec.qty = rec.packing / packing
-                # rec.capacity = rec.qty * capacity
 
     @api.onchange('capacity')
     def _get_capacity_record(self):
@@ -935,12 +930,6 @@ class MrpPlanninLine(models.Model):
             else:
                 rec.packing, rec.qty = 0, 0
 
-            # capacity = boms.net_weight
-            # packing = boms.product_qty
-            #
-            # rec.qty = (rec.capacity / capacity)
-            # rec.packing = (rec.qty * packing)
-
     @api.onchange('qty')
     def _get_quantity_record(self):
         for rec in self:
@@ -950,25 +939,6 @@ class MrpPlanninLine(models.Model):
                 rec.capacity = rec.qty * rec.bom_id.net_weight
             else:
                 rec.packing, rec.capacity = 0, 0
-
-    # @api.onchange('product_id', 'packing', 'capacity', 'qty')
-    # def _update_calculated_fields(self):
-    #     if self.product_id and self.packaging_line_id:
-    #         qty_id = self.env['mrp.packaging.pp'].search(
-    #             [('product_id', '=', self.product_id.id), ('packaging_line_id', '=', self.packaging_line_id.id)])
-    #         boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-    #         packing = self.qty * boms.product_qty
-    #         capacity = self.qty * boms.net_weight
-    #
-    #         if self._origin.packing != self.packing:
-    #             self.qty = self.packing / packing
-    #             self.capacity = self.qty * capacity
-    #         elif self._origin.capacity != self.capacity:
-    #             self.qty = self.capacity / capacity
-    #             self.packing = self.qty * packing
-    #         elif self._origin.qty != self.qty:
-    #             self.packing = packing
-    #             self.capacity = self.qty * capacity
 
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
