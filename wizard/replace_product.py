@@ -269,7 +269,7 @@ class ReplaceProduct(models.TransientModel):
     packaging_line_domain = fields.Many2many('mrp.packaging.line', compute="_compute_packaging_line_domain")
     section = fields.Many2one('mrp.detail.planning.line', string=_('Section to replace'), required=True)
     section_domain = fields.Many2many('mrp.detail.planning.line', compute="_compute_section_to_replace_domain")
-    qty = fields.Integer(string=_("Quantity"))
+    qty = fields.Integer(string=_("Replacement quantity"), help=_("If value of this field is 0, the quantity will not be changed."))
 
     planning_id = fields.Many2one("mrp.planning", string=_("Planning"))
 
