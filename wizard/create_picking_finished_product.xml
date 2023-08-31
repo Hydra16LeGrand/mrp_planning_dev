@@ -10,17 +10,11 @@
                         <page name="cp_finished_product_page" string="Picking Finished Product">
                             <field name="cp_finished_line_ids" widget="section_and_note_one2many" mode="tree">
                                 <tree create="false" editable="1">
-                                    <field name="product_domain" invisible="1"/>
-                                    <field name="product_id" options="{'no_open': True, 'no_create':True}" domain="[('id', '=', product_domain)]"/>
-<!--                                    <field name="product_id" options="{'no_open': True, 'no_create':True}" readonly="1"/>-->
-                                    <field name="location_domain" invisible="1"/>
-                                    <field name="location_id" options="{'no_open': True, 'no_create':True}" domain="[('id', '=', location_domain)]"/>
-<!--                                    <field name="location_id" options="{'no_open': True, 'no_create':True}" readonly="1"/>-->
-                                    <field name="old_quantity" readonly="1"/>
+                                    <field name="product_id" options="{'no_open': True, 'no_create':True}" readonly="1" force_save="1"/>
+                                    <field name="location_id" options="{'no_open': True, 'no_create':True}" readonly="1" force_save="1"/>
+                                    <field name="old_quantity" readonly="1" force_save="1"/>
                                     <field name="quantity"/>
-                                    <field name="product_uom_domain" invisible="1"/>
-                                    <field name="product_uom_id" options="{'no_open': True, 'no_create':True}" domain="[('id', '=', product_uom_domain)]"/>
-<!--                                    <field name="product_uom_id" options="{'no_open': True, 'no_create':True}" readonly="1"/>-->
+                                    <field name="product_uom_id" options="{'no_open': True, 'no_create':True}" readonly="1" force_save="1"/>
                                 </tree>
                             </field>
                         </page>

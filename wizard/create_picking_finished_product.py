@@ -21,13 +21,10 @@ class CreatePickingFinishedProduct(models.TransientModel):
                 group_list.append(
                     (0, 0, {
                         'product_id': quant.product_id.id,
-                        'product_domain': quant.product_id.id,
                         'location_id': quant.location_id.id,
-                        'location_domain': quant.location_id.id,
                         'quantity': quant.quantity,
                         'old_quantity': quant.quantity,
                         'product_uom_id': quant.product_uom_id.id,
-                        'product_uom_domain': quant.product_uom_id.id,
                     })
                 )
 
@@ -106,13 +103,10 @@ class WizardFinishedProductLine(models.TransientModel):
     _description = 'Wizard Finished Product Line'
 
     product_id = fields.Many2one('product.product', string='Product')
-    product_domain = fields.Many2one('product.product')
     location_id = fields.Many2one('stock.location', string='Source location')
-    location_domain = fields.Many2one('stock.location')
     quantity = fields.Float(string='Quantity', required=True)
     old_quantity = fields.Float(string='Current quantity in stock')
     product_uom_id = fields.Many2one('uom.uom', string='Unit')
-    product_uom_domain = fields.Many2one('uom.uom')
     cp_finished_product_id = fields.Many2one('create.picking.finished.product', string='Create Picking Finished Product')
 
     @api.onchange('quantity')
