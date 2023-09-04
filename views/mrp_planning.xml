@@ -6,13 +6,13 @@
 		<field name="arch" type="xml">
 			<form>
 				<header>
+					<button name="%(mrp_planning.action_report_planning_details)d" string="Print Planning" type="action" attrs="{'invisible': [('state', '=', 'draft')]}"/>
 					<button name="action_cancel" type="object" string="Cancel" states="confirm,04_mo_generated" confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?" />
 					<button name="action_draft" type="object" string="Re-draft" states="cancel" />
 					<button name="action_confirm" type="object" string="DETAILED THE PLANNING" states="draft" class="oe_highlight" confirm="Planning lines will no longer be editable. Are you sure to do this?" />
 					<button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight" confirm="Are you sure to do this action ?" />
 					<button name="create_overview_wizard" type="object" string="RM Overview"
                          attrs="{'invisible': [('state','not in',('04_mo_generated','confirm'))]}" />
-					<button name="%(mrp_planning.action_report_planning_details)d" string="Print Planning" type="action" attrs="{'invisible': [('state', '=', 'draft')]}"/>
 					<button name="action_product_replacement" type="object" string="Replace product" attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary" />
 					<button name="action_mark_productions_as_done" type="object" string="FINALIZE PRODUCTION"  class="btn-warning" confirm="This action will complete all manufacturing orders process in this planning. Proceed?" attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}" />
 					<field name="state" widget="statusbar" statusbar_visible="draft,confirm,04_mo_generated" statusbar_invisible="cancel" attrs="{'invisible': [('state', '=', '0')]}"/>
