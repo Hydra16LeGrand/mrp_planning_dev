@@ -122,6 +122,8 @@ class MrpPlanning(models.Model):
 
         # self.env.cr.commit()
 
+
+
     @api.model
     def create(self, vals):
 
@@ -938,23 +940,17 @@ class MrpPlanninLine(models.Model):
 
     @api.onchange('product_id')
     def _get_default_bill_of_material(self):
-        bomss = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-        self.bom_id = bomss.id if bomss else False
-
-    @api.onchange('product_id')
-    def _get_default_values(self):
         for rec in self:
             if rec.product_id:
-                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
                 if bom_ids:
                     rec.bom_id = bom_ids[0]
 
-
-    @api.onchange('packing')
-    def _get_packing_record(self):
+    @api.onchange('package')
+    def _get_package_record(self):
         for rec in self:
-            if rec.product_id and rec.packaging_line_id and rec.packing != 0 and rec.bom_id:
-                rec.qty = rec.packing / rec.bom_id.product_qty
+            if rec.product_id and rec.packaging_line_id and rec.package != 0 and rec.bom_id:
+                rec.qty = rec.package / rec.bom_id.product_qty
                 rec.capacity = rec.qty * rec.bom_id.net_weight
             else:
                 rec.qty, rec.capacity = 0, 0
@@ -964,24 +960,67 @@ class MrpPlanninLine(models.Model):
         for rec in self:
             if rec.product_id and rec.packaging_line_id and rec.capacity != 0 and rec.bom_id:
                 rec.qty = rec.capacity / rec.bom_id.net_weight
-                rec.packing = rec.qty * rec.bom_id.product_qty
+                rec.package = rec.qty * rec.bom_id.product_qty
             else:
-                rec.packing, rec.qty = 0, 0
+                rec.package, rec.qty = 0, 0
 
     @api.onchange('qty')
     def _get_quantity_record(self):
         for rec in self:
             print("origin", rec._origin.qty,rec.qty)
-            if rec.product_id and rec.packaging_line_id and rec.qty != rec._origin.qty and rec.bom_id:
-                rec.packing = rec.qty * rec.bom_id.product_qty
+            if rec.product_id and rec.packaging_line_id and rec.qty != 0 and rec.bom_id:
+                rec.package = rec.qty / rec.bom_id.product_qty
                 rec.capacity = rec.qty * rec.bom_id.net_weight
             else:
-                rec.packing, rec.capacity = 0, 0
+                rec.package, rec.capacity = 0, 0
+
+    # @api.onchange('qty', 'capacity', 'package')
+    # def _get_all_record(self):
+    #     for rec in self:
+    #         if rec.product_id and rec.packaging_line_id and rec.bom_id:
+    #             print("Le bom_id", rec.bom_id)
+    #             print("Dans le if")
+    #             print("valeur avant", rec.qty)
+    #
+    #             qty_changed = rec._origin.qty != rec.qty and rec.qty != 0  # and rec._origin.package == rec.package and rec._origin.capacity == rec.capacity
+    #             capacity_changed = rec._origin.capacity != rec.capacity and rec.capacity != 0 #and rec._origin.package != rec.package and rec._origin.qty != rec.qty
+    #             package_changed = rec._origin.package != rec.package and rec.package != 0 #and rec._origin.qty != rec.qty and rec._origin.capacity != rec.capacity
+    #
+    #             print("Origin qty", rec._origin.qty, rec.qty)
+    #             print("Origin capacity", rec._origin.capacity, rec.capacity)
+    #             print("Origin package", rec._origin.package, rec.package)
+    #
+    #             if qty_changed:
+    #                 print("Première vérification qty")
+    #                 rec.package = rec.qty / rec.bom_id.product_qty
+    #                 rec.capacity = rec.qty * rec.bom_id.net_weight
+    #                 print("Rec package", rec.package)
+    #                 print("Rec capacity", rec.capacity)
+    #                 print("Origin qty", rec._origin.qty, rec.qty)
+    #
+    #             elif capacity_changed:
+    #                 print("Deuxième vérification capacity")
+    #                 rec.qty = rec.capacity / rec.bom_id.net_weight
+    #                 rec.package = rec.qty * rec.bom_id.product_qty
+    #                 print("Rec qty", rec.qty)
+    #                 print("Rec package", rec.package)
+    #                 print("Origin capacity", rec._origin.capacity, rec.capacity)
+    #
+    #             elif package_changed:
+    #                 print("Troisième vérification package")
+    #                 rec.qty = rec.package * rec.bom_id.product_qty
+    #                 rec.capacity = rec.qty * rec.bom_id.net_weight
+    #                 print("Rec qty", rec.qty)
+    #                 print("Rec capacity", rec.capacity)
+    #                 print("Origin package", rec._origin.package, rec.package)
+    #             print("valeur saisie apres", rec.qty)
+    #         else:
+    #             rec.package, rec.capacity, rec.qty = 0, 0, 0
 
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
-    qty = fields.Integer(_("Qty per day"))
-    capacity = fields.Integer(_("Capacity"))
+    qty = fields.Float(_("Qty per day"))
+    capacity = fields.Float(_("Capacity"))
     employee_number = fields.Integer(_("EN"))
 
     product_id = fields.Many2one("product.product", string=_("Article"), required=True)
@@ -994,8 +1033,7 @@ class MrpPlanninLine(models.Model):
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
-    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
-    packing = fields.Float(string="Packing")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
 
 class MrpDetailPlanningLine(models.Model):
     _name = "mrp.detail.planning.line"

@@ -13,7 +13,7 @@
                 <attribute name="options">{'no_create': 1, 'no_open': 1}</attribute>
                 <attribute name="domain">[('detailed_type_custom', 'not in', ['final_product', 'service', 'project'])]</attribute>
             </xpath>
-            <xpath expr="//sheet/group/group/label[@for='product_qty']" position="before">
+            <xpath expr="//sheet/group/group/div" position="after">
                 <field name="packing"/>
             </xpath>
         </field>
