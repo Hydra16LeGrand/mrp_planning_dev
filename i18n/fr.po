@@ -1304,7 +1304,7 @@ msgstr "Usines"
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_plant__is_principal
 #, python-format
 msgid "Principal plant"
-msgstr "Usine principale"
+msgstr "Stock usine principale"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
@@ -1422,7 +1422,7 @@ msgstr "Usine principale MP"
 #: model:ir.actions.act_window,name:mrp_planning.action_rm_plastic_factory
 #: model:ir.ui.menu,name:mrp_planning.menu_mrp_rm_plastic_factory
 msgid "RM plastic factory"
-msgstr "Usine de plastique MP"
+msgstr "Stock usine plastique"
 
 #. module: mrp_planning
 #. odoo-python
