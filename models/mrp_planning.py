@@ -539,18 +539,18 @@ class MrpPlanning(models.Model):
                 if day_name in day.name:
                     raise UserError(_("This day already exists in the week"))
 
-                day_iso = day.date.isocalendar()
+                # day_iso = day.date.isocalendar()
 
-                if iso.year < day_iso.year:
-
-                    raise UserError(_("The date must not be less than the current week's dates."))
-                elif self.scheduled_date.month < day.date.month:
-
-                    raise UserError(_("The date must not be less than the current week's dates."))
-                elif iso.week < day_iso.week:
-                    if self.scheduled_date.month <= day.date.month:
-                        if iso.year <= day_iso.year:
-                            raise UserError(_("The date must not be less than the current week's dates."))
+                # if iso.year < day_iso.year:
+                #
+                #     raise UserError(_("The date must not be less than the current week's dates."))
+                # elif self.scheduled_date.month < day.date.month:
+                #
+                #     raise UserError(_("The date must not be less than the current week's dates."))
+                # elif iso.week < day_iso.week:
+                #     if self.scheduled_date.month <= day.date.month:
+                #         if iso.year <= day_iso.year:
+                #             raise UserError(_("The date must not be less than the current week's dates."))
 
             day_in_week_of = self.env['mrp.planning.days'].search([
                 ('name', '=', day_name)
@@ -926,6 +926,58 @@ class MrpPlanninLine(models.Model):
         ppp_id = self.env['mrp.packaging.pp'].search([('product_id', '=', self.product_id.id)], limit=1)
         self.packaging_line_id = ppp_id.id if ppp_id else False
 
+    @api.depends('product_id')
+    def _compute_bill_of_material_domain(self):
+        for rec in self:
+            if rec.product_id:
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.id)])
+                rec.bom_domain = [bom.id for bom in boms]
+                print("le boms", rec.bom_domain)
+            else:
+                rec.bom_domain = []
+
+    @api.onchange('product_id')
+    def _get_default_bill_of_material(self):
+        bomss = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+        self.bom_id = bomss.id if bomss else False
+
+    @api.onchange('product_id')
+    def _get_default_values(self):
+        for rec in self:
+            if rec.product_id:
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                if bom_ids:
+                    rec.bom_id = bom_ids[0]
+
+
+    @api.onchange('packing')
+    def _get_packing_record(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.packing != 0 and rec.bom_id:
+                rec.qty = rec.packing / rec.bom_id.product_qty
+                rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.qty, rec.capacity = 0, 0
+
+    @api.onchange('capacity')
+    def _get_capacity_record(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.capacity != 0 and rec.bom_id:
+                rec.qty = rec.capacity / rec.bom_id.net_weight
+                rec.packing = rec.qty * rec.bom_id.product_qty
+            else:
+                rec.packing, rec.qty = 0, 0
+
+    @api.onchange('qty')
+    def _get_quantity_record(self):
+        for rec in self:
+            print("origin", rec._origin.qty,rec.qty)
+            if rec.product_id and rec.packaging_line_id and rec.qty != rec._origin.qty and rec.bom_id:
+                rec.packing = rec.qty * rec.bom_id.product_qty
+                rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.packing, rec.capacity = 0, 0
+
     package = fields.Float(_("Package"))
     qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
     qty = fields.Integer(_("Qty per day"))
@@ -941,7 +993,9 @@ class MrpPlanninLine(models.Model):
     section_id = fields.Many2one("mrp.section", required=1)
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
     planning_id = fields.Many2one("mrp.planning")
-
+    bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
+    packing = fields.Float(string="Packing")
 
 class MrpDetailPlanningLine(models.Model):
     _name = "mrp.detail.planning.line"
@@ -966,6 +1020,52 @@ class MrpDetailPlanningLine(models.Model):
         for line in self:
             mrp_productions = self.env['mrp.production'].search([('detailed_pl_id', '=', line.id)]).id
             line.mrp_production_id = mrp_productions
+
+    # @api.onchange('product_id')
+    # def _get_default_values(self):
+    #     for rec in self:
+    #         if rec.product_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+    #             package = self.qty * boms.product_qty
+    #             rec.packing = package
+    #
+    #             capacity = self.qty * boms.net_weight
+    #             rec.capacity = capacity
+    #
+    # @api.onchange('package')
+    # def _get_package_record(self):
+    #     for rec in self:
+    #         if rec.product_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search([('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.planning.line'].search([('product_id', '=', self.product_id.id)])
+    #             self.qty = boms.qty
+    #             self.capacity = boms.capacity
+    #
+    # @api.onchange('capacity')
+    # def _get_capacity_record(self):
+    #     for rec in self:
+    #         if rec.product_id and rec.packaging_line_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search(
+    #                 [('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.planning.line'].search([('product_id', '=', self.product_id.id)])
+    #
+    #             self.qty = boms.qty
+    #             self.package = boms.packing
+    #
+    # @api.onchange('qty')
+    # def _get_quantity_record(self):
+    #
+    #     for rec in self:
+    #         if rec.product_id:
+    #             qty_id = self.env['mrp.packaging.pp'].search(
+    #                 [('product_id', '=', rec.product_id.id)])
+    #             boms = self.env['mrp.planning.line'].search([('product_id', '=', self.product_id.id), ('product_id','=',self.planning_line_id.bom_id.product_tmpl_id.id)])
+    #             print("le bomsssssssssss",boms)
+    #             self.package = boms.packing
+    #             self.capacity = boms.capacity
+
+
 
     date_char = fields.Char(_("Date"))
     date = fields.Date(_("Date"), required=1)
