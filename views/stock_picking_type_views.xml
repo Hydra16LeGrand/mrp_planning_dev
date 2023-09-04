@@ -41,7 +41,7 @@
         <field name="view_id" ref="stock.view_stock_quant_tree"/>
     </record>
 
-    <!-- Bouton Mon Bouton -->
+    <!-- Heritage stock quant tree -->
     <record model="ir.ui.view" id="view_stock_quant_tree_buttons">
         <field name="name">stock.quant.tree.buttons</field>
         <field name="model">stock.quant</field>
@@ -51,7 +51,12 @@
                 <header>
                     <button name="finished_product_transfer" type="object" string="Finished product transfer"
                             invisible="context.get('rm_main_factory', True)"/>
+                    <button name="calculating_packs" type="object" string="Calculating packs"
+                            invisible="context.get('rm_main_factory', True)"/>
                 </header>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="pack_of"/>
             </xpath>
         </field>
     </record>

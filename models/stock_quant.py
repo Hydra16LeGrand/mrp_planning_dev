@@ -27,3 +27,36 @@ class StockQuantInherit(models.Model):
                 'quant_line': quant_lst
             }
             return action
+
+    def calculating_packs(self):
+        quant_lst = []
+        for rec in self:
+            if rec.location_id.packaged_finished_product and rec.pack_of:
+                quant_lst.append(rec.id)
+            else:
+                raise UserError(_("You cannot calculate the packs of these transfers"))
+
+        if quant_lst:
+            action = self.env.ref('mrp_planning.action_calculating_packs').read()[0]
+            action['context'] = {
+                'quant_line': quant_lst
+            }
+            return action
+
+    # pack_of_bool = fields.Boolean(compute="_compute_pack_of_bool")
+    pack_of_bool = fields.Selection([
+        ('true', 'True'),
+        ('false', 'False'),
+    ], compute="_compute_pack_of_bool")
+    pack_of = fields.Char('Pack Of')
+    package = fields.Integer('Package')
+    pack = fields.Integer('Pack')
+
+    @api.depends('pack_of')
+    def _compute_pack_of_bool(self):
+        for rec in self:
+            if rec.pack_of:
+                print(f"rec.pack_of : {rec.pack_of}")
+                rec.pack_of_bool = "true"
+            else:
+                rec.pack_of_bool = "false"

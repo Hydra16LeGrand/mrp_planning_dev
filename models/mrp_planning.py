@@ -1024,15 +1024,15 @@ class MrpDetailPlanningLine(models.Model):
 
     def action_replace_product_from_planning(self):
         action = self.env.ref('mrp_planning.action_replace_product').read()[0]
-        val = {
-            'planning_id': self.planning_id,
-            'product_to_replace': self.product_id.id,
-            'section': self.section_id,
-            'packaging_line': self.packaging_line_id,
-            'replacement_days': self.env['mrp.planning.days'].search([
-                ('date', '=', self.date)
-            ])
-        }
+        # val = {
+        #     'planning_id': self.planning_id,
+        #     'product_to_replace': self.product_id.id,
+        #     'section': self.section_id,
+        #     'packaging_line': self.packaging_line_id,
+        #     'replacement_days': self.env['mrp.planning.days'].search([
+        #         ('date', '=', self.date)
+        #     ])
+        # }
         action['context'] = {
             'replace_product_from_detailed_planning': self.id
         }
