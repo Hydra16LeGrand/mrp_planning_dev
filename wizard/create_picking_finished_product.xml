@@ -15,6 +15,7 @@
                                     <field name="old_quantity" readonly="1" force_save="1"/>
                                     <field name="quantity"/>
                                     <field name="product_uom_id" options="{'no_open': True, 'no_create':True}" readonly="1" force_save="1"/>
+                                    <field name="pack_of"/>
                                 </tree>
                             </field>
                         </page>

@@ -40,6 +40,7 @@
         'wizard/create_overview_wizard_view.xml',
         'wizard/mrp_immediate_production_inherit.xml',
         'wizard/create_picking_finished_product.xml',
+        'wizard/calculating_packs_view.xml',
 
         'views/mrp_planning.xml',
         'views/mrp_section.xml',
@@ -51,6 +52,7 @@
         'views/mrp_bom_views.xml',
         'views/mrp_plant.xml',
         'views/stock_picking_type_views.xml',
+        'views/stock_quant_package_inherit.xml',
 
     ],
 
