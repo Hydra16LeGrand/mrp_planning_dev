@@ -122,6 +122,8 @@ class MrpPlanning(models.Model):
 
         # self.env.cr.commit()
 
+
+
     @api.model
     def create(self, vals):
 
@@ -939,10 +941,10 @@ class MrpPlanninLine(models.Model):
                 rec.bom_domain = []
 
     @api.onchange('product_id')
-    def _get_default_values(self):
+    def _get_default_bill_of_material(self):
         for rec in self:
             if rec.product_id:
-                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
                 if bom_ids:
                     rec.bom_id = bom_ids[0]
 
@@ -995,8 +997,8 @@ class MrpPlanninLine(models.Model):
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
-    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
-    # packing = fields.Float(string="Packing")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
+
 
 class MrpDetailPlanningLine(models.Model):
     _name = "mrp.detail.planning.line"
