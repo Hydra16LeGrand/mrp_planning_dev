@@ -41,6 +41,12 @@
                             <field name="default_location_src_id" domain="[('plant_id', '=', id)]"/>
                             <field name="default_location_dest_id" domain="[('plant_id', '=', id)]"/>
                         </group>
+
+                        <group string="Emballage" name="emballage">
+                            <field name="picking_type_id"/>
+                            <field name="unpackaged_location_id" />
+                            <field name="packaged_location_id" />
+                        </group>
                     </group>
                 </sheet>
             </form>
