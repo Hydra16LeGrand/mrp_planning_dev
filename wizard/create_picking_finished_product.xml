@@ -30,13 +30,4 @@
             </form>
         </field>
     </record>
-
-    <record model="ir.actions.act_window" id="action_picking_finished_product">
-        <field name="name">Picking Finished Product</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">create.picking.finished.product</field>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_create_picking_finished_product_form"/>
-        <field name="target">new</field>
-    </record>
 </odoo>

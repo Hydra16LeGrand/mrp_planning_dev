@@ -122,6 +122,8 @@ class MrpPlanning(models.Model):
 
         # self.env.cr.commit()
 
+
+
     @api.model
     def create(self, vals):
 
@@ -144,7 +146,7 @@ class MrpPlanning(models.Model):
                 'product_id': element['product_id'].id,
                 'package': element['package'],
                 'qty': element['qty'],
-                'capacity': ppp_id.capacity if ppp_id else 0,
+                'capacity': element['capacity'],
                 'packaging_line_id': element['packaging_line_id'].id,
                 'planning_line_id': element['planning_line_id'],
                 'section_id': element['section_id'].id,
@@ -161,7 +163,9 @@ class MrpPlanning(models.Model):
             'planning_line_id': element['planning_line_id'],
             'section_id': element['section_id'].id,
             'planning_id': element['planning_id'],
+            'package': element['package'],
             'qty': element['qty'],
+            'capacity': element['capacity'],
             'packaging_line_id': element['packaging_line_id'].id,
             'date': date.today(),
         }])
@@ -191,7 +195,6 @@ class MrpPlanning(models.Model):
             for pline in self.planning_line_ids:
                 val = {
                     'package': pline.package,
-                    'qty_compute': pline.qty_compute,
                     'qty': pline.qty,
                     'capacity': pline.capacity,
                     'product_id': pline.product_id,
@@ -489,7 +492,7 @@ class MrpPlanning(models.Model):
         if self.planning_line_ids:
             new_planning_line_ids = [(0, 0, {
                 'package': line.package,
-                'qty_compute': line.qty_compute,
+                # 'qty_compute': line.qty_compute,
                 'qty': line.qty,
                 'capacity': line.capacity,
                 'product_id': line.product_id.id,
@@ -539,18 +542,18 @@ class MrpPlanning(models.Model):
                 if day_name in day.name:
                     raise UserError(_("This day already exists in the week"))
 
-                day_iso = day.date.isocalendar()
+                # day_iso = day.date.isocalendar()
 
-                if iso.year < day_iso.year:
-
-                    raise UserError(_("The date must not be less than the current week's dates."))
-                elif self.scheduled_date.month < day.date.month:
-
-                    raise UserError(_("The date must not be less than the current week's dates."))
-                elif iso.week < day_iso.week:
-                    if self.scheduled_date.month <= day.date.month:
-                        if iso.year <= day_iso.year:
-                            raise UserError(_("The date must not be less than the current week's dates."))
+                # if iso.year < day_iso.year:
+                #
+                #     raise UserError(_("The date must not be less than the current week's dates."))
+                # elif self.scheduled_date.month < day.date.month:
+                #
+                #     raise UserError(_("The date must not be less than the current week's dates."))
+                # elif iso.week < day_iso.week:
+                #     if self.scheduled_date.month <= day.date.month:
+                #         if iso.year <= day_iso.year:
+                #             raise UserError(_("The date must not be less than the current week's dates."))
 
             day_in_week_of = self.env['mrp.planning.days'].search([
                 ('name', '=', day_name)
@@ -699,7 +702,7 @@ class MrpPlanning(models.Model):
             'value': val[2]
         } for val in vals['planning_line_ids'] if val[0] == 1]
 
-        self.process_update_pl(update_pl, old_planning_line, mrp_planning)
+        # self.process_update_pl(update_pl, old_planning_line, mrp_planning)
         self.process_delete_pl(delete_pl, old_planning_line, mrp_planning)
 
         message_to_add_pl = self._get_pl_message(add_pl, "Planning lines added are")
@@ -906,9 +909,10 @@ class MrpPlanninLine(models.Model):
                     [('product_id', '=', rec.product_id.id), ('packaging_line_id', '=', rec.packaging_line_id.id)],
                     limit=1)
                 rec.qty = ppp_id.capacity
-                rec.qty_compute = rec.qty
+                rec.recent_qty = rec.qty
+                # rec.qty_compute = rec.qty
             else:
-                rec.qty, rec.qty_compute = 0, 0
+                rec.qty = 0
 
     @api.depends('product_id')
     def _compute_packaging_line_domain(self):
@@ -926,10 +930,61 @@ class MrpPlanninLine(models.Model):
         ppp_id = self.env['mrp.packaging.pp'].search([('product_id', '=', self.product_id.id)], limit=1)
         self.packaging_line_id = ppp_id.id if ppp_id else False
 
+    @api.depends('product_id')
+    def _compute_bill_of_material_domain(self):
+        for rec in self:
+            if rec.product_id:
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.id)])
+                rec.bom_domain = [bom.id for bom in boms]
+                print("le boms", rec.bom_domain)
+            else:
+                rec.bom_domain = []
+
+    @api.onchange('product_id')
+    def _get_default_bill_of_material(self):
+        for rec in self:
+            if rec.product_id:
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+                if bom_ids:
+                    rec.bom_id = bom_ids[0]
+
+    @api.onchange('qty')
+    def _update_quantity_variants_onchange_qty(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.bom_id:
+                rec.recent_qty = rec.qty
+                rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
+                rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.recent_qty, rec.package, rec.capacity = 0, 0, 0
+
+    @api.onchange('capacity')
+    def _update_quantity_variants_onchange_capacity(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.bom_id:
+                # print("Affectation qty 2", rec.recent_qty, rec.qty)
+                if rec.qty != rec.recent_qty:
+                    rec.qty = rec.capacity / rec.bom_id.net_weight if rec.bom_id.net_weight != 0 else 0
+                    rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
+            else:
+                rec.package, rec.qty = 0, 0
+
+    @api.onchange('package')
+    def _update_quantity_variants_onchange_package(self):
+        for rec in self:
+            if rec.product_id and rec.packaging_line_id and rec.bom_id:
+                if rec.recent_qty != rec.qty:
+                    rec.qty = rec.package * rec.bom_id.packing
+                    rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.capacity, rec.qty = 0, 0
+
+
     package = fields.Float(_("Package"))
-    qty_compute = fields.Integer(_("Qty per day"), compute="_compute_qty", store=True)
-    qty = fields.Integer(_("Qty per day"))
-    capacity = fields.Integer(_("Capacity"))
+    # qty_compute = fields.Integer(_("Qty per day"))
+    recent_qty = fields.Integer()
+    qty = fields.Float(_("Qty per day"), compute="_compute_qty", store=True, readonly=False)
+    capacity = fields.Float(_("Capacity"))
     employee_number = fields.Integer(_("EN"))
 
     product_id = fields.Many2one("product.product", string=_("Article"), required=True)
@@ -941,6 +996,8 @@ class MrpPlanninLine(models.Model):
     section_id = fields.Many2one("mrp.section", required=1)
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
     planning_id = fields.Many2one("mrp.planning")
+    bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
 
 
 class MrpDetailPlanningLine(models.Model):
@@ -972,8 +1029,8 @@ class MrpDetailPlanningLine(models.Model):
     product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
     product_id = fields.Many2one("product.product", string=_("Désignation"), required=True)
     package = fields.Float(_("Package"))
-    qty = fields.Integer(_("Quantity"), required=1)
-    capacity = fields.Integer(_("Capacity"))
+    qty = fields.Float(_("Quantity"), required=1)
+    capacity = fields.Float(_("Capacity"))
     state = fields.Selection([
         ('draft', _("Draft")),
         ('confirmed', _("Confirmed")),
