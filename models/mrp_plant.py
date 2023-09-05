@@ -29,6 +29,17 @@ class MrpPlant(models.Model):
 			rec.supply_location_src_id = picking_type_id.default_location_src_id.id if picking_type_id else False
 			rec.supply_location_dest_id = picking_type_id.default_location_dest_id.id if picking_type_id else False
 
+	def _compute_packing_location(self):
+		for rec in self:
+			rec.packaged_location_id = self.env['stock.location'].search([
+				('plant_id.is_principal', '!=', False),
+				('packaged_finished_product', '=', True)
+			])
+			rec.unpackaged_location_id = self.env['stock.location'].search([
+				('plant_id.is_principal', '!=', False),
+				('unpackaged_finished_product', '=', True)
+			])
+
 
 	name = fields.Char(_("Name"), required=1)
 	code = fields.Char(_("Short name"), required=1)
@@ -40,6 +51,8 @@ class MrpPlant(models.Model):
 	picking_type_internal = fields.Many2one('stock.picking.type', 'Type of operation', compute='_compute_picking_type_internal')
 	supply_location_src_id = fields.Many2one("stock.location", string=_("Default supply location"), compute="_compute_plant_supply_locations")
 	supply_location_dest_id = fields.Many2one("stock.location", string=_("Default supply destination location"), compute="_compute_plant_supply_locations")
+	unpackaged_location_id = fields.Many2one("stock.location", string=_("Emplacement des produits non emballés"), compute="_compute_packing_location")
+	packaged_location_id = fields.Many2one("stock.location", string=_("Emplacement des produits emballés"), compute="_compute_packing_location")
 
 	_sql_constraints = [
         ('warehouse_code_uniq', 'unique(code, company_id)', 'The short name of the plant must be unique per company!'),

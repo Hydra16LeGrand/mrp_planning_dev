@@ -37,7 +37,6 @@ class StockQuantInherit(models.Model):
                     'quant_line': quant_lst,
                 },
             }
-
             return action
 
     def calculating_packs(self):
