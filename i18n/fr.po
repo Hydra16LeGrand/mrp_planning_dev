@@ -201,7 +201,7 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
 #: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_picking_finished_product_form
 msgid "Annuler"
-msgstr "Cancel"
+msgstr "Annuler"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_picking_finished_product_form
@@ -1794,7 +1794,7 @@ msgstr ""
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_plant_kanban
 msgid "To Process"
-msgstr "Procéder"
+msgstr "À Traiter"
 
 #. module: mrp_planning
 #: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_detail_planning_line__state__to_close

@@ -283,7 +283,7 @@ class MrpPlanning(models.Model):
     def create_overview_wizard(self):
 
         action = {
-            "name": "Raw Material Overview",
+            "name": "Aperçu des matières premières",
             "res_model": "overview.wizard",
             "type": "ir.actions.act_window",
             "view_mode": "form",
