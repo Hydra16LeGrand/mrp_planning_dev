@@ -1024,6 +1024,46 @@ class MrpDetailPlanningLine(models.Model):
             mrp_productions = self.env['mrp.production'].search([('detailed_pl_id', '=', line.id)]).id
             line.mrp_production_id = mrp_productions
 
+    @api.onchange('qty')
+    def _update_quantity_variants_onchange_qty(self):
+        for rec in self:
+            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            if bom_ids:
+                rec.bom_id = bom_ids[0]
+            if rec.product_id and rec.packaging_line_id and rec.bom_id:
+                rec.recent_qty = rec.qty
+                rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
+                rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.recent_qty, rec.package, rec.capacity = 0, 0, 0
+
+    @api.onchange('capacity')
+    def _update_quantity_variants_onchange_capacity(self):
+        for rec in self:
+            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            if bom_ids:
+                rec.bom_id = bom_ids[0]
+            if rec.product_id and rec.packaging_line_id and rec.bom_id:
+                # print("Affectation qty 2", rec.recent_qty, rec.qty)
+                if rec.qty != rec.recent_qty:
+                    rec.qty = rec.capacity / rec.bom_id.net_weight if rec.bom_id.net_weight != 0 else 0
+                    rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
+            else:
+                rec.package, rec.qty = 0, 0
+
+    @api.onchange('package')
+    def _update_quantity_variants_onchange_package(self):
+        for rec in self:
+            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            if bom_ids:
+                rec.bom_id = bom_ids[0]
+            if rec.product_id and rec.packaging_line_id and rec.bom_id:
+                if rec.recent_qty != rec.qty:
+                    rec.qty = rec.package * rec.bom_id.packing
+                    rec.capacity = rec.qty * rec.bom_id.net_weight
+            else:
+                rec.capacity, rec.qty = 0, 0
+
     date_char = fields.Char(_("Date"))
     date = fields.Date(_("Date"), required=1)
     product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
@@ -1031,6 +1071,8 @@ class MrpDetailPlanningLine(models.Model):
     package = fields.Float(_("Package"))
     qty = fields.Float(_("Quantity"), required=1)
     capacity = fields.Float(_("Capacity"))
+    recent_qty = fields.Integer()
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
     state = fields.Selection([
         ('draft', _("Draft")),
         ('confirmed', _("Confirmed")),

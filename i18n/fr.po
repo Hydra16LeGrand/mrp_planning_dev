@@ -35,7 +35,7 @@ msgstr "<i class=\"fa fa-gear\" role=\"img\" aria-label=\"Gérer\" title=\"Gére
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "<span class=\"o_stat_text\">Mrp orders</span>"
-msgstr "<span class=\"o_stat_text\">Ordre de fabrication</span>"
+msgstr "<span class=\"o_stat_text\">Ordres de fabrication</span>"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_production_form_view_inherit
@@ -932,7 +932,7 @@ msgstr "Fabrication"
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning__mrp_production_ids
 #, python-format
 msgid "Mrp orders"
-msgstr "Ordre de fabrication"
+msgstr "Ordres de fabrication"
 
 #. module: mrp_planning
 #: model:ir.model,name:mrp_planning.model_mrp_packaging_pp
@@ -1644,7 +1644,7 @@ msgstr "Nombre de RAVITAILLEMENT"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 msgid "Supply order(s)"
-msgstr "Ordre(s) de ravitaillement"
+msgstr "Ordres de ravitaillement"
 
 #. module: mrp_planning
 #. odoo-python

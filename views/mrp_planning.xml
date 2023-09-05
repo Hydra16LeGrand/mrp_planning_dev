@@ -224,7 +224,7 @@
     </record>
 
 	<record id="action_mrp_planning" model="ir.actions.act_window" >
-<!--		<field name="name">MRP Planning</field>-->
+		<field name="name">MRP Planning</field>
 		<field name="res_model">mrp.planning</field>
 		<field name="view_mode">tree,form</field>
 		<field name="context">{'search_default_by_plants': 1}</field>
