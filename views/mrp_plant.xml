@@ -68,7 +68,7 @@
                                 </div>
                                 <div class="o_kanban_card_header_title">
                                     <div class="o_primary">
-                                        <a type="object" name="get_mrp_planning_action">
+                                        <a type="object" name="action_mrp_planning_name_tree">
                                             <field name="name"/>
                                         </a>
                                     </div>
