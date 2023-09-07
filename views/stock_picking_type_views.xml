@@ -55,11 +55,11 @@
                             invisible="context.get('rm_main_factory', True)"/>
                 </header>
             </xpath>
-            <xpath expr="//field[@name='company_id']" position="after">
-                <field name="pack_of"/>
-            </xpath>
             <xpath expr="//field[@name='available_quantity']" position="attributes">
                 <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//field[@name='company_id']" position="after">
+                <field name="pack_of"/>
             </xpath>
         </field>
     </record>

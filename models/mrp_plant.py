@@ -149,16 +149,21 @@ class MrpPlant(models.Model):
 		return action
 
 	def action_mrp_planning_tree_name(self):
-		# action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
-		# action['name'] = self.plant_id.name
-		# return action
-		return {
-			'type': 'ir.actions.act_window',
-			'name': self.name,
-			'res_model': 'mrp.plant',  # Modèle de l'autre vue formulaire
-			# 'view_mode': 'tree',  # Mode d'affichage
-			'view_id': self.env.ref('mrp_planning.action_mrp_planning').id,
-			'res_id': self.id,  # ID de l'enregistrement à afficher
-			# 'target': 'current',  # Ouvrir dans la fenêtre courante
+		# return {
+		# 	'type': 'ir.actions.act_window',
+		# 	'name': self.name,
+		# 	'res_model': 'mrp.plant',
+		# 	'view_mode': 'form',
+		# 	'view_id': self.env.ref('mrp_planning.action_mrp_planning').id,
+		# 	'res_id': self.id,
+		# 	'context': {'search_default_by_plants': 1},
+		# }
+		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
+		action['context'] = {
+			'search_default_plant_id': self.id,
 		}
+		action['name'] = self.name
+		return action
+
+
 
