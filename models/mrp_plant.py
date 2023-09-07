@@ -148,22 +148,12 @@ class MrpPlant(models.Model):
 		action['domain'] = [('state','=','cancel')]
 		return action
 
-	def action_mrp_planning_tree_name(self):
-		# return {
-		# 	'type': 'ir.actions.act_window',
-		# 	'name': self.name,
-		# 	'res_model': 'mrp.plant',
-		# 	'view_mode': 'form',
-		# 	'view_id': self.env.ref('mrp_planning.action_mrp_planning').id,
-		# 	'res_id': self.id,
-		# 	'context': {'search_default_by_plants': 1},
-		# }
-		action = self.env.ref('mrp_planning.action_mrp_planning').read()[0]
-		action['context'] = {
-			'search_default_plant_id': self.id,
+	def action_mrp_planning_name_tree(self):
+		print("le name",self.name)
+		return {
+			'type': 'ir.actions.act_window',
+			'name': self.name,
+			'res_model': 'mrp.planning',
+			'view_mode': 'tree,form',
+			'domain':[('plant_id','=',self.id)],
 		}
-		action['name'] = self.name
-		return action
-
-
-

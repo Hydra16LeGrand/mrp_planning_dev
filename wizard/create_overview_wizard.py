@@ -72,9 +72,8 @@ class WizardOverview(models.TransientModel):
 				)
 
 				product_id = line.product_id.id
-				required_qty = dl.qty * line.product_qty
+				required_qty = dl.qty * line.product_qty / bom_id.product_qty
 				on_hand_qty = on_hand_qty
-				print("la valeur du champ qty_to_order:",self.overview_line_ids.qty_to_order)
 
 				dico = {
 					'product_id': product_id,
