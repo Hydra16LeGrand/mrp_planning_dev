@@ -13,6 +13,7 @@ class CalculatingPacks(models.TransientModel):
     def default_get(self, fields_list):
         res = super(CalculatingPacks, self).default_get(fields_list)
         group_list = []
+        print(f"self.env.context : {self.env.context}")
         if self.env.context.get('quant_line'):
             quant_line = self.env.context.get('quant_line')
             for elm in quant_line:

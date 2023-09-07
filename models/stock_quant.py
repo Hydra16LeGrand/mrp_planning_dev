@@ -52,6 +52,7 @@ class StockQuantInherit(models.Model):
             action['context'] = {
                 'quant_line': quant_lst
             }
+            print(f"action : {action}")
             return action
 
     # pack_of_bool = fields.Boolean(compute="_compute_pack_of_bool")
