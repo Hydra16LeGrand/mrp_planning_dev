@@ -79,7 +79,6 @@
         </field>
     </record>
 
-
     <menuitem id="mrp.menu_mrp_production_action" action="stock_picking_type_action_inherit"
               parent="mrp.menu_mrp_manufacturing" sequence="3"/>
 
