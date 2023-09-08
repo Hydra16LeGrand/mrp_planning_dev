@@ -15,7 +15,7 @@ class ReplaceProduct(models.TransientModel):
             print(f"rpf_detailed_planning : {rpf_detailed_planning}")
 
             detail_line = self.env['mrp.detail.planning.line'].browse(rpf_detailed_planning)
-            print(f"detail_line.section_id : {detail_line.section_id}")
+            # print(f"detail_line.section_id : {detail_line.section_id}")
             section_ids = self.env['mrp.detail.planning.line'].search(
                 [('display_type', '=', 'line_section'), ('planning_id', '=', detail_line.planning_id.id),
                  ('id', '<', rpf_detailed_planning)])

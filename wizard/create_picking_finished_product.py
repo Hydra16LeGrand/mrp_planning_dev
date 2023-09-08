@@ -55,7 +55,7 @@ class CreatePickingFinishedProduct(models.TransientModel):
             picking_type = self.env['stock.picking.type'].search(
                 [('code', '=', 'internal')], limit=1)
             location_dest_id = self.env['stock.location'].search([
-                ('plant_id.is_principal', '!=', False),
+                # ('plant_id.is_principal', '!=', False),
                 ('packaged_finished_product', '=', True)
             ])
 

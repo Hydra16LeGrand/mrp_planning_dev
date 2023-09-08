@@ -44,8 +44,8 @@
 					<group>
 						<group>
 							<field name="plant_id" options="{'no_open': 1, 'no_create': 1}" invisible="1" />
-							<field name="section_ids" widget="many2many_tags" attrs="{'readonly': [('state', 'not in', ['draft'])]}" />
-							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+							<field name="section_ids" options="{'no_create': 1, 'no_open': 1}" attrs="{'readonly': [('state', 'not in', ['draft'])]}" />
+<!--							<field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>-->
 							<field name="section_first" invisible="1" />
 						</group>
 						<group>
@@ -63,7 +63,7 @@
 									<field name="bom_domain" invisible="1"/>
 									<field name="bom_id" domain="[('id', 'in', bom_domain)]" options="{'no_create': 1}"/>
 									<field name="packaging_line_id" domain="[('id', 'in', packaging_line_domain)]" options="{'no_create': 1}"/>
-									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
+<!--									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />-->
 									<field name="package"/>
 									<field name="qty" />
 									<field name="capacity"/>
@@ -83,8 +83,8 @@
 												<field name="packaging_line_id"
 													   domain="[('id', 'in', packaging_line_domain)]"
 													   options="{'no_create': 1}"/>
-												<field name="section_id" options="{'no_open': 1, 'no_create': 1}"
-													   domain="[('id', 'in', parent.section_ids)]"/>
+<!--												<field name="section_id" options="{'no_open': 1, 'no_create': 1}"-->
+<!--													   domain="[('id', 'in', parent.section_ids)]"/>-->
 
 											</group>
 											<group>
@@ -142,7 +142,7 @@
 									<field name="product_id" domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]" optional="show" />
 									<field name="packaging_line_domain" invisible="1"/>
 									<field name="packaging_line_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', packaging_line_domain)]" />
-									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />
+<!--									<field name="section_id" options="{'no_open': 1, 'no_create': 1}" domain="[('id', 'in', parent.section_ids)]" />-->
 									<field name="mrp_production_id" string="Order" optional="hide" attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated')]}"/>
 									<field name="package" />
 									<field name="qty" />
@@ -171,8 +171,8 @@
 		<field name="arch" type="xml">
 			<tree default_order="create_date DESC">
 				<field name="reference" />
-				<field name="code" />
-				<field name="section_ids" widget="many2many_tags" />
+<!--				<field name="code" />-->
+				<field name="section_ids" />
 
 				<field name="state" widget="badge" decoration-info="state == 'draft'" decoration-danger="state == 'cancel'" decoration-warning="state == 'confirm'" decoration-success="state == '04_mo_generated'" />
 

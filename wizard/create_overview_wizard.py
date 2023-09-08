@@ -4,10 +4,15 @@ from odoo.exceptions import ValidationError
 class WizardOverview(models.TransientModel):
 	_name = 'overview.wizard'
 	_description = 'Overview Wizard'
+	@api.onchange('start_date')
+	def _get_product_for_one_date(self):
+		pass
 
 	planning_id = fields.Many2one("mrp.planning", string=_("Planning"))
 	overview_line_ids = fields.One2many("overview.wizard.line", "overview_id", string=_("Overview"))
 	plant_id = fields.Many2one("mrp.plant")
+	start_date = fields.Date("Start Date")
+	end_date = fields.Date("End Date")
 
 
 	@api.model
@@ -53,7 +58,7 @@ class WizardOverview(models.TransientModel):
 				[("product_tmpl_id", "=", dl.product_id.product_tmpl_id.id)]
 			)
 			bom_id = bom_id[0]
-			temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1), ('plant_id', '=', planning.plant_id.id)])
+			temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1)])
 			if not temp_stock:
 				raise ValidationError(
 					_("No temp location find. Please configure it or contact support.")
@@ -66,6 +71,14 @@ class WizardOverview(models.TransientModel):
 						("location_id", "=", temp_stock.id),
 					]
 				)
+
+				quant_ids = self.env['stock.quant'].search([
+					('product_id', '=', line.product_id.id),
+					('location_id.usage', '=', 'internal')  # 'internal' pour le stock natif
+				])
+				main_stock = sum(quant_ids.mapped('quantity'))
+				print("le jour", self.planning_id.week_of)
+
 				# Convert qty about unit of measure. Because of each raw material can have a different unit of measure for bom and storage(same categorie)
 				on_hand_qty = quant.product_uom_id._compute_quantity(
 					quant.available_quantity, line.product_uom_id
@@ -74,12 +87,15 @@ class WizardOverview(models.TransientModel):
 				product_id = line.product_id.id
 				required_qty = dl.qty * line.product_qty
 				on_hand_qty = on_hand_qty
-				print("la valeur du champ qty_to_order:",self.overview_line_ids.qty_to_order)
+
+				print("la valeur du champ main_stock:",main_stock)
+
 
 				dico = {
 					'product_id': product_id,
 					'required_qty': required_qty,
 					'on_hand_qty': on_hand_qty,
+					'main_stock': main_stock,
 					'uom_id': line.product_uom_id.id,
 					'bom_id': line.bom_id.id,
 				}
@@ -100,9 +116,10 @@ class WizardOverview(models.TransientModel):
 
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
 				overview['required_qty'] = required_qty
+				print('Operation',overview['required_qty'] - (overview['on_hand_qty'] + overview['main_stock']))
 				overview['missing_qty'] = (
-					overview['required_qty'] - overview['on_hand_qty']
-					if overview['on_hand_qty'] < overview['required_qty']
+					overview['required_qty'] - overview['on_hand_qty'] + overview['main_stock']
+					if overview['on_hand_qty'] + overview['main_stock'] < overview['required_qty']
 					else 0
 				)
 			else:
@@ -124,10 +141,8 @@ class WizardOverview(models.TransientModel):
 				'missing_qty': element['missing_qty'],
 				'uom_id': element['uom_id'],
 				'bom_id': element['bom_id'],
-				# 'ordered_qty': element['missing_qty'],
 			}))
 
-		total_missing_qty = (line['missing_qty'] for line in self.overview_line_ids)
 
 		res.update({
 			'planning_id': planning.id,
@@ -142,7 +157,6 @@ class WizardOverview(models.TransientModel):
 		context = self.env.context
 		overview_ids = context.get("overview_ids", [])
 		planning_id = context.get("planning_id", False)
-		total_missing_qty = context.get("total_missing_qty", [])
 
 		if not planning_id:
 			raise ValidationError(_("No planning ID found in the context."))
@@ -223,6 +237,43 @@ class WizardOverview(models.TransientModel):
 class WizardOverviewLine(models.TransientModel):
 	_name = 'overview.wizard.line'
 	_description = 'Overview Wizard Line'
+
+	def _compute_on_hand_qty_count(self):
+		# temp_stock = self.env['stock.location'].search(
+		# 	[('temp_stock', '=', 1), ('plant_id', '=', self.overview_id.planning_id.plant_id.id)])
+
+		temp_stock = self.env['stock.location'].search(
+			[('temp_stock', '=', 1)])
+		if not temp_stock:
+			raise ValidationError(
+				_("No temp location found. Please configure it or contact support."))
+
+		for overview in self:
+			quant = self.env['stock.quant'].search([
+				('product_id', '=', overview.product_id.id),
+				('location_id', '=', temp_stock.id)
+			])
+			on_hand_qty = sum(quant.mapped('quantity'))
+			overview.on_hand_qty = on_hand_qty
+
+	def _compute_main_stock_count(self):
+		for overview in self:
+			quant = self.env['stock.quant'].search([
+				('product_id', '=', overview.product_id.id),
+				('location_id.usage', '=', 'internal')  # 'internal' pour le stock natif
+			])
+			main_stock = sum(quant.mapped('quantity'))
+			overview.main_stock = main_stock
+
+
+
+	@api.depends('required_qty', 'product_id.net_weight')
+	def _compute_required_capacity_count(self):
+		for overview in self:
+			required_capacity = overview.required_qty * overview.product_id.net_weight
+			print("required_capacity",required_capacity)
+			overview.required_capacity = required_capacity
+
 	
 	product_id = fields.Many2one("product.product", string=_("Raw materiel"))
 	required_qty = fields.Float(_("Required qty"), digits=(16, 0))
@@ -236,26 +287,7 @@ class WizardOverviewLine(models.TransientModel):
 	overview_id = fields.Many2one("overview.wizard", string=_("Overview"))
 	qty_to_order = fields.Float(_("Quantity to order"), default=lambda self: self.missing_qty, digits=(16, 0))
 	required_capacity = fields.Float(string=_("Required capacity"), compute="_compute_required_capacity_count",digits=(16, 0))
-
+	main_stock = fields.Float(
+		_("Main Stock"), compute="_compute_main_stock_count", digits=(16, 0))
 	
-	def _compute_on_hand_qty_count(self):
-		temp_stock = self.env['stock.location'].search(
-			[('temp_stock', '=', 1), ('plant_id', '=', self.overview_id.planning_id.plant_id.id)])
-		if not temp_stock:
-			raise ValidationError(
-				_("No temp location found. Please configure it or contact support."))
 
-		for overview in self:
-			quant = self.env['stock.quant'].search([
-				('product_id', '=', overview.product_id.id),
-				('location_id', '=', temp_stock.id)
-			])
-			on_hand_qty = sum(quant.mapped('quantity'))
-			overview.on_hand_qty = on_hand_qty
-
-	@api.depends('required_qty', 'product_id.net_weight')
-	def _compute_required_capacity_count(self):
-		for overview in self:
-			required_capacity = overview.required_qty * overview.product_id.net_weight
-			print("required_capacity",required_capacity)
-			overview.required_capacity = required_capacity

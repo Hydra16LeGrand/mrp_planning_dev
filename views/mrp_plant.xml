@@ -38,8 +38,11 @@
 
                         <group string="Manufacturing" name="manufacturing">
                             <field name="picking_type_id"/>
-                            <field name="default_location_src_id" domain="[('plant_id', '=', id)]"/>
-                            <field name="default_location_dest_id" domain="[('plant_id', '=', id)]"/>
+<!--                            <field name="default_location_src_id" domain="[('plant_id', '=', id)]"/>-->
+<!--                            <field name="default_location_dest_id" domain="[('plant_id', '=', id)]"/>-->
+
+                            <field name="default_location_src_id" />
+                            <field name="default_location_dest_id" />
                         </group>
                     </group>
                 </sheet>

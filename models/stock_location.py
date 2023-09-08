@@ -8,12 +8,12 @@ class StockLocationInherit(models.Model):
 	temp_stock = fields.Boolean(_("Raw material location"))
 	packaged_finished_product = fields.Boolean(string=_("Packaged products location"))
 	unpackaged_finished_product = fields.Boolean(string=_("Unpackaged product location"))
-	plant_id = fields.Many2one("mrp.plant", string=_("Plant"))
+	# plant_id = fields.Many2one("mrp.plant", string=_("Plant"))
 
 	@api.onchange('temp_stock')
 	def _onchange_temp_stock(self):
 		if self.temp_stock:
-			all_temp_stock = self.search_count([('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
+			all_temp_stock = self.search_count([('temp_stock', '=', 1)])
 			
 			if all_temp_stock != 0:
 				raise ValidationError(_("A temp location already exists for this plant. Uncheck this one before this operation."))
@@ -27,7 +27,8 @@ class StockLocationInherit(models.Model):
 	@api.onchange('packaged_finished_product')
 	def _onchange_packaged_finished_product(self):
 		if self.packaged_finished_product:
-			all_packaged_finished_product = self.search_count([('packaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
+			# all_packaged_finished_product = self.search_count([('packaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
+			all_packaged_finished_product = self.search_count([('packaged_finished_product', '=', 1)])
 			if all_packaged_finished_product != 0:
 				raise ValidationError(_("A packaged finished product location already exists for this plant. Uncheck this one before this operation."))
 			else:
@@ -40,7 +41,8 @@ class StockLocationInherit(models.Model):
 	@api.onchange('unpackaged_finished_product')
 	def _onchange_unpackaged_finished_product(self):
 		if self.unpackaged_finished_product:
-			all_unpackaged_finished_product = self.search_count([('unpackaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
+			# all_unpackaged_finished_product = self.search_count([('unpackaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
+			all_unpackaged_finished_product = self.search_count([('unpackaged_finished_product', '=', 1)])
 			if all_unpackaged_finished_product != 0:
 				raise ValidationError(_("An unpackaged finished product location already exists for this plant. Uncheck this one before this operation."))
 			else:

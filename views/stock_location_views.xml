@@ -8,7 +8,7 @@
             <xpath expr="//sheet/group" position="after">
                 <group>
                     <group string="Plant Information" name="plant_information">
-                        <field name="plant_id" options="{'no_create': 1}"/>
+<!--                        <field name="plant_id" options="{'no_create': 1}"/>-->
                         <field name="temp_stock"/>
                         <field name="packaged_finished_product" />
                         <field name="unpackaged_finished_product" />

@@ -5,6 +5,12 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <group>
+						<group>
+							<field name="start_date" />
+                            <field name="end_date" />
+						</group>
+					</group>
                     <notebook>
                         <page name="overview_page" string="Overview">
                             <field name="overview_line_ids" widget="one2many">
@@ -15,6 +21,7 @@
                                     <field name="on_hand_qty"/>
                                     <field name="missing_qty"/>
                                     <field name="qty_to_order"/>
+                                    <field name="main_stock"/>
                                     <field name="uom_id"/>
                                     <field name="bom_ids" invisible="1" widget="many2many_tags"/>
                                 </tree>

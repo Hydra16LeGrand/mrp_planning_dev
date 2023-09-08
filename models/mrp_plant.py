@@ -143,4 +143,7 @@ class MrpPlant(models.Model):
 			'res_model': 'mrp.planning',
 			'view_mode': 'tree,form',
 			'domain':[('plant_id','=',self.id)],
+			'context':{'search_default_plant_id': self.id}
 		}
+
+
