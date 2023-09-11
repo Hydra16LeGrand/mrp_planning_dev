@@ -20,10 +20,10 @@
                             attrs="{'invisible': [('state', '=', 'draft')]}"/>
                     <button name="action_product_replacement" type="object" string="Replace product"
                             attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary"/>
-<!--                    <button name="action_mark_productions_as_done" type="object" string="FINALIZE PRODUCTION"-->
-<!--                            class="btn-warning"-->
-<!--                            confirm="This action will complete all manufacturing orders process in this planning. Proceed?"-->
-<!--                            attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}"/>-->
+                    <button name="action_mark_productions_as_done" type="object" string="FINALIZE PRODUCTION"
+                            class="btn-warning"
+                            confirm="This action will complete all manufacturing orders process in this planning. Proceed?"
+                            attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirm,04_mo_generated"
                            statusbar_invisible="cancel" attrs="{'invisible': [('state', '=', '0')]}"/>
                     <field name="detailed_pl_done_state" invisible="1"/>
@@ -32,13 +32,13 @@
                     <field name="mrp_production_ids" invisible="1"/>
                     <field name="picking_ids" invisible="1"/>
                     <div name="button_box" class="oe_button_box">
-                        <button name="view_mrp_orders" type="object" icon="fa-flask"
-                                class="oe_stat_button"
-                                attrs="{'invisible': [('mrp_production_ids', '=', [])]}">
-                            <div class="o_field_widget o_stat_info">
-                                <span class="o_stat_text">Mrp orders</span>
-                            </div>
-                        </button>
+<!--                        <button name="view_mrp_orders" type="object" icon="fa-flask"-->
+<!--                                class="oe_stat_button"-->
+<!--                                attrs="{'invisible': [('mrp_production_ids', '=', [])]}">-->
+<!--                            <div class="o_field_widget o_stat_info">-->
+<!--                                <span class="o_stat_text">Mrp orders</span>-->
+<!--                            </div>-->
+<!--                        </button>-->
                         <button name="view_internal_transfer" type="object"
                                 attrs="{'invisible': [('picking_ids', '=', [])]}" icon="fa-cubes"
                                 class="oe_stat_button" position="before">
@@ -198,7 +198,8 @@
                                            attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated')]}"/>
                                     <field name="package"/>
                                     <field name="qty"/>
-                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>
+<!--                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>-->
+                                    <field name="qty_done" string="Quantity done"/>
                                     <field name="capacity"/>
                                     <field name="employee_number" optional="hide"/>
                                     <field name="date"/>

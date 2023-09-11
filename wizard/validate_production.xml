@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_validate_production_form" model="ir.ui.view">
+        <field name="name">validate.production.form</field>
+        <field name="model">validate.production</field>
+        <field name="arch" type="xml">
+            <form string="Validate Production">
+                <group>
+                    <p colspan="2">By clicking on <i>apply</i>, you will finalize the production of the items for which the field <i>to be processed</i> is checked.</p>
+                </group>
+                <field name="validate_production_line_ids" widget="section_and_note_one2many" mode="tree" force_save="1">
+                    <tree create="false" delete="false" editable="1">
+                        <field name="product_id" options="{'no_open': True}" readonly="1" force_save="1"/>
+                        <field name="packaging_line_id" options="{'no_open': True}" readonly="1" force_save="1"/>
+                        <field name="qty" readonly="1" force_save="1"/>
+                        <field name="qty_done" readonly="1" force_save="1"/>
+                        <field name="production_id" options="{'no_open': True}" readonly="1" force_save="1"/>
+                        <field name="date" readonly="1" force_save="1"/>
+                        <field name="to_be_processed" widget="boolean_toggle"/>
+                    </tree>
+                </field>
+                <footer>
+<!--                    <field name="count_to_be_processed" invisible="1"/>-->
+                    <button name="validate" type="object" string="Apply" class="btn-primary" />
+                    <button string="Cancel" special="cancel" class="btn-default"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

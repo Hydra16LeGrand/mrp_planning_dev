@@ -15,3 +15,5 @@ access_create_picking_finished_product,access.create.picking.finished.product,mo
 access_wizard_finished_product_line,access.wizard.finished.product.line,model_wizard_finished_product_line,,1,1,1,1
 access_calculating_pack,access.calculating.pack,model_calculating_pack,,1,1,1,1
 access_calculating_pack_line,access.calculating.pack.line,model_calculating_pack_line,,1,1,1,1
+access_validate_production,access.validate.production,model_validate_production,,1,1,1,1
+access_validate_production_line,access.validate.production.line,model_validate_production_line,,1,1,1,1

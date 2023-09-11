@@ -41,6 +41,7 @@
         'wizard/mrp_immediate_production_inherit.xml',
         'wizard/create_picking_finished_product.xml',
         'wizard/calculating_packs_view.xml',
+        'wizard/validate_production.xml',
 
         'views/mrp_planning.xml',
         'views/mrp_section.xml',

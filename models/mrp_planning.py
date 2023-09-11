@@ -395,21 +395,21 @@ class MrpPlanning(models.Model):
             }
         }
 
-    def view_mrp_orders(self):
-
-        return {
-            "name": f"{self.reference} manufacturing orders",
-            "type": "ir.actions.act_window",
-            "res_model": "mrp.production",
-            "view_mode": "tree,form",
-            "domain": [('planning_id', '=', self.id), ('state', '!=', "cancel")],
-            "context": {
-                'search_default_todo': True,
-                # 'search_default_group_by_planning': 1,
-                'search_default_group_by_section': 1,
-                'search_default_group_by_packaging_line_id': 1,
-            },
-        }
+    # def view_mrp_orders(self):
+    #
+    #     return {
+    #         "name": f"{self.reference} manufacturing orders",
+    #         "type": "ir.actions.act_window",
+    #         "res_model": "mrp.production",
+    #         "view_mode": "tree,form",
+    #         "domain": [('planning_id', '=', self.id), ('state', '!=', "cancel")],
+    #         "context": {
+    #             'search_default_todo': True,
+    #             # 'search_default_group_by_planning': 1,
+    #             'search_default_group_by_section': 1,
+    #             'search_default_group_by_packaging_line_id': 1,
+    #         },
+    #     }
 
     # Action for supply orders checking
     def view_internal_transfer(self):
@@ -464,7 +464,7 @@ class MrpPlanning(models.Model):
                 grouped_lines = defaultdict(lambda: defaultdict(list))
 
                 for detailed_planning_line in rec.detailed_pl_ids:
-                    if detailed_planning_line.display_type == False:
+                    if not detailed_planning_line.display_type:
                         section = detailed_planning_line.section_id
                         packaging_line = detailed_planning_line.packaging_line_id
 
@@ -503,20 +503,35 @@ class MrpPlanning(models.Model):
     #     }
 
     # Action to finalize planning's products manufacturing
-    # def action_mark_productions_as_done(self):
-    #     if self.detailed_pl_ids.filtered(lambda self: self.state == 'progress'):
-    #         raise ValidationError(_("You have to manage line(s) in progress state before this action."))
-    #
-    #     productions = []
-    #     for dpl in self.detailed_pl_ids:
-    #         production_id = self.env['mrp.production'].search(
-    #             [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['confirmed', 'progress', 'to_close']]])
-    #         if production_id:
-    #             productions.append(production_id.id)
-    #
-    #     production_ids = self.env['mrp.production'].browse(productions)
-    #     result = production_ids.button_mark_done()
-    #     return result
+    def action_mark_productions_as_done(self):
+        # if self.detailed_pl_ids.filtered(lambda self: self.state == 'progress'):
+        #     raise ValidationError(_("You have to manage line(s) in progress state before this action."))
+        #
+        # productions = []
+        # for dpl in self.detailed_pl_ids:
+        #     production_id = self.env['mrp.production'].search(
+        #         [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['confirmed', 'progress', 'to_close']]])
+        #     if production_id:
+        #         productions.append(production_id.id)
+        #
+        # production_ids = self.env['mrp.production'].browse(productions)
+        # result = production_ids.button_mark_done()
+        # return result
+        detailed_line = [dpl.id for dpl in self.detailed_pl_ids if dpl.qty_done and dpl.mrp_production_id.state not in ['cancel', 'done']]
+        if detailed_line:
+            action = {
+                "name": "Production",
+                "res_model": "validate.production",
+                "type": "ir.actions.act_window",
+                "view_mode": "form",
+                "target": "new",
+                "context": {
+                    'dpl': detailed_line,
+                },
+            }
+            return action
+        else:
+            raise UserError(_("No production order to finalize"))
 
     # Dupliquer le formulaire de planning avec les données qui doivent etre gardé dans le nouveau
     def copy(self, default=None):
@@ -807,39 +822,40 @@ class MrpPlanning(models.Model):
 
     def process_detailed_pl_ids(self, vals, old_detail_planning_line, mrp_planning):
         if 'detailed_pl_ids' in vals:
+
             # Fabrication
-            print(f"vals : {vals}")
-            detail_id = []
-            for val in vals['detailed_pl_ids']:
-                if val[2]:
-                    for elm in val[2]:
-                        if elm == 'qty_done':
-                            print('yes')
-                            detail_id.append(val[1])
-            # detail_id = [val[1] for val in vals['detailed_pl_ids'] for elm in val[2] if elm == 'qty_done']
-            if detail_id:
-                # print(f"detail_id : {detail_id}")
-                for detail in detail_id:
-                    rec = self.env['mrp.detail.planning.line'].browse(detail)
-                    if rec.qty_done > rec.qty:
-                        rec.qty_done = False
-                        raise UserError(_('The quantity made cannot be greater than the planned quantity'))
-                    elif rec.qty == rec.qty_done:
-                        if rec.mrp_production_id.reservation_state == 'assigned':
-                            rec.mrp_production_id.qty_producing = rec.qty_done
-                            for move in rec.mrp_production_id.move_raw_ids:
-                                move.quantity_done = move.should_consume_qty
-                            rec.mrp_production_id.button_mark_done()
-                        else:
-                            raise UserError(_('Unavailability of components, please create supply orders'))
-                    elif rec.qty_done < rec.qty:
-                        if rec.mrp_production_id.reservation_state == 'assigned':
-                            rec.mrp_production_id.qty_producing = rec.qty_done
-                            for move in rec.mrp_production_id.move_raw_ids:
-                                move.quantity_done = move.should_consume_qty
-                            rec.mrp_production_id.with_context(skip_backorder=True).button_mark_done()
-                        else:
-                            raise UserError(_('Unavailability of components, please create supply orders'))
+            # print(f"vals : {vals}")
+            # detail_id = []
+            # for val in vals['detailed_pl_ids']:
+            #     if val[2]:
+            #         for elm in val[2]:
+            #             if elm == 'qty_done':
+            #                 print('yes')
+            #                 detail_id.append(val[1])
+            # # detail_id = [val[1] for val in vals['detailed_pl_ids'] for elm in val[2] if elm == 'qty_done']
+            # if detail_id:
+            #     # print(f"detail_id : {detail_id}")
+            #     for detail in detail_id:
+            #         rec = self.env['mrp.detail.planning.line'].browse(detail)
+            #         if rec.qty_done > rec.qty:
+            #             rec.qty_done = False
+            #             raise UserError(_('The quantity made cannot be greater than the planned quantity'))
+            #         elif rec.qty == rec.qty_done:
+            #             if rec.mrp_production_id.reservation_state == 'assigned':
+            #                 rec.mrp_production_id.qty_producing = rec.qty_done
+            #                 for move in rec.mrp_production_id.move_raw_ids:
+            #                     move.quantity_done = move.should_consume_qty
+            #                 # rec.mrp_production_id.button_mark_done()
+            #             else:
+            #                 raise UserError(_('Unavailability of components, please create supply orders'))
+            #         elif rec.qty_done < rec.qty:
+            #             if rec.mrp_production_id.reservation_state == 'assigned':
+            #                 rec.mrp_production_id.qty_producing = rec.qty_done
+            #                 for move in rec.mrp_production_id.move_raw_ids:
+            #                     move.quantity_done = move.should_consume_qty
+            #                 # rec.mrp_production_id.with_context(skip_backorder=True).button_mark_done()
+            #             else:
+            #                 raise UserError(_('Unavailability of components, please create supply orders'))
 
             # Tracabilité
             new_dl_id = [val[1] for val in vals['detailed_pl_ids'] if val[0] > 2]
@@ -1072,6 +1088,8 @@ class MrpPlanninLine(models.Model):
                     mrp_days.append((4, day_record.id, 0))
                     current_date = current_date + timedelta(days=1)
                 rec.mrp_days = mrp_days
+            else:
+                rec.mrp_days = False
 
     package = fields.Float(_("Package"))
     # qty_compute = fields.Integer(_("Qty per day"))
@@ -1196,18 +1214,18 @@ class MrpDetailPlanningLine(models.Model):
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
     qty_done = fields.Integer(_("Quantity done"))
 
-    def action_manage_production(self):
-        production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
-        action = {
-            "name": f"Manufacturing order",
-            "type": "ir.actions.act_window",
-            "res_model": "mrp.production",
-            "view_mode": "form",
-            "res_id": production_id.id,
-            "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
-            "target": "new",
-        }
-        return action
+    # def action_manage_production(self):
+    #     production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
+    #     action = {
+    #         "name": f"Manufacturing order",
+    #         "type": "ir.actions.act_window",
+    #         "res_model": "mrp.production",
+    #         "view_mode": "form",
+    #         "res_id": production_id.id,
+    #         "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
+    #         "target": "new",
+    #     }
+    #     return action
 
     def unlink(self):
         for rec in self:
@@ -1224,39 +1242,26 @@ class MrpDetailPlanningLine(models.Model):
         }
         return action
 
-    # @api.onchange('qty_done')
-    # def _onchange_qty_done(self):
-    #     for rec in self:
-    #         if rec.qty_done > rec.qty:
-    #             rec.qty_done = False
-    #             raise UserError(_('The quantity made cannot be greater than the planned quantity'))
-    #         elif rec.qty == rec.qty_done:
-    #             if rec.mrp_production_id.reservation_state == 'assigned':
-    #                 rec.mrp_production_id.qty_producing = rec.qty_done
-    #                 for move in rec.mrp_production_id.move_raw_ids:
-    #                     move.quantity_done = move.should_consume_qty
-    #                 print(f"rec.id : {rec.id}")
-    #                 self.env['mrp.planning'].search([
-    #                     ('id', '=', rec.planning_id.id)
-    #                 ]).save()
-    #                 # rec.planning_id.save()
-    #                 rec.mrp_production_id.button_mark_done()
-    #             else:
-    #                 raise UserError(_('Unavailability of components, please create supply orders'))
-    #         elif rec.qty_done < rec.qty:
-    #             if rec.mrp_production_id.reservation_state == 'assigned':
-    #                 rec.mrp_production_id.qty_producing = rec.qty_done
-    #                 for move in rec.mrp_production_id.move_raw_ids:
-    #                     move.quantity_done = move.should_consume_qty
-    #                 # stock_scrap = self.env['stock.scrap'].create({
-    #                 #     'product_id': rec.product_id.id,
-    #                 #     'scrap_qty': rec.qty - rec.qty_done,
-    #                 # })
-    #                 # stock_scrap.action_validate()
-    #                 # self.save()
-    #                 rec.mrp_production_id.button_mark_done()
-    #             else:
-    #                 raise UserError(_('Unavailability of components, please create supply orders'))
+    @api.onchange('qty_done')
+    def _onchange_qty_done(self):
+        for rec in self:
+            if rec.qty_done > rec.qty:
+                rec.qty_done = False
+                raise UserError(_('The quantity made cannot be greater than the planned quantity'))
+            elif rec.qty == rec.qty_done:
+                if rec.mrp_production_id.reservation_state == 'assigned':
+                    rec.mrp_production_id.qty_producing = rec.qty_done
+                    for move in rec.mrp_production_id.move_raw_ids:
+                        move.quantity_done = move.should_consume_qty
+                else:
+                    raise UserError(_('Unavailability of components, please create supply orders'))
+            elif rec.qty_done < rec.qty:
+                if rec.mrp_production_id.reservation_state == 'assigned':
+                    rec.mrp_production_id.qty_producing = rec.qty_done
+                    for move in rec.mrp_production_id.move_raw_ids:
+                        move.quantity_done = move.should_consume_qty
+                else:
+                    raise UserError(_('Unavailability of components, please create supply orders'))
 
 
 class MrpPlanningDays(models.Model):
