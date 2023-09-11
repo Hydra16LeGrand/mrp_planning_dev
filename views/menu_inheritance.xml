@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Héritage du menu "menu_mrp_production_action" -->
+        <record id="mrp.menu_mrp_production_action" model="ir.ui.menu">
+            <field name="action" eval="False"/> <!-- Pour le rendre invisible -->
+        </record>
+    </data>
+</odoo>

@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from odoo import fields, models, api, _
-from odoo.exceptions import UserError
 
 
 # Model used to calculate packs
-class CalculatingPacks(models.TransientModel):
-    _name = "calculating.packs"
+class CalculatingPack(models.TransientModel):
+    _name = "calculating.pack"
     _description = "Calculating packs"
 
     @api.model
     def default_get(self, fields_list):
-        res = super(CalculatingPacks, self).default_get(fields_list)
+        res = super(CalculatingPack, self).default_get(fields_list)
+
         group_list = []
-        print(f"self.env.context : {self.env.context}")
+        print(f"self.env.context : {fields_list}")
         if self.env.context.get('quant_line'):
             quant_line = self.env.context.get('quant_line')
             for elm in quant_line:
@@ -55,18 +55,18 @@ class CalculatingPacks(models.TransientModel):
                             })
                         )
 
-                    res['calculating_packs_line'] = line_values
+                    res['cal_packs_line'] = line_values
         return res
 
-    calculating_packs_line = fields.One2many('calculating.packs.line', inverse_name='calculating_packs_id',
+    cal_packs_line = fields.One2many('calculating.pack.line', inverse_name='calculating_packs_id',
                                              string='Calculating packs line')
 
 
-class CalculatingPacksLine(models.TransientModel):
-    _name = "calculating.packs.line"
+class CalculatingPackLine(models.TransientModel):
+    _name = "calculating.pack.line"
     _description = "Calculating Packs Line"
 
     product_id = fields.Many2one('product.product', string='Product')
     pack_of = fields.Char('Package')
-    calculating_packs_id = fields.Many2one('calculating.packs', string='Calculating packs')
+    calculating_packs_id = fields.Many2one('calculating.pack', string='Calculating packs')
 

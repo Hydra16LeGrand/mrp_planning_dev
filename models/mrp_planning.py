@@ -1,5 +1,5 @@
 from odoo import fields, models, api, _
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from odoo.exceptions import ValidationError, UserError
 from collections import defaultdict
 
@@ -8,51 +8,51 @@ class MrpPlanning(models.Model):
     _name = "mrp.planning"
     _inherit = ["mail.thread", "mail.activity.mixin"]
     _rec_name = "reference"
-    _order = "scheduled_date desc"
+    _order = "begin_date desc"
 
-    today_date = fields.Date.today()
-    iso = today_date.isocalendar()
-
-    monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
-    tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
-    wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
-    thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
-    friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
-
-    # Global variable for date format (Eg: monday 14/08)
-    week_days = [
-        'monday {}/{}'.format(monday.strftime('%d'), monday.month),
-        'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month),
-        'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month),
-        'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month),
-        'friday {}/{}'.format(friday.strftime('%d'), friday.month),
-    ]
-
-    def _get_default_week_of(self):
-        iso = self.today_date.isocalendar()
-        monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
-        tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
-        wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
-        thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
-        friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
-
-        current_week_days = [
-            (0, 0, {'name': 'monday {}/{}'.format(monday.strftime('%d'), monday.month), 'date': monday}),
-            (0, 0, {'name': 'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month), 'date': tuesday}),
-            (0, 0, {'name': 'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month), 'date': wednesday}),
-            (0, 0, {'name': 'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month), 'date': thursday}),
-            (0, 0, {'name': 'friday {}/{}'.format(friday.strftime('%d'), friday.month), 'date': friday}),
-        ]
-
-        week_of_records = []
-        for day in current_week_days:
-            day_record = self.env['mrp.planning.days'].search(
-                [('name', '=', day[2]['name']), ('date', '=', day[2]['date'])], limit=1)
-            if not day_record:
-                day_record = self.env['mrp.planning.days'].create(day[2])
-            week_of_records.append((4, day_record.id, 0))
-
-        return week_of_records
+    # today_date = fields.Date.today()
+    # iso = today_date.isocalendar()
+    #
+    # monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
+    # tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
+    # wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
+    # thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
+    # friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
+    #
+    # # Global variable for date format (Eg: monday 14/08)
+    # week_days = [
+    #     'monday {}/{}'.format(monday.strftime('%d'), monday.month),
+    #     'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month),
+    #     'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month),
+    #     'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month),
+    #     'friday {}/{}'.format(friday.strftime('%d'), friday.month),
+    # ]
+    #
+    # def _get_default_week_of(self):
+    #     iso = self.today_date.isocalendar()
+    #     monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
+    #     tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
+    #     wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
+    #     thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
+    #     friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
+    #
+    #     current_week_days = [
+    #         (0, 0, {'name': 'monday {}/{}'.format(monday.strftime('%d'), monday.month), 'date': monday}),
+    #         (0, 0, {'name': 'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month), 'date': tuesday}),
+    #         (0, 0, {'name': 'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month), 'date': wednesday}),
+    #         (0, 0, {'name': 'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month), 'date': thursday}),
+    #         (0, 0, {'name': 'friday {}/{}'.format(friday.strftime('%d'), friday.month), 'date': friday}),
+    #     ]
+    #
+    #     week_of_records = []
+    #     for day in current_week_days:
+    #         day_record = self.env['mrp.planning.days'].search(
+    #             [('name', '=', day[2]['name']), ('date', '=', day[2]['date'])], limit=1)
+    #         if not day_record:
+    #             day_record = self.env['mrp.planning.days'].create(day[2])
+    #         week_of_records.append((4, day_record.id, 0))
+    #
+    #     return week_of_records
 
     def _compute_internal_transfer_count(self):
         for rec in self:
@@ -72,10 +72,13 @@ class MrpPlanning(models.Model):
         ('04_mo_generated', "Mo generate"),
     ], default="draft", index=True, readonly=True, copy=False, tracking=True
     )
-    scheduled_date = fields.Date(_("Add a date"), default=lambda self: fields.Date.today(), required=True)
+    # scheduled_date = fields.Date(_("Add a date"), default=lambda self: fields.Date.today(), required=True)
+    #
+    # week_of = fields.Many2many('mrp.planning.days', string='Scheduled dates', default=_get_default_week_of,
+    #                            domain=lambda self: [('name', 'in', self.week_days)], copy=True)
 
-    week_of = fields.Many2many('mrp.planning.days', string='Scheduled dates', default=_get_default_week_of,
-                               domain=lambda self: [('name', 'in', self.week_days)], copy=True)
+    begin_date = fields.Date(_('Begin Date'), copy=True, tracking=True)
+    end_date = fields.Date(_('End Date'), copy=True, tracking=True)
 
     company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
                                  default=lambda self: self.env.company.id)
@@ -132,8 +135,6 @@ class MrpPlanning(models.Model):
 
         # self.env.cr.commit()
 
-
-
     @api.model
     def create(self, vals):
 
@@ -144,10 +145,25 @@ class MrpPlanning(models.Model):
 
         return res
 
-    def create_detail_planning_line(self, element):
-        ppp_id = self.env['mrp.packaging.pp'].search(
-            [('packaging_line_id', '=', element['packaging_line_id'].id),
-             ('product_id', '=', element['product_id'].id)], limit=1)
+    # def create_detail_planning_line(self, element):
+    #     ppp_id = self.env['mrp.packaging.pp'].search(
+    #         [('packaging_line_id', '=', element['packaging_line_id'].id),
+    #          ('product_id', '=', element['product_id'].id)], limit=1)
+    #
+    #     self.env['mrp.detail.planning.line'].create([
+    #         {
+    #             'date_char': day['name'],
+    #             'date': day['date'],
+    #             'product_id': element['product_id'].id,
+    #             'package': element['package'],
+    #             'qty': element['qty'],
+    #             'capacity': element['capacity'],
+    #             'packaging_line_id': element['packaging_line_id'].id,
+    #             'planning_line_id': element['planning_line_id'],
+    #             'section_id': element['section_id'].id,
+    #             'planning_id': element['planning_id'],
+    #             'employee_number': ppp_id.employee_number if ppp_id else 0,
+    #         } for day in element['mrp_days']])
 
         self.env['mrp.detail.planning.line'].create([
             {
@@ -164,19 +180,33 @@ class MrpPlanning(models.Model):
                 'employee_number': ppp_id.employee_number if ppp_id else 0,
             } for day in element['mrp_days']])
 
-    def create_lines_or_sections(self, element, dt):
-        name = '       ' + element['packaging_line_id'].name if dt == 'line_note' else False # element['section_id'].name
+
+    def create_lines_or_sections(self, element):
+        # self.env['mrp.detail.planning.line'].create([{
+        #     'display_type': "line_section",
+        #     'name': element['date'].strftime('%d-%m-%y'),
+        #     'product_id': element['product_id'],
+        #     'planning_line_id': element['planning_line_id'],
+        #     'section_id': element['section_id'],
+        #     'planning_id': element['planning_id'],
+        #     'package': element['package'],
+        #     'qty': element['qty'],
+        #     'capacity': element['capacity'],
+        #     'packaging_line_id': element['packaging_line_id'],
+        #     'date': date.today(),
+        # }])
+
         self.env['mrp.detail.planning.line'].create([{
-            'display_type': dt,
-            'name': name,
-            'product_id': element['product_id'].id,
+            'display_type': "line_section",
+            'name': element['date_char'],
+            'product_id': element['product_id'],
             'planning_line_id': element['planning_line_id'],
             # 'section_id': element['section_id'].id,
             'planning_id': element['planning_id'],
             'package': element['package'],
             'qty': element['qty'],
             'capacity': element['capacity'],
-            'packaging_line_id': element['packaging_line_id'].id,
+            'packaging_line_id': element['packaging_line_id'],
             'date': date.today(),
         }])
 
@@ -217,48 +247,53 @@ class MrpPlanning(models.Model):
                 value_planning_line.append(val)
 
             if value_planning_line:
-                dict_dictionnaires = self.group_by_key(value_planning_line, 'section_ids') #, 'section_id')
+                # dict_dictionnaires = self.group_by_key(value_planning_line, 'section_ids') #, 'section_id')
+                #
+                # # Extraction des dictionnaires avec la même section_id
+                # liste_meme_planning_line = [dictionnaires for dictionnaires in dict_dictionnaires.values() if
+                all_detailed_line = []
+                for val in value_planning_line:
+                    ppp_id = self.env['mrp.packaging.pp'].search(
+                        [('packaging_line_id', '=', val['packaging_line_id'].id),
+                         ('product_id', '=', val['product_id'].id)], limit=1)
+                    for day in val['mrp_days']:
+                        detailed_line = {
+                            'date_char': day['name'],
+                            'date': day['date'],
+                            'product_id': val['product_id'].id,
+                            'package': val['package'],
+                            'qty': val['qty'],
+                            'capacity': val['capacity'],
+                            'packaging_line_id': val['packaging_line_id'].id,
+                            'planning_line_id': val['planning_line_id'],
+                            'section_id': val['section_id'].id,
+                            'planning_id': val['planning_id'],
+                            'employee_number': ppp_id.employee_number if ppp_id else 0,
+                        }
+                        all_detailed_line.append(detailed_line)
+                # print(f"all_detailed_line : {all_detailed_line}")
+                dict_dictionnaires = self.group_by_key(all_detailed_line, 'date')
 
                 # Extraction des dictionnaires avec la même section_id
-                liste_meme_planning_line = [dictionnaires for dictionnaires in dict_dictionnaires.values() if
+                liste_meme_date_id = [dictionnaires for dictionnaires in dict_dictionnaires.values() if
                                          len(dictionnaires) > 1]
 
                 # Extraction des dictionnaires restants
                 liste_autres_dictionnaires = [dictionnaires[0] for dictionnaires in dict_dictionnaires.values() if
                                               len(dictionnaires) == 1]
 
-                if liste_meme_planning_line:
-                    for element in liste_meme_planning_line:
-                        section_element = element[0]
-                        # self.create_lines_or_sections(section_element, 'line_section')
-                        dico = self.group_by_key(element, 'packaging_line_id')
-
-                        # Extraction des dictionnaires avec le même packaging line
-                        liste_meme_packaging_line_id = [dictionnaires for dictionnaires in dico.values() if
-                                                        len(dictionnaires) > 1]
-
-                        # Extraction des dictionnaires restants
-                        liste_autres_dico = [dictionnaires[0] for dictionnaires in
-                                             dico.values() if
-                                             len(dictionnaires) == 1]
-
-                        if liste_meme_packaging_line_id:
-                            for elm in liste_meme_packaging_line_id:
-                                packaging_element = elm[0]
-                                self.create_lines_or_sections(packaging_element, 'line_note')
-                                for value in elm:
-                                    self.create_detail_planning_line(value)
-
-                        if liste_autres_dico:
-                            for value in liste_autres_dico:
-                                self.create_lines_or_sections(value, 'line_note')
-                                self.create_detail_planning_line(value)
+                if liste_meme_date_id:
+                    for element in liste_meme_date_id:
+                        date_element = element[0]
+                        self.create_lines_or_sections(date_element)
+                        self.env['mrp.detail.planning.line'].create(element)
+                        # dico = self.group_by_key(element, 'packaging_line_id')
 
                 if liste_autres_dictionnaires:
                     for element in liste_autres_dictionnaires:
-                        # self.create_lines_or_sections(element, 'line_section')
-                        self.create_lines_or_sections(element, 'line_note')
-                        self.create_detail_planning_line(element)
+                        self.create_lines_or_sections(element)
+                        self.env['mrp.detail.planning.line'].create(element)
+
         except Exception as e:
             raise e
         else:
@@ -479,20 +514,20 @@ class MrpPlanning(models.Model):
     #     }
 
     # Action to finalize planning's products manufacturing
-    def action_mark_productions_as_done(self):
-        if self.detailed_pl_ids.filtered(lambda self: self.state == 'progress'):
-            raise ValidationError(_("You have to manage line(s) in progress state before this action."))
-
-        productions = []
-        for dpl in self.detailed_pl_ids:
-            production_id = self.env['mrp.production'].search(
-                [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['confirmed', 'progress', 'to_close']]])
-            if production_id:
-                productions.append(production_id.id)
-
-        production_ids = self.env['mrp.production'].browse(productions)
-        result = production_ids.button_mark_done()
-        return result
+    # def action_mark_productions_as_done(self):
+    #     if self.detailed_pl_ids.filtered(lambda self: self.state == 'progress'):
+    #         raise ValidationError(_("You have to manage line(s) in progress state before this action."))
+    #
+    #     productions = []
+    #     for dpl in self.detailed_pl_ids:
+    #         production_id = self.env['mrp.production'].search(
+    #             [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['confirmed', 'progress', 'to_close']]])
+    #         if production_id:
+    #             productions.append(production_id.id)
+    #
+    #     production_ids = self.env['mrp.production'].browse(productions)
+    #     result = production_ids.button_mark_done()
+    #     return result
 
     # Dupliquer le formulaire de planning avec les données qui doivent etre gardé dans le nouveau
     def copy(self, default=None):
@@ -512,6 +547,8 @@ class MrpPlanning(models.Model):
                 'packaging_line_domain': [(6, 0, line.packaging_line_domain.ids)],
                 # 'section_id': line.section_id.id,
                 'mrp_days': [(6, 0, line.mrp_days.ids)],
+                'begin_date': line.begin_date,
+                'end_date': line.end_date,
                 'planning_id': self.id,
             }) for line in self.planning_line_ids]
             default['planning_line_ids'] = new_planning_line_ids
@@ -519,81 +556,81 @@ class MrpPlanning(models.Model):
         return super().copy(default)
 
     # Function to add a date in scheduled dates
-    @api.onchange('scheduled_date')
-    def _onchange_scheduled_date(self):
-
-        if self.scheduled_date != self.today_date:
-            iso = self.scheduled_date.isocalendar()
-
-            monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
-            tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
-            wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
-            thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
-            friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
-            saturday = date.fromisocalendar(year=iso[0], week=iso[1], day=6)
-            sunday = date.fromisocalendar(year=iso[0], week=iso[1], day=7)
-
-            if iso[2] == 1:
-                day_name = 'monday {}/{}'.format(monday.strftime('%d'), monday.month)
-            elif iso[2] == 2:
-                day_name = 'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month)
-            elif iso[2] == 3:
-                day_name = 'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month)
-            elif iso[2] == 4:
-                day_name = 'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month)
-            elif iso[2] == 5:
-                day_name = 'friday {}/{}'.format(friday.strftime('%d'), friday.month)
-            elif iso[2] == 6:
-                day_name = 'saturday {}/{}'.format(saturday.strftime('%d'), saturday.month)
-            elif iso[2] == 7:
-                day_name = 'sunday {}/{}'.format(sunday.strftime('%d'), sunday.month)
-
-            for day in self.week_of:
-                if day_name in day.name:
-                    raise UserError(_("This day already exists in the week"))
-
-                # day_iso = day.date.isocalendar()
-
-                # if iso.year < day_iso.year:
-                #
-                #     raise UserError(_("The date must not be less than the current week's dates."))
-                # elif self.scheduled_date.month < day.date.month:
-                #
-                #     raise UserError(_("The date must not be less than the current week's dates."))
-                # elif iso.week < day_iso.week:
-                #     if self.scheduled_date.month <= day.date.month:
-                #         if iso.year <= day_iso.year:
-                #             raise UserError(_("The date must not be less than the current week's dates."))
-
-            day_in_week_of = self.env['mrp.planning.days'].search([
-                ('name', '=', day_name)
-            ])
-            if day_in_week_of:
-                # Récupérer les valeurs actuelles du champ Many2many self.week_of
-                existing_week_of = self.week_of.ids
-
-                # Ajouter l'ID de day_record à la liste des valeurs existantes
-                existing_week_of.append(day_in_week_of.id)
-
-                # Écrire la liste mise à jour dans le champ Many2many self.week_of
-                self.week_of = [(6, 0, existing_week_of)]
-                self._get_week_of_domain(day_name)
-            else:
-                day_record = self.env['mrp.planning.days'].create({
-                    'name': day_name,
-                    'date': self.scheduled_date
-                })
-                # Récupérer les valeurs actuelles du champ Many2many self.week_of
-                existing_week_of = self.week_of.ids
-                # Ajouter l'ID de day_record à la liste des valeurs existantes
-                existing_week_of.append(day_record.id)
-                # Écrire la liste mise à jour dans le champ Many2many self.week_of
-                self.week_of = [(6, 0, existing_week_of)]
-                self._get_week_of_domain(day_name)
-
-    def _get_week_of_domain(self, day_name):
-
-        return self.week_days.append(day_name)
+    # @api.onchange('scheduled_date')
+    # def _onchange_scheduled_date(self):
+    #
+    #     if self.scheduled_date != self.today_date:
+    #         iso = self.scheduled_date.isocalendar()
+    #
+    #         monday = date.fromisocalendar(year=iso[0], week=iso[1], day=1)
+    #         tuesday = date.fromisocalendar(year=iso[0], week=iso[1], day=2)
+    #         wednesday = date.fromisocalendar(year=iso[0], week=iso[1], day=3)
+    #         thursday = date.fromisocalendar(year=iso[0], week=iso[1], day=4)
+    #         friday = date.fromisocalendar(year=iso[0], week=iso[1], day=5)
+    #         saturday = date.fromisocalendar(year=iso[0], week=iso[1], day=6)
+    #         sunday = date.fromisocalendar(year=iso[0], week=iso[1], day=7)
+    #
+    #         if iso[2] == 1:
+    #             day_name = 'monday {}/{}'.format(monday.strftime('%d'), monday.month)
+    #         elif iso[2] == 2:
+    #             day_name = 'tuesday {}/{}'.format(tuesday.strftime('%d'), tuesday.month)
+    #         elif iso[2] == 3:
+    #             day_name = 'wednesday {}/{}'.format(wednesday.strftime('%d'), wednesday.month)
+    #         elif iso[2] == 4:
+    #             day_name = 'thursday {}/{}'.format(thursday.strftime('%d'), thursday.month)
+    #         elif iso[2] == 5:
+    #             day_name = 'friday {}/{}'.format(friday.strftime('%d'), friday.month)
+    #         elif iso[2] == 6:
+    #             day_name = 'saturday {}/{}'.format(saturday.strftime('%d'), saturday.month)
+    #         elif iso[2] == 7:
+    #             day_name = 'sunday {}/{}'.format(sunday.strftime('%d'), sunday.month)
+    #
+    #         for day in self.week_of:
+    #             if day_name in day.name:
+    #                 raise UserError(_("This day already exists in the week"))
+    #
+    #             # day_iso = day.date.isocalendar()
+    #
+    #             # if iso.year < day_iso.year:
+    #             #
+    #             #     raise UserError(_("The date must not be less than the current week's dates."))
+    #             # elif self.scheduled_date.month < day.date.month:
+    #             #
+    #             #     raise UserError(_("The date must not be less than the current week's dates."))
+    #             # elif iso.week < day_iso.week:
+    #             #     if self.scheduled_date.month <= day.date.month:
+    #             #         if iso.year <= day_iso.year:
+    #             #             raise UserError(_("The date must not be less than the current week's dates."))
+    #
+    #         day_in_week_of = self.env['mrp.planning.days'].search([
+    #             ('name', '=', day_name)
+    #         ])
+    #         if day_in_week_of:
+    #             # Récupérer les valeurs actuelles du champ Many2many self.week_of
+    #             existing_week_of = self.week_of.ids
+    #
+    #             # Ajouter l'ID de day_record à la liste des valeurs existantes
+    #             existing_week_of.append(day_in_week_of.id)
+    #
+    #             # Écrire la liste mise à jour dans le champ Many2many self.week_of
+    #             self.week_of = [(6, 0, existing_week_of)]
+    #             self._get_week_of_domain(day_name)
+    #         else:
+    #             day_record = self.env['mrp.planning.days'].create({
+    #                 'name': day_name,
+    #                 'date': self.scheduled_date
+    #             })
+    #             # Récupérer les valeurs actuelles du champ Many2many self.week_of
+    #             existing_week_of = self.week_of.ids
+    #             # Ajouter l'ID de day_record à la liste des valeurs existantes
+    #             existing_week_of.append(day_record.id)
+    #             # Écrire la liste mise à jour dans le champ Many2many self.week_of
+    #             self.week_of = [(6, 0, existing_week_of)]
+    #             self._get_week_of_domain(day_name)
+    #
+    # def _get_week_of_domain(self, day_name):
+    #
+    #     return self.week_days.append(day_name)
 
     def unlink(self):
 
@@ -634,14 +671,13 @@ class MrpPlanning(models.Model):
             # Récupérer le planning associé
             mrp_planning = self._get_mrp_planning(rec)
 
-            # old_sect_name =  rec.section_ids
-            old_day_name = [day.name for day in rec.week_of]
+
             old_planning_line = self._get_old_planning_lines(rec)
             old_detail_planning_line = self._get_old_detail_planning_lines(rec)
             res = super(MrpPlanning, rec).write(vals)
 
             # self._process_section_changes(vals, old_sect_name, mrp_planning)
-            self._process_week_of_changes(vals, old_day_name, mrp_planning)
+
             self.process_planning_line_ids(vals, old_planning_line, mrp_planning)
             self.process_detailed_pl_ids(vals, old_detail_planning_line, mrp_planning)
 
@@ -702,37 +738,27 @@ class MrpPlanning(models.Model):
             return new_sect_name
         return False
 
-    def _process_week_of_changes(self, vals, old_day_name, mrp_planning):
-        if 'week_of' in vals:
-            new_week_of_name = self._get_new_week_of_names(vals)
-            formatted_old_week_of_name = ', '.join(map(str, old_day_name))
-            formatted_new_week_of_name = ', '.join(map(str, new_week_of_name))
-            message_to_day = f"<p><b> {formatted_old_week_of_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{formatted_new_week_of_name}</span></b><em> (Week of)</em></p>"
-            mrp_planning.message_post(body=message_to_day)
 
-    def _get_new_week_of_names(self, vals):
-        new_day_id = [day for val in vals['week_of'] for day in val[2]]
-        new_week_of_name = [self.env['mrp.planning.days'].browse(day).name for day in new_day_id]
-        return new_week_of_name
 
     def process_planning_line_ids(self, vals, old_planning_line, mrp_planning):
-        if 'planning_line_ids' not in vals:
-            return
+        if 'planning_line_ids' in vals:
 
-        add_pl = [val[2] for val in vals['planning_line_ids'] if val[0] == 0]
-        delete_pl = [val[1] for val in vals['planning_line_ids'] if val[0] == 2]
+            add_pl = [val[2] for val in vals['planning_line_ids'] if val[0] == 0]
+            delete_pl = [val[1] for val in vals['planning_line_ids'] if val[0] == 2]
 
-        update_pl = [{
-            'id': val[1],
-            'value': val[2]
-        } for val in vals['planning_line_ids'] if val[0] == 1]
+            update_pl = [{
+                'id': val[1],
+                'value': val[2]
+            } for val in vals['planning_line_ids'] if val[0] == 1]
 
-        # self.process_update_pl(update_pl, old_planning_line, mrp_planning)
-        self.process_delete_pl(delete_pl, old_planning_line, mrp_planning)
 
-        message_to_add_pl = self._get_pl_message(add_pl, "Planning lines added are")
-        if message_to_add_pl:
-            mrp_planning.message_post(body=message_to_add_pl)
+            self.process_update_pl(update_pl, old_planning_line, mrp_planning)
+            self.process_delete_pl(delete_pl, old_planning_line, mrp_planning)
+
+
+            message_to_add_pl = self._get_pl_message(add_pl, "Planning lines added are")
+            if message_to_add_pl:
+                mrp_planning.message_post(body=message_to_add_pl)
 
     def process_update_pl(self, update_pl, old_planning_line, mrp_planning):
         if not update_pl:
@@ -740,18 +766,47 @@ class MrpPlanning(models.Model):
 
         update_pl_id = [pl['id'] for pl in update_pl]
 
+
         for pl in update_pl:
             for planning in old_planning_line:
                 if pl['id'] == planning['id']:
                     position = update_pl_id.index(pl['id'])
                     value = update_pl[position]['value']
-
                     if 'product_id' in value:
                         msg = ""
+
                         message_to_update_pl = f"<p><b><em> (Planning lines)</em> Packaging Line {planning['packaging_line_id']['name']}, Section {planning['section_id']['name']} : </b></p><ul>"
                         new_prod = self.env['product.product'].browse(value['product_id'])
                         msg += f"<li><p><b>{planning['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
                         message_to_update_pl += msg
+                        if 'packaging_line_id' in value:
+                            new_pack = self.env['mrp.packaging.line'].browse(value['packaging_line_id'])
+                            msg += f"<li><p><b>Packaging line {planning['packaging_line_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Packaging line {new_pack.name}</span></b></p></li>"
+
+                        if 'qty' in value:
+                            msg += f"<li><p><b>Quantity {planning['qty']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Quantity {value['qty']}</span></b></p></li>"
+
+                        # if 'section_id' in value:
+                        #     new_sect = self.env['mrp.section'].browse(value['section_id'])
+                        #     msg += f"<li><p><b>Section {planning['section_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Section {new_sect.name}</span></b></p></li>"
+                        #
+                        # if 'mrp_days' in value:
+                        #
+                        #     old_day_name = [day['name'] for day in planning['mrp_days']]
+                        #     new_day_id = [day for dy in value['mrp_days'] for day in dy[2]]
+                        #
+                        #     new_day_name = []
+                        #     for ndi in new_day_id:
+                        #         ndi_name = self.env['mrp.planning.days'].browse(ndi)
+                        #         new_day_name.append(ndi_name.name)
+
+                            msg += f"<li><p><b>{old_day_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_day_name}</span></b></p></li>"
+                        if 'uom_id' in value:
+                            new_uom = self.env['uom.uom'].browse(value['uom_id'])
+                            msg += f"<li><p><b>{planning['uom_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_uom.name}</span></b></p></li>"
+
+                        message_to_update_pl += f"{msg}"
+
                         mrp_planning.message_post(body=message_to_update_pl)
 
                     message_to_update_pl = f"<p><b><em> (Planning lines)</em> {planning['product_id']['name']} : </b></p><ul>" if 'product_id' not in value else f"<p><b><em> (Planning lines)</em> {self.env['product.product'].browse(value['product_id']).name} : </b></p><ul>"
@@ -787,123 +842,152 @@ class MrpPlanning(models.Model):
                     mrp_planning.message_post(body=message_to_update_pl)
 
     def process_delete_pl(self, delete_pl, old_planning_line, mrp_planning):
-        if not delete_pl:
-            return
+        if delete_pl:
+            message_to_delete_pl = "<p><em>Planning lines removed are :</em></p><ul>"
 
-        message_to_delete_pl = "<p><em>Planning lines removed are :</em></p><ul>"
-
-        for pl in delete_pl:
-            for planning in old_planning_line:
-                if pl == planning['id']:
-                    message_to_delete_pl += f"<li><p><b>{planning['product_id']['name']}, section {planning['section_id']['name']}, packaging line {planning['packaging_line_id']['name']}</b></p></li>"
-        mrp_planning.message_post(body=message_to_delete_pl)
+            for pl in delete_pl:
+                for planning in old_planning_line:
+                    if pl == planning['id']:
+                        # message_to_delete_pl += f"<li><p><b>{planning['product_id']['name']}, section {planning['section_id']['name']}, packaging line {planning['packaging_line_id']['name']}</b></p></li>"
+                        message_to_delete_pl += f"<li><p><b>{planning['product_id']['name']}, packaging line {planning['packaging_line_id']['name']}</b></p></li>"
+            mrp_planning.message_post(body=message_to_delete_pl)
 
     def process_detailed_pl_ids(self, vals, old_detail_planning_line, mrp_planning):
-        if 'detailed_pl_ids' not in vals:
-            return
+        if 'detailed_pl_ids' in vals:
+            # Fabrication
+            print(f"vals : {vals}")
+            detail_id = []
+            for val in vals['detailed_pl_ids']:
+                if val[2]:
+                    for elm in val[2]:
+                        if elm == 'qty_done':
+                            print('yes')
+                            detail_id.append(val[1])
+            # detail_id = [val[1] for val in vals['detailed_pl_ids'] for elm in val[2] if elm == 'qty_done']
+            if detail_id:
+                # print(f"detail_id : {detail_id}")
+                for detail in detail_id:
+                    rec = self.env['mrp.detail.planning.line'].browse(detail)
+                    if rec.qty_done > rec.qty:
+                        rec.qty_done = False
+                        raise UserError(_('The quantity made cannot be greater than the planned quantity'))
+                    elif rec.qty == rec.qty_done:
+                        if rec.mrp_production_id.reservation_state == 'assigned':
+                            rec.mrp_production_id.qty_producing = rec.qty_done
+                            for move in rec.mrp_production_id.move_raw_ids:
+                                move.quantity_done = move.should_consume_qty
+                            rec.mrp_production_id.button_mark_done()
+                        else:
+                            raise UserError(_('Unavailability of components, please create supply orders'))
+                    elif rec.qty_done < rec.qty:
+                        if rec.mrp_production_id.reservation_state == 'assigned':
+                            rec.mrp_production_id.qty_producing = rec.qty_done
+                            for move in rec.mrp_production_id.move_raw_ids:
+                                move.quantity_done = move.should_consume_qty
+                            rec.mrp_production_id.with_context(skip_backorder=True).button_mark_done()
+                        else:
+                            raise UserError(_('Unavailability of components, please create supply orders'))
 
-        new_dl_id = [val[1] for val in vals['detailed_pl_ids'] if val[0] > 2]
-        delete_dl = [val[1] for val in vals['detailed_pl_ids'] if val[0] == 2]
-        update_dl = [{'id': val[1], 'value': val[2]} for val in vals['detailed_pl_ids'] if val[0] == 1]
+            # Tracabilité
+            new_dl_id = [val[1] for val in vals['detailed_pl_ids'] if val[0] > 2]
+            delete_dl = [val[1] for val in vals['detailed_pl_ids'] if val[0] == 2]
+            update_dl = [{'id': val[1], 'value': val[2]} for val in vals['detailed_pl_ids'] if val[0] == 1]
 
-        ids = self.env['mrp.detail.planning.line'].browse(new_dl_id)
-        section_dl = [dl.id for dl in ids if dl.display_type == 'line_section']
-        line_dl = [dl.id for dl in ids if dl.display_type == 'line_note']
-        section_dls = sorted(section_dl)
-        line_dls = sorted(line_dl)
+            ids = self.env['mrp.detail.planning.line'].browse(new_dl_id)
+            section_dl = [dl.id for dl in ids if dl.display_type == 'line_section']
+            line_dl = [dl.id for dl in ids if dl.display_type == 'line_note']
+            section_dls = sorted(section_dl)
+            line_dls = sorted(line_dl)
 
-        self.process_update_dl(update_dl, old_detail_planning_line, mrp_planning, section_dls, line_dls)
-        self.process_delete_dl(delete_dl, old_detail_planning_line, mrp_planning, section_dls, line_dls)
+            self.process_update_dl(update_dl, old_detail_planning_line, mrp_planning, section_dls, line_dls)
+            self.process_delete_dl(delete_dl, old_detail_planning_line, mrp_planning, section_dls, line_dls)
 
     def process_update_dl(self, update_dl, old_detail_planning_line, mrp_planning, section_dls, line_dls):
-        if not update_dl:
-            return
+        if update_dl:
 
-        update_dl_id = [dl['id'] for dl in update_dl]
+            update_dl_id = [dl['id'] for dl in update_dl]
 
-        for dl in update_dl:
-            for detail in old_detail_planning_line:
-                if dl['id'] == detail['id']:
-                    if dl['id'] in section_dls:
-                        self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "",
-                                           " (Detailed planning lines Large Sections)")
+            for dl in update_dl:
+                for detail in old_detail_planning_line:
+                    if dl['id'] == detail['id']:
+                        if dl['id'] in section_dls:
+                            self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "",
+                                               " (Detailed planning lines Large Sections)")
 
-                    elif dl['id'] in line_dls:
-                        self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "",
-                                           " (Detailed planning lines Large Line)")
+                        elif dl['id'] in line_dls:
+                            self.print_message(mrp_planning, 'mrp.detail.planning.line', dl['id'], detail, "",
+                                               " (Detailed planning lines Large Line)")
 
-                    else:
-                        # Récupérer la lign et la section de l'éléments modifié
-                        sect_dl = max([sect_id for sect_id in section_dls if sect_id < dl['id']],
-                                      default=None)
-                        line_dl = max([line_id for line_id in line_dls if line_id < dl['id']],
-                                      default=None)
+                        else:
+                            # Récupérer la lign et la section de l'éléments modifié
+                            sect_dl = max([sect_id for sect_id in section_dls if sect_id < dl['id']],
+                                          default=None)
+                            line_dl = max([line_id for line_id in line_dls if line_id < dl['id']],
+                                          default=None)
 
-                        large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
-                        large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
+                            large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
+                            large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
 
-                        position = update_dl_id.index(dl['id'])
-                        value = update_dl[position]['value']
+                            position = update_dl_id.index(dl['id'])
+                            value = update_dl[position]['value']
 
-                        if 'date' in value:
+                            if 'date' in value:
+                                msg = ""
+                                message_to_update_dl = f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name} : </b></p><ul>"
+                                msg += f"<li><p><b>{detail['date']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{dl['date']}</span></b></p></li>"
+                                message_to_update_dl += msg
+                                mrp_planning.message_post(body=message_to_update_dl)
+
+                            message_to_update_dl = f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name}, Date {detail['date'].strftime('%d/%m/%Y')} : </b></p><ul>" if 'date' not in value else f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name}, Date {dl['date']} : </b></p><ul>"
                             msg = ""
-                            message_to_update_dl = f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name} : </b></p><ul>"
-                            msg += f"<li><p><b>{detail['date']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{dl['date']}</span></b></p></li>"
-                            message_to_update_dl += msg
+                            if 'product_id' in value:
+                                new_prod = self.env['product.product'].browse(value['product_id'])
+                                msg += f"<li><p><b>{detail['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
+
+                            if 'packaging_line_id' in value:
+                                new_pack = self.env['mrp.packaging.line'].browse(value['packaging_line_id'])
+                                msg += f"<li><p><b>Packaging line {detail['packaging_line_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Packaging line {new_pack.name}</span></b></p></li>"
+
+                            if 'section_id' in value:
+                                new_sect = self.env['mrp.section'].browse(value['section_id'])
+                                msg += f"<li><p><b>Small Section {detail['section_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Section {new_sect.name}</span></b></p></li>"
+
+                            if 'qty' in value:
+                                msg += f"<li><p><b>Quantity {detail['qty']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Quantity {value['qty']}</span></b></p></li>"
+
+                            message_to_update_dl += f"{msg}"
+
                             mrp_planning.message_post(body=message_to_update_dl)
 
-                        message_to_update_dl = f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name}, Date {detail['date'].strftime('%d/%m/%Y')} : </b></p><ul>" if 'date' not in value else f"<p><b><em> (Detailed planning lines)</em> Large Section {large_section.name}, Large Line {large_line.name}, Date {dl['date']} : </b></p><ul>"
-                        msg = ""
-                        if 'product_id' in value:
-                            new_prod = self.env['product.product'].browse(value['product_id'])
-                            msg += f"<li><p><b>{detail['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
-
-                        if 'packaging_line_id' in value:
-                            new_pack = self.env['mrp.packaging.line'].browse(value['packaging_line_id'])
-                            msg += f"<li><p><b>Packaging line {detail['packaging_line_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Packaging line {new_pack.name}</span></b></p></li>"
-
-                        if 'section_id' in value:
-                            new_sect = self.env['mrp.section'].browse(value['section_id'])
-                            msg += f"<li><p><b>Small Section {detail['section_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Section {new_sect.name}</span></b></p></li>"
-
-                        if 'qty' in value:
-                            msg += f"<li><p><b>Quantity {detail['qty']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Quantity {value['qty']}</span></b></p></li>"
-
-                        message_to_update_dl += f"{msg}"
-
-                        mrp_planning.message_post(body=message_to_update_dl)
-
     def process_delete_dl(self, delete_dl, old_detail_planning_line, mrp_planning, section_dls, line_dls):
-        if not delete_dl:
-            return
+        if delete_dl:
+            message_to_delete_dl = "<p><em>Detailed planning lines removed are :</em></p><ul>"
 
-        message_to_delete_dl = "<p><em>Detailed planning lines removed are :</em></p><ul>"
+            for dl in delete_dl:
+                for detail in old_detail_planning_line:
+                    if dl == detail['id']:
+                        if dl in section_dls:
+                            new_sect = self.env['mrp.detail.planning.line'].browse(dl['id'])
+                            message_to_delete_dl += (f"<li><p><b>"
+                                                     f"{detail['name']} <span style='font-size: "
+                                                     f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
+                                                     f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
+                            mrp_planning.message_post(body=message_to_delete_dl)
 
-        for dl in delete_dl:
-            for detail in old_detail_planning_line:
-                if dl == detail['id']:
-                    if dl in section_dls:
-                        new_sect = self.env['mrp.detail.planning.line'].browse(dl['id'])
-                        message_to_delete_dl += (f"<li><p><b>"
-                                                 f"{detail['name']} <span style='font-size: "
-                                                 f"1.5em;'>&#8594;</span> <span style='color: #0182b6;'>"
-                                                 f"{new_sect.name}</span></b><em>(Large Section)</em></p></li>")
-                        mrp_planning.message_post(body=message_to_delete_dl)
+                        elif dl in line_dls:
+                            new_line = self.env['mrp.detail.planning.line'].browse(dl['id'])
+                            message_to_delete_dl += f"<li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_line.name}</span></b><em>(Large Line)</em></p></li>"
+                            mrp_planning.message_post(body=message_to_delete_dl)
 
-                    elif dl in line_dls:
-                        new_line = self.env['mrp.detail.planning.line'].browse(dl['id'])
-                        message_to_delete_dl += f"<li><p><b>{detail['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_line.name}</span></b><em>(Large Line)</em></p></li>"
-                        mrp_planning.message_post(body=message_to_delete_dl)
-
-                    else:
-                        sect_dl = max([sect_id for sect_id in section_dls if sect_id < dl],
-                                      default=None)
-                        line_dl = max([line_id for line_id in line_dls if line_id < dl],
-                                      default=None)
-                        large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
-                        large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
-                        message_to_delete_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
-                        mrp_planning.message_post(body=message_to_delete_dl)
+                        else:
+                            sect_dl = max([sect_id for sect_id in section_dls if sect_id < dl],
+                                          default=None)
+                            line_dl = max([line_id for line_id in line_dls if line_id < dl],
+                                          default=None)
+                            large_section = self.env['mrp.detail.planning.line'].browse(sect_dl)
+                            large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
+                            message_to_delete_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
+                            mrp_planning.message_post(body=message_to_delete_dl)
 
 
 class MrpPlanninLine(models.Model):
@@ -1007,6 +1091,37 @@ class MrpPlanninLine(models.Model):
             else:
                 rec.capacity, rec.qty = 0, 0
 
+    @api.depends('begin_date', 'end_date')
+    def _compute_mrp_days(self):
+        for rec in self:
+            if rec.begin_date and rec.end_date:
+                current_date = rec.begin_date
+                day_dico = {
+                    1: 'monday',
+                    2: 'tuesday',
+                    3: 'wednesday',
+                    4: 'thursday',
+                    5: 'friday',
+                    6: 'saturday',
+                    7: 'sunday',
+                }
+                mrp_days = []
+                while current_date <= rec.end_date:
+                    iso = current_date.isocalendar()
+                    day = day_dico[iso.weekday]
+                    name = '{} {}/{}'.format(day, current_date.strftime('%d'), current_date.strftime('%m'))
+                    day_record = self.env['mrp.planning.days'].search([
+                        ('name', '=', name),
+                        ('date', '=', current_date)
+                    ])
+                    if not day_record:
+                        day_record = self.env['mrp.planning.days'].create({
+                            'name': name,
+                            'date': current_date
+                        })
+                    mrp_days.append((4, day_record.id, 0))
+                    current_date = current_date + timedelta(days=1)
+                rec.mrp_days = mrp_days
 
     package = fields.Float(_("Package"))
     # qty_compute = fields.Integer(_("Qty per day"))
@@ -1021,8 +1136,10 @@ class MrpPlanninLine(models.Model):
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     packaging_line_first = fields.Many2one("mrp.packaging.line")
     packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
-    # section_id = fields.Many2one("mrp.section", required=1)
-    mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
+
+    mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', compute="_compute_mrp_days")
+    begin_date = fields.Date(_('Begin Date'))
+    end_date = fields.Date(_('End Date'))
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
@@ -1127,6 +1244,7 @@ class MrpDetailPlanningLine(models.Model):
         default=False)
     name = fields.Text()
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
+    qty_done = fields.Integer(_("Quantity done"))
 
     def action_manage_production(self):
         production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
@@ -1164,6 +1282,40 @@ class MrpDetailPlanningLine(models.Model):
             'replace_product_from_detailed_planning': self.id
         }
         return action
+
+    # @api.onchange('qty_done')
+    # def _onchange_qty_done(self):
+    #     for rec in self:
+    #         if rec.qty_done > rec.qty:
+    #             rec.qty_done = False
+    #             raise UserError(_('The quantity made cannot be greater than the planned quantity'))
+    #         elif rec.qty == rec.qty_done:
+    #             if rec.mrp_production_id.reservation_state == 'assigned':
+    #                 rec.mrp_production_id.qty_producing = rec.qty_done
+    #                 for move in rec.mrp_production_id.move_raw_ids:
+    #                     move.quantity_done = move.should_consume_qty
+    #                 print(f"rec.id : {rec.id}")
+    #                 self.env['mrp.planning'].search([
+    #                     ('id', '=', rec.planning_id.id)
+    #                 ]).save()
+    #                 # rec.planning_id.save()
+    #                 rec.mrp_production_id.button_mark_done()
+    #             else:
+    #                 raise UserError(_('Unavailability of components, please create supply orders'))
+    #         elif rec.qty_done < rec.qty:
+    #             if rec.mrp_production_id.reservation_state == 'assigned':
+    #                 rec.mrp_production_id.qty_producing = rec.qty_done
+    #                 for move in rec.mrp_production_id.move_raw_ids:
+    #                     move.quantity_done = move.should_consume_qty
+    #                 # stock_scrap = self.env['stock.scrap'].create({
+    #                 #     'product_id': rec.product_id.id,
+    #                 #     'scrap_qty': rec.qty - rec.qty_done,
+    #                 # })
+    #                 # stock_scrap.action_validate()
+    #                 # self.save()
+    #                 rec.mrp_production_id.button_mark_done()
+    #             else:
+    #                 raise UserError(_('Unavailability of components, please create supply orders'))
 
 
 class MrpPlanningDays(models.Model):
