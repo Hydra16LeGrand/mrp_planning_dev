@@ -199,7 +199,7 @@
                                     <field name="package"/>
                                     <field name="qty"/>
 <!--                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>-->
-                                    <field name="qty_done" string="Quantity done"/>
+                                    <field name="qty_done" string="Quantity done" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"/>
                                     <field name="capacity"/>
                                     <field name="employee_number" optional="hide"/>
                                     <field name="date"/>
