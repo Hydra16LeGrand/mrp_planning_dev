@@ -149,7 +149,7 @@ class MrpPlanning(models.Model):
                 'capacity': element['capacity'],
                 'packaging_line_id': element['packaging_line_id'].id,
                 'planning_line_id': element['planning_line_id'],
-                'section_id': element['section_id'].id,
+                # 'section_id': element['section_id'].id,
                 'planning_id': element['planning_id'],
                 'employee_number': ppp_id.employee_number if ppp_id else 0,
             } for day in element['mrp_days']])
@@ -161,7 +161,7 @@ class MrpPlanning(models.Model):
             'name': name,
             'product_id': element['product_id'].id,
             'planning_line_id': element['planning_line_id'],
-            'section_id': element['section_id'].id,
+            # 'section_id': element['section_id'].id,
             'planning_id': element['planning_id'],
             'package': element['package'],
             'qty': element['qty'],
@@ -185,7 +185,7 @@ class MrpPlanning(models.Model):
     def action_confirm(self):
 
         if not self.planning_line_ids:
-            raise ValidationError(_("Yo have to give at least one planning line"))
+            raise ValidationError(_("You have to give at least one planning line"))
 
         detailed_lines_to_delete = self.env['mrp.detail.planning.line'].search([('planning_id', '=', self.id)]).unlink()
         section_id_lst = []
@@ -199,7 +199,7 @@ class MrpPlanning(models.Model):
                     'capacity': pline.capacity,
                     'product_id': pline.product_id,
                     'packaging_line_id': pline.packaging_line_id,
-                    'section_id': pline.section_id,
+                    # 'section_id': pline.section_id,
                     'mrp_days': pline.mrp_days,
                     'planning_id': self.id,
                     'planning_line_id': pline.id,
@@ -207,20 +207,20 @@ class MrpPlanning(models.Model):
                 value_planning_line.append(val)
 
             if value_planning_line:
-                dict_dictionnaires = self.group_by_key(value_planning_line, 'section_id')
+                dict_dictionnaires = self.group_by_key(value_planning_line, 'section_ids') #, 'section_id')
 
                 # Extraction des dictionnaires avec la même section_id
-                liste_meme_section_id = [dictionnaires for dictionnaires in dict_dictionnaires.values() if
+                liste_meme_planning_line = [dictionnaires for dictionnaires in dict_dictionnaires.values() if
                                          len(dictionnaires) > 1]
 
                 # Extraction des dictionnaires restants
                 liste_autres_dictionnaires = [dictionnaires[0] for dictionnaires in dict_dictionnaires.values() if
                                               len(dictionnaires) == 1]
 
-                if liste_meme_section_id:
-                    for element in liste_meme_section_id:
+                if liste_meme_planning_line:
+                    for element in liste_meme_planning_line:
                         section_element = element[0]
-                        self.create_lines_or_sections(section_element, 'line_section')
+                        # self.create_lines_or_sections(section_element, 'line_section')
                         dico = self.group_by_key(element, 'packaging_line_id')
 
                         # Extraction des dictionnaires avec le même packaging line
@@ -246,7 +246,7 @@ class MrpPlanning(models.Model):
 
                 if liste_autres_dictionnaires:
                     for element in liste_autres_dictionnaires:
-                        self.create_lines_or_sections(element, 'line_section')
+                        # self.create_lines_or_sections(element, 'line_section')
                         self.create_lines_or_sections(element, 'line_note')
                         self.create_detail_planning_line(element)
         except Exception as e:
@@ -338,7 +338,7 @@ class MrpPlanning(models.Model):
                     "product_uom_id": line.uom_id.id,
                     "date_planned_start": datetime.combine(line.date, datetime.min.time()),
                     "packaging_line_id": line.packaging_line_id.id,
-                    "section_id": line.section_id.id,
+                    # "section_id": line.section_id.id,
                     "planning_line_id": line.planning_line_id.id,
                     "detailed_pl_id": line.id,
                     "planning_id": self.id,
@@ -431,7 +431,7 @@ class MrpPlanning(models.Model):
 
                 for detailed_planning_line in rec.detailed_pl_ids:
                     if detailed_planning_line.display_type == False:
-                        section = detailed_planning_line.section_id
+                        section = rec.section_ids
                         packaging_line = detailed_planning_line.packaging_line_id
 
                         grouped_lines[section][packaging_line].append(detailed_planning_line)
@@ -500,7 +500,7 @@ class MrpPlanning(models.Model):
                 'uom_domain': [(6, 0, line.uom_domain.ids)],
                 'packaging_line_id': line.packaging_line_id.id,
                 'packaging_line_domain': [(6, 0, line.packaging_line_domain.ids)],
-                'section_id': line.section_id.id,
+                # 'section_id': line.section_id.id,
                 'mrp_days': [(6, 0, line.mrp_days.ids)],
                 'planning_id': self.id,
             }) for line in self.planning_line_ids]
@@ -624,13 +624,13 @@ class MrpPlanning(models.Model):
             # Récupérer le planning associé
             mrp_planning = self._get_mrp_planning(rec)
 
-            old_sect_name = [sect.name for sect in rec.section_ids]
+            # old_sect_name = [sect.name for sect in rec.section_ids]
             old_day_name = [day.name for day in rec.week_of]
             old_planning_line = self._get_old_planning_lines(rec)
             old_detail_planning_line = self._get_old_detail_planning_lines(rec)
             res = super(MrpPlanning, rec).write(vals)
 
-            self._process_section_changes(vals, old_sect_name, mrp_planning)
+            # self._process_section_changes(vals, old_sect_name, mrp_planning)
             self._process_week_of_changes(vals, old_day_name, mrp_planning)
             self.process_planning_line_ids(vals, old_planning_line, mrp_planning)
             self.process_detailed_pl_ids(vals, old_detail_planning_line, mrp_planning)
@@ -647,7 +647,7 @@ class MrpPlanning(models.Model):
             'product_id': pl.product_id,
             'packaging_line_id': pl.packaging_line_id,
             'qty': pl.qty,
-            'section_id': pl.section_id,
+            # 'section_id': pl.section_id,
             'mrp_days': pl.mrp_days,
             'uom_id': pl.uom_id,
         } for pl in rec.planning_line_ids]
@@ -661,7 +661,7 @@ class MrpPlanning(models.Model):
             'product_id': dl.product_id,
             'qty': dl.qty,
             'packaging_line_id': dl.packaging_line_id,
-            'section_id': dl.section_id.id,
+            # 'section_id': dl.section_id.id,
         } for dl in rec.detailed_pl_ids]
 
     def _process_section_changes(self, vals, old_sect_name, mrp_planning):
@@ -991,7 +991,7 @@ class MrpPlanninLine(models.Model):
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     packaging_line_first = fields.Many2one("mrp.packaging.line")
     packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
-    section_id = fields.Many2one("mrp.section", required=1)
+    # section_id = fields.Many2one("mrp.section", required=1)
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', required=True)
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
@@ -1086,7 +1086,7 @@ class MrpDetailPlanningLine(models.Model):
     uom_id = fields.Many2one("uom.uom", related="planning_line_id.uom_id")
     packaging_line_id = fields.Many2one("mrp.packaging.line", required=1, tracking=True)
     planning_line_id = fields.Many2one("mrp.planning.line")
-    section_id = fields.Many2one("mrp.section", required=True)
+    # section_id = fields.Many2one("mrp.section", required=True)
     planning_id = fields.Many2one("mrp.planning")
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     display_type = fields.Selection(
