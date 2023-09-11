@@ -31,7 +31,7 @@ class StockLocationInherit(models.Model):
 			if all_packaged_finished_product != 0:
 				raise ValidationError(_("A packaged finished product location already exists for this plant. Uncheck this one before this operation."))
 			else:
-				# temp_stock = self.search_count([('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
+				temp_stock = self.search_count([('temp_stock', '=', 1), ('plant_id', '=', self.plant_id.id)])
 				if self.temp_stock:
 					raise ValidationError(_("This location can't be both a temp location and a packaged finished product location."))
 				if self.unpackaged_finished_product:

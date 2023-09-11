@@ -64,7 +64,7 @@ class MrpPlanning(models.Model):
         return plant_id.id if plant_id else False
 
     reference = fields.Char(_("Reference"), default=lambda self: _('New'), tracking=True)
-    code = fields.Char(_("Code"), tracking=True)
+    code = fields.Char(_("Code"), default=lambda self: self.env['ir.config_parameter'].sudo().get_param('mrp_planning.code'), tracking=True)
     state = fields.Selection([
         ('cancel', "Cancelled"),
         ('draft', "Draft"),
@@ -79,7 +79,8 @@ class MrpPlanning(models.Model):
 
     company_id = fields.Many2one('res.company', string='Company', required=True, index=True,
                                  default=lambda self: self.env.company.id)
-    section_ids = fields.Many2many("mrp.section", string=_("Sections"), required=True, tracking=5)
+    section_ids = fields.Many2one("mrp.section", string=_("Sections"), required=True, tracking=5)
+
     # team_ids = fields.Many2many("mrp.team", string=_("Teams"), tracking=True, required=True)
 
     planning_line_ids = fields.One2many("mrp.planning.line", "planning_id", string=_("Planning lines"), tracking=5)
@@ -94,13 +95,22 @@ class MrpPlanning(models.Model):
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
     detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
 
+    # @api.depends('section_ids')
+    # def _compute_section_first(self):
+    #     for rec in self:
+    #         if rec.section_ids:
+    #
+    #             ls = [sect.id for sect in rec.section_ids]
+    #             ls = [sect.id for sect in rec.section_ids]
+    #             rec.section_first = ls[0]
+    #         else:
+    #             rec.section_first = False
+
     @api.depends('section_ids')
     def _compute_section_first(self):
         for rec in self:
             if rec.section_ids:
-
-                ls = [sect.id for sect in rec.section_ids]
-                rec.section_first = ls[0]
+                rec.section_first = rec.section_ids.id
             else:
                 rec.section_first = False
 
@@ -155,7 +165,7 @@ class MrpPlanning(models.Model):
             } for day in element['mrp_days']])
 
     def create_lines_or_sections(self, element, dt):
-        name = '       ' + element['packaging_line_id'].name if dt == 'line_note' else element['section_id'].name
+        name = '       ' + element['packaging_line_id'].name if dt == 'line_note' else False # element['section_id'].name
         self.env['mrp.detail.planning.line'].create([{
             'display_type': dt,
             'name': name,
@@ -180,7 +190,7 @@ class MrpPlanning(models.Model):
                 dict_of_lists[dict_key] = [dictionary]
         return dict_of_lists
 
-    # This function generate detailed planning lines and regroup them by sections and by packaging line. 
+    # This function generate detailed planning lines and regroup them by sections and by packaging line.
     # Each detailed planning line will be related to a production order
     def action_confirm(self):
 
@@ -283,7 +293,7 @@ class MrpPlanning(models.Model):
     def create_overview_wizard(self):
 
         action = {
-            "name": "Aperçu des matières premières",
+            "name": "Raw Material Overview",
             "res_model": "overview.wizard",
             "type": "ir.actions.act_window",
             "view_mode": "form",
@@ -624,7 +634,7 @@ class MrpPlanning(models.Model):
             # Récupérer le planning associé
             mrp_planning = self._get_mrp_planning(rec)
 
-            # old_sect_name = [sect.name for sect in rec.section_ids]
+            # old_sect_name =  rec.section_ids
             old_day_name = [day.name for day in rec.week_of]
             old_planning_line = self._get_old_planning_lines(rec)
             old_detail_planning_line = self._get_old_detail_planning_lines(rec)
@@ -664,18 +674,33 @@ class MrpPlanning(models.Model):
             # 'section_id': dl.section_id.id,
         } for dl in rec.detailed_pl_ids]
 
+    # def _process_section_changes(self, vals, old_sect_name, mrp_planning):
+    #     if 'section_ids' in vals:
+    #         new_sect_name = self._get_new_section_names(vals)
+    #         formatted_old_sect_name = ', '.join(map(str, old_sect_name))
+    #         formatted_new_sect_name = ', '.join(map(str, new_sect_name))
+    #         message_to_sect = f"<p><b> {formatted_old_sect_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{formatted_new_sect_name}</span></b><em> (Sections)</em></p>"
+    #         mrp_planning.message_post(body=message_to_sect)
+    #
+    # def _get_new_section_names(self, vals):
+    #     new_sect_id = [sect for val in vals['section_ids'] for sect in val[2]]
+    #     new_sect_name = [self.env['mrp.section'].browse(nsn).name for nsn in new_sect_id]
+    #     return new_sect_name
+
     def _process_section_changes(self, vals, old_sect_name, mrp_planning):
         if 'section_ids' in vals:
-            new_sect_name = self._get_new_section_names(vals)
-            formatted_old_sect_name = ', '.join(map(str, old_sect_name))
-            formatted_new_sect_name = ', '.join(map(str, new_sect_name))
+            new_sect_name = self._get_new_section_name(vals)
+            formatted_old_sect_name = old_sect_name
+            formatted_new_sect_name = new_sect_name
             message_to_sect = f"<p><b> {formatted_old_sect_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{formatted_new_sect_name}</span></b><em> (Sections)</em></p>"
             mrp_planning.message_post(body=message_to_sect)
 
-    def _get_new_section_names(self, vals):
-        new_sect_id = [sect for val in vals['section_ids'] for sect in val[2]]
-        new_sect_name = [self.env['mrp.section'].browse(nsn).name for nsn in new_sect_id]
-        return new_sect_name
+    def _get_new_section_name(self, vals):
+        new_sect_id = vals.get('section_ids')
+        if new_sect_id:
+            new_sect_name = self.env['mrp.section'].browse(new_sect_id).name
+            return new_sect_name
+        return False
 
     def _process_week_of_changes(self, vals, old_day_name, mrp_planning):
         if 'week_of' in vals:
@@ -702,7 +727,7 @@ class MrpPlanning(models.Model):
             'value': val[2]
         } for val in vals['planning_line_ids'] if val[0] == 1]
 
-        self.process_update_pl(update_pl, old_planning_line, mrp_planning)
+        # self.process_update_pl(update_pl, old_planning_line, mrp_planning)
         self.process_delete_pl(delete_pl, old_planning_line, mrp_planning)
 
         message_to_add_pl = self._get_pl_message(add_pl, "Planning lines added are")
@@ -710,54 +735,56 @@ class MrpPlanning(models.Model):
             mrp_planning.message_post(body=message_to_add_pl)
 
     def process_update_pl(self, update_pl, old_planning_line, mrp_planning):
-        if update_pl:
-            update_pl_id = [pl['id'] for pl in update_pl]
+        if not update_pl:
+            return
 
-            for pl in update_pl:
-                for planning in old_planning_line:
-                    if pl['id'] == planning['id']:
-                        position = update_pl_id.index(pl['id'])
-                        value = update_pl[position]['value']
+        update_pl_id = [pl['id'] for pl in update_pl]
 
-                        if 'product_id' in value:
-                            msg = ""
-                            message_to_update_pl = f"<p><b><em> (Planning lines)</em> Packaging Line {planning['packaging_line_id']['name']}, Section {planning['section_id']['name']} : </b></p><ul>"
-                            new_prod = self.env['product.product'].browse(value['product_id'])
-                            msg += f"<li><p><b>{planning['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
-                            message_to_update_pl += msg
-                            mrp_planning.message_post(body=message_to_update_pl)
+        for pl in update_pl:
+            for planning in old_planning_line:
+                if pl['id'] == planning['id']:
+                    position = update_pl_id.index(pl['id'])
+                    value = update_pl[position]['value']
 
-                        message_to_update_pl = f"<p><b><em> (Planning lines)</em> {planning['product_id']['name']} : </b></p><ul>" if 'product_id' not in value else f"<p><b><em> (Planning lines)</em> {self.env['product.product'].browse(value['product_id']).name} : </b></p><ul>"
+                    if 'product_id' in value:
                         msg = ""
-                        if 'packaging_line_id' in value:
-                            new_pack = self.env['mrp.packaging.line'].browse(value['packaging_line_id'])
-                            msg += f"<li><p><b>Packaging line {planning['packaging_line_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Packaging line {new_pack.name}</span></b></p></li>"
-
-                        if 'qty' in value:
-                            msg += f"<li><p><b>Quantity {planning['qty']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Quantity {value['qty']}</span></b></p></li>"
-
-                        if 'section_id' in value:
-                            new_sect = self.env['mrp.section'].browse(value['section_id'])
-                            msg += f"<li><p><b>Section {planning['section_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Section {new_sect.name}</span></b></p></li>"
-
-                        if 'mrp_days' in value:
-
-                            old_day_name = [day['name'] for day in planning['mrp_days']]
-                            new_day_id = [day for dy in value['mrp_days'] for day in dy[2]]
-
-                            new_day_name = []
-                            for ndi in new_day_id:
-                                ndi_name = self.env['mrp.planning.days'].browse(ndi)
-                                new_day_name.append(ndi_name.name)
-
-                            msg += f"<li><p><b>{old_day_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_day_name}</span></b></p></li>"
-                        if 'uom_id' in value:
-                            new_uom = self.env['uom.uom'].browse(value['uom_id'])
-                            msg += f"<li><p><b>{planning['uom_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_uom.name}</span></b></p></li>"
-
-                        message_to_update_pl += f"{msg}"
-
+                        message_to_update_pl = f"<p><b><em> (Planning lines)</em> Packaging Line {planning['packaging_line_id']['name']}, Section {planning['section_id']['name']} : </b></p><ul>"
+                        new_prod = self.env['product.product'].browse(value['product_id'])
+                        msg += f"<li><p><b>{planning['product_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_prod.name}</span></b></p></li>"
+                        message_to_update_pl += msg
                         mrp_planning.message_post(body=message_to_update_pl)
+
+                    message_to_update_pl = f"<p><b><em> (Planning lines)</em> {planning['product_id']['name']} : </b></p><ul>" if 'product_id' not in value else f"<p><b><em> (Planning lines)</em> {self.env['product.product'].browse(value['product_id']).name} : </b></p><ul>"
+                    msg = ""
+                    if 'packaging_line_id' in value:
+                        new_pack = self.env['mrp.packaging.line'].browse(value['packaging_line_id'])
+                        msg += f"<li><p><b>Packaging line {planning['packaging_line_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Packaging line {new_pack.name}</span></b></p></li>"
+
+                    if 'qty' in value:
+                        msg += f"<li><p><b>Quantity {planning['qty']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Quantity {value['qty']}</span></b></p></li>"
+
+                    if 'section_id' in value:
+                        new_sect = self.env['mrp.section'].browse(value['section_id'])
+                        msg += f"<li><p><b>Section {planning['section_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Section {new_sect.name}</span></b></p></li>"
+
+                    if 'mrp_days' in value:
+
+                        old_day_name = [day['name'] for day in planning['mrp_days']]
+                        new_day_id = [day for dy in value['mrp_days'] for day in dy[2]]
+
+                        new_day_name = []
+                        for ndi in new_day_id:
+                            ndi_name = self.env['mrp.planning.days'].browse(ndi)
+                            new_day_name.append(ndi_name.name)
+
+                        msg += f"<li><p><b>{old_day_name} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_day_name}</span></b></p></li>"
+                    if 'uom_id' in value:
+                        new_uom = self.env['uom.uom'].browse(value['uom_id'])
+                        msg += f"<li><p><b>{planning['uom_id']['name']} <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>{new_uom.name}</span></b></p></li>"
+
+                    message_to_update_pl += f"{msg}"
+
+                    mrp_planning.message_post(body=message_to_update_pl)
 
     def process_delete_pl(self, delete_pl, old_planning_line, mrp_planning):
         if not delete_pl:
@@ -940,6 +967,9 @@ class MrpPlanninLine(models.Model):
 
     @api.onchange('product_id')
     def _get_default_bill_of_material(self):
+        code = self.env['ir.config_parameter'].sudo().get_param('mrp_planning.code')
+        # code = self.env.ref('mrp_planning.code')
+        print('le code',code)
         for rec in self:
             if rec.product_id:
                 bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
@@ -1066,9 +1096,9 @@ class MrpDetailPlanningLine(models.Model):
     date = fields.Date(_("Date"), required=1)
     product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
     product_id = fields.Many2one("product.product", string=_("Désignation"), required=True)
-    package = fields.Float(_("Package"))
+    package = fields.Float(_("Package"),digits=(16, 2))
     qty = fields.Float(_("Quantity"), required=1)
-    capacity = fields.Float(_("Capacity"))
+    capacity = fields.Float(_("Capacity"),digits=(16, 2))
     recent_qty = fields.Integer()
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
     state = fields.Selection([
@@ -1121,6 +1151,15 @@ class MrpDetailPlanningLine(models.Model):
 
     def action_replace_product_from_planning(self):
         action = self.env.ref('mrp_planning.action_replace_product').read()[0]
+        val = {
+            'planning_id': self.planning_id,
+            'product_to_replace': self.product_id.id,
+            # 'section': self.section_id,
+            'packaging_line': self.packaging_line_id,
+            'replacement_days': self.env['mrp.planning.days'].search([
+                ('date', '=', self.date)
+            ])
+        }
         action['context'] = {
             'replace_product_from_detailed_planning': self.id
         }
