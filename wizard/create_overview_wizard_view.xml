@@ -6,11 +6,18 @@
             <form>
                 <sheet>
                     <group>
-						<group>
-							<field name="start_date" />
-                            <field name="end_date" />
-						</group>
-					</group>
+                        <group>
+                            <field name="start_date" widget="daterange" options="{'related_end_date': 'end_date'}"/>
+                        </group>
+                        <group>
+                            <field name="end_date" widget="daterange" options="{'related_end_date': 'start_date'}"/>
+                        </group>
+                        <group>
+                            <button name="create_days_overview_wizard" string="Valider" type="object"
+                                    class="oe_highlight"/>
+                        </group>
+                    </group>
+
                     <notebook>
                         <page name="overview_page" string="Overview">
                             <field name="overview_line_ids" widget="one2many">
@@ -55,6 +62,7 @@
                             class="oe_highlight"/>
                     <button string="Annuler" special="cancel"
                             invisible="context.get('total_missing_qty') == 0"/>
+
                 </footer>
             </form>
 

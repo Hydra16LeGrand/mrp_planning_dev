@@ -53,11 +53,8 @@
         'views/mrp_plant.xml',
         'views/stock_picking_type_views.xml',
         'views/stock_quant_package_inherit.xml',
-<<<<<<< HEAD
         'views/res_config_settings.xml',
-=======
         'views/menu_inheritance.xml',
->>>>>>> all_merges
 
     ],
 

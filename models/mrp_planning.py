@@ -182,19 +182,6 @@ class MrpPlanning(models.Model):
 
 
     def create_lines_or_sections(self, element):
-        # self.env['mrp.detail.planning.line'].create([{
-        #     'display_type': "line_section",
-        #     'name': element['date'].strftime('%d-%m-%y'),
-        #     'product_id': element['product_id'],
-        #     'planning_line_id': element['planning_line_id'],
-        #     'section_id': element['section_id'],
-        #     'planning_id': element['planning_id'],
-        #     'package': element['package'],
-        #     'qty': element['qty'],
-        #     'capacity': element['capacity'],
-        #     'packaging_line_id': element['packaging_line_id'],
-        #     'date': date.today(),
-        # }])
 
         self.env['mrp.detail.planning.line'].create([{
             'display_type': "line_section",
@@ -207,7 +194,7 @@ class MrpPlanning(models.Model):
             'qty': element['qty'],
             'capacity': element['capacity'],
             'packaging_line_id': element['packaging_line_id'],
-            'date': date.today(),
+            # 'date': date.today(),
         }])
 
     def group_by_key(self, list_of_dicts, key):
@@ -266,7 +253,7 @@ class MrpPlanning(models.Model):
                             'capacity': val['capacity'],
                             'packaging_line_id': val['packaging_line_id'].id,
                             'planning_line_id': val['planning_line_id'],
-                            'section_id': val['section_id'].id,
+                            # 'section_id': val['section_id'].id,
                             'planning_id': val['planning_id'],
                             'employee_number': ppp_id.employee_number if ppp_id else 0,
                         }
@@ -336,10 +323,10 @@ class MrpPlanning(models.Model):
             'target': 'new',
             "context": {
                 "planning_id": self.id,
-                "overview_ids": self.env["overview.wizard"].search([("planning_id", "=", self.id)]).ids,
             },
         }
         return action
+
 
     def verif_bom(self):
         for pl in self.planning_line_ids:
@@ -1210,7 +1197,7 @@ class MrpDetailPlanningLine(models.Model):
                 rec.capacity, rec.qty = 0, 0
 
     date_char = fields.Char(_("Date"))
-    date = fields.Date(_("Date"), required=1)
+    date = fields.Date(_("Date"))
     product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
     product_id = fields.Many2one("product.product", string=_("Désignation"), required=True)
     package = fields.Float(_("Package"),digits=(16, 2))
@@ -1282,6 +1269,25 @@ class MrpDetailPlanningLine(models.Model):
             'replace_product_from_detailed_planning': self.id
         }
         return action
+
+    def create_days_overview_wizard(self):
+        print("le self", self)
+        print("Le planning",self.planning_id.id)
+        action = {
+            "name": "Raw Material Overview Of Day",
+            "res_model": "overview.wizard",
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            # "view_id": self.env.ref("mrp_planning.view_create_overview_wizard_from").id,
+            'target': 'new',
+            "context": {
+                'planning_ids': self.planning_id.id,
+                'planning_id':self.planning_id.id,
+            }
+
+        }
+        return action
+
 
     # @api.onchange('qty_done')
     # def _onchange_qty_done(self):

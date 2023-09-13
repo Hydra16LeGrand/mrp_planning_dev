@@ -1,21 +1,40 @@
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+from datetime import datetime
+from datetime import timedelta
+
 
 
 class WizardOverview(models.TransientModel):
     _name = 'overview.wizard'
     _description = 'Overview Wizard'
 
-    @api.onchange('start_date')
-    def _get_product_for_one_date(self):
-        date_days = self.env['mrp.detail.planning.line'].search([('date', '=', self.start_date)])
-        print('les donees recuperer', date_days)
-
     planning_id = fields.Many2one("mrp.planning", string=_("Planning"))
     overview_line_ids = fields.One2many("overview.wizard.line", "overview_id", string=_("Overview"))
     plant_id = fields.Many2one("mrp.plant")
-    start_date = fields.Date("Start Date")
-    end_date = fields.Date("End Date")
+    start_date = fields.Date(string=("Start date"),copy=True)
+    end_date = fields.Date(string=("End date"),copy=True)
+
+
+
+    def create_days_overview_wizard(self):
+        print("le self", self)
+        print("Le planning",self.planning_id.id)
+        action = {
+            "name": "Raw Material Overview Of Day",
+            "res_model": "overview.wizard",
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            # "view_id": self.env.ref("mrp_planning.view_create_overview_wizard_from").id,
+            'target': 'new',
+            "context": {
+                'start_date': self.start_date,
+                'end_date':self.end_date,
+            }
+
+        }
+        return action
+
 
     @api.model
     def default_get(self, fields_list):
@@ -23,45 +42,72 @@ class WizardOverview(models.TransientModel):
 
         # On récupère le contexte actuel ainsi que les éléments dans le contexte
         context = self.env.context
-        overview_ids = context.get("overview_ids", [])
         planning = context.get("planning_id")
+        start_date = context.get("start_date", False)
+        end_date = context.get("end_date", False)
+        print("Planning_ids",self.env.context)
+
+        if planning:
+            planning_id = self.env['mrp.planning'].browse(planning)
+
+        elif start_date:
+            planning_id = self.planning_id
+            print("la deucieme action", planning_id)
+
 
 
         # Vérifie s'il y a un ID actif dans le contexte
-        if self.env.context.get('active_id'):
-            # Récupère l'enregistrement du modèle 'mrp.planning' correspondant à l'ID actif
-            planning = self.env['mrp.planning'].browse(self.env.context.get('active_id'))
 
-            # Verif if products of planning have a bill of material
-            verif_bom = planning.verif_bom()
-            # Verif if products of planning have all qty informations necessary
-            verif_product_proportion = planning.verif_product_proportion()
-            if verif_bom:
-                raise ValidationError(
-                    _(
-                        "No bill of material find for %s. Please create a one."
-                        % verif_bom.name
-                    )
-                )
+        # Verif if products of planning have a bill of material
+        verif_bom = planning_id.verif_bom()
+        # Verif if products of planning have all qty informations necessary
+        verif_product_proportion = planning_id.verif_product_proportion()
+        if verif_bom:
+            raise ValidationError(_("No bill of material find for %s. Please create a one."% verif_bom.name))
 
-            if verif_product_proportion:
-                raise ValidationError(
-                    _(
-                        "No quantity found for %s in %s"
-                        % (
-                            verif_product_proportion[0],
-                            verif_product_proportion[1],
-                        )
-                    )
-                )
+        if verif_product_proportion:
+            raise ValidationError(_("No quantity found for %s in %s"% (verif_product_proportion[0],verif_product_proportion[1],)))
 
         overview_line = []
-        for dl in planning.detailed_pl_ids:
+        detailed_pl_ids = planning_id.detailed_pl_ids
+
+        if start_date and not end_date:
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            print("detailed_pl_ids avant", detailed_pl_ids)
+            detailed_pl_ids = detailed_pl_ids.filtered(lambda rec: rec.date == start_date)
+            print("detailed_pl_ids apres", detailed_pl_ids)
+
+            for line in detailed_pl_ids:
+                lines = line.date
+                print("les dates planning line deatils",line.name, line.id )
+
+        elif start_date and end_date:
+            print("dans le elif")
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+            if start_date < planning_id.begin_date:
+                raise ValidationError(_("The date entered in start date is invalid"))
+            elif end_date > planning_id.end_date:
+                raise ValidationError(_("The date entered in end date is invalid"))
+
+            # Utilisez la fonction `timedelta` pour obtenir une liste de dates entre start_date et end_date, y compris ces dates
+            date_range = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
+
+            # Filtrez les enregistrements en vérifiant si la date de chaque enregistrement est dans la plage de dates
+            detailed_pl_ids = detailed_pl_ids.filtered(lambda rec: rec.date in date_range)
+
+            print("detailed_pl_ids entre start_date et end_date inclusivement:", detailed_pl_ids)
+
+        #Dans le elif j'aimerais filtered le element qui sont compris entre strart_date et end_date sachant que entre les deux date il peut il avoir. donc veut filtrer pour tout les jours de start_date jusqua end_date
+
+        for dl in detailed_pl_ids:
             bom_id = self.env["mrp.bom"].search(
                 [("product_tmpl_id", "=", dl.product_id.product_tmpl_id.id)]
             )
+            print("le bom",bom_id)
             bom_id = bom_id[0]
-            temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1), ('plant_id','=',planning.plant_id.id)])
+            temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1), ('plant_id','=',planning_id.plant_id.id)])
             if not temp_stock:
                 raise ValidationError(
                     _("No temp location find. Please configure it or contact support.")
@@ -81,7 +127,6 @@ class WizardOverview(models.TransientModel):
                     ('location_id.usage', '=', 'internal')  # 'internal' pour le stock natif
                 ])
                 main_stock = sum(quant_ids.mapped('quantity'))
-                print("le jour", self.planning_id.week_of)
 
                 # Convert qty about unit of measure. Because of each raw material can have a different unit of measure for bom and storage(same categorie)
                 on_hand_qty = quant.product_uom_id._compute_quantity(
@@ -145,7 +190,7 @@ class WizardOverview(models.TransientModel):
             }))
 
         res.update({
-            'planning_id': planning.id,
+            'planning_id': planning_id.id,
             'overview_line_ids': overview_lines,
         })
 
