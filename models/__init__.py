@@ -10,4 +10,3 @@ from . import stock_location
 from . import mrp_production
 from . import stock_picking
 from . import stock_quant
-from . import mrp_bom

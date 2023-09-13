@@ -75,8 +75,14 @@ class WizardOverview(models.TransientModel):
 				required_qty = dl.qty * line.product_qty / bom_id.product_qty
 				on_hand_qty = on_hand_qty
 
+				if line.location_id.id:
+					location_id = line.location_id.id
+				else:
+					location_id = False
+
 				dico = {
 					'product_id': product_id,
+					'location_id': location_id,
 					'required_qty': required_qty,
 					'on_hand_qty': on_hand_qty,
 					'uom_id': line.product_uom_id.id,
@@ -118,6 +124,7 @@ class WizardOverview(models.TransientModel):
 		for element in overview_line:
 			overview_lines.append((0, 0, {
 				'product_id': element['product_id'],
+				'location_id': element["location_id"],
 				'required_qty': element['required_qty'],
 				'on_hand_qty': element['on_hand_qty'],
 				'missing_qty': element['missing_qty'],
@@ -197,16 +204,31 @@ class WizardOverview(models.TransientModel):
 
 			if data.missing_qty != 0:
 				# Crée un mouvement de stock (stock.move)
-				stock_move = self.env['stock.move'].create({
-					'name': f'Send {data.product_id.name}',
-					'product_id': data.product_id.id,
-					'product_uom_qty': data.qty_to_order,  # Quantité à transférer
-					'product_uom': data.uom_id.id,
-					'location_id': picking_type.default_location_src_id.id,
-					'location_dest_id': stock_tampon_location.id,
-					'picking_type_id': picking_type.id,
-					'picking_id': stock_picking.id,
-				})
+				if data.location_id:
+					print(f"data.location_id : {data.location_id}")
+					stock_move = self.env['stock.move'].create({
+						'name': f'Send {data.product_id.name}',
+						'product_id': data.product_id.id,
+						'product_uom_qty': data.qty_to_order,  # Quantité à transférer
+						'product_uom': data.uom_id.id,
+						'location_id': data.location_id.id,
+						'location_dest_id': stock_tampon_location.id,
+						'picking_type_id': picking_type.id,
+						'picking_id': stock_picking.id,
+					})
+
+				else:
+					print(f"No data.location_id")
+					stock_move = self.env['stock.move'].create({
+						'name': f'Send {data.product_id.name}',
+						'product_id': data.product_id.id,
+						'product_uom_qty': data.qty_to_order,  # Quantité à transférer
+						'product_uom': data.uom_id.id,
+						'location_id': picking_type.default_location_src_id.id,
+						'location_dest_id': stock_tampon_location.id,
+						'picking_type_id': picking_type.id,
+						'picking_id': stock_picking.id,
+					})
 
 		return {
 			'type': 'ir.actions.client',
@@ -224,6 +246,7 @@ class WizardOverviewLine(models.TransientModel):
 	_description = 'Overview Wizard Line'
 	
 	product_id = fields.Many2one("product.product", string=_("Raw materiel"))
+	location_id = fields.Many2one('stock.location', "Location")
 	required_qty = fields.Float(_("Required qty"), digits=(16, 0))
 	on_hand_qty = fields.Float(
 		_("On hand qty"), compute="_compute_on_hand_qty_count", digits=(16, 0))
