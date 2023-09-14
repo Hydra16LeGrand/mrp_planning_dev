@@ -11,8 +11,8 @@
                         <field name="pack_of" readonly="1" force_save="1"/>
                     </tree>
                 </field>
+                <footer invisible="1"/>
             </form>
-            <footer invisible="1"/>
         </field>
     </record>
 <!--    <record id="action_calculating_packs" model="ir.actions.act_window">-->
