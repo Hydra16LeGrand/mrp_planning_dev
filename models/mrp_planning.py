@@ -211,6 +211,7 @@ class MrpPlanning(models.Model):
                     'qty': pline.qty,
                     'capacity': pline.capacity,
                     'product_id': pline.product_id,
+                    'bom_id': pline.bom_id,
                     'packaging_line_id': pline.packaging_line_id,
                     'section_id': pline.section_id,
                     'mrp_days': pline.mrp_days,
@@ -230,6 +231,7 @@ class MrpPlanning(models.Model):
                             'date_char': day['name'],
                             'date': day['date'],
                             'product_id': val['product_id'].id,
+                            'bom_id': val['bom_id'].id,
                             'package': val['package'],
                             'qty': val['qty'],
                             'capacity': val['capacity'],
@@ -1099,6 +1101,7 @@ class MrpPlanninLine(models.Model):
     employee_number = fields.Integer(_("EN"))
 
     product_id = fields.Many2one("product.product", string=_("Article"), required=True)
+    product_domain = fields.Many2many('product.product', compute='_compute_product_domain')
     uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1)
     uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain")
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
@@ -1111,6 +1114,15 @@ class MrpPlanninLine(models.Model):
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
+
+    @api.depends('product_id')
+    def _compute_product_domain(self):
+        for rec in self:
+            boms_ids = self.env['mrp.bom'].search([])
+            print(f'boms_ids: {boms_ids}')
+            all_products = [bom.product_tmpl_id.id for bom in boms_ids]
+            print(f'all_products : {all_products}')
+            rec.product_domain = all_products
 
 
 class MrpDetailPlanningLine(models.Model):
@@ -1181,11 +1193,13 @@ class MrpDetailPlanningLine(models.Model):
     date = fields.Date(_("Date"), required=1)
     product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
     product_id = fields.Many2one("product.product", string=_("Désignation"), required=True)
+    product_domain = fields.Many2many('product.product', compute='_compute_product_domain')
     package = fields.Float(_("Package"))
     qty = fields.Float(_("Quantity"), required=1)
     capacity = fields.Float(_("Capacity"))
     recent_qty = fields.Integer()
-    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
+    bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
     state = fields.Selection([
         ('draft', _("Draft")),
         ('confirmed', _("Confirmed")),
@@ -1248,20 +1262,35 @@ class MrpDetailPlanningLine(models.Model):
             if rec.qty_done > rec.qty:
                 rec.qty_done = False
                 raise UserError(_('The quantity made cannot be greater than the planned quantity'))
-            elif rec.qty == rec.qty_done:
-                if rec.mrp_production_id.reservation_state == 'assigned':
-                    rec.mrp_production_id.qty_producing = rec.qty_done
-                    for move in rec.mrp_production_id.move_raw_ids:
-                        move.quantity_done = move.should_consume_qty
-                else:
-                    raise UserError(_('Unavailability of components, please create supply orders'))
-            elif rec.qty_done < rec.qty:
-                if rec.mrp_production_id.reservation_state == 'assigned':
-                    rec.mrp_production_id.qty_producing = rec.qty_done
-                    for move in rec.mrp_production_id.move_raw_ids:
-                        move.quantity_done = move.should_consume_qty
-                else:
-                    raise UserError(_('Unavailability of components, please create supply orders'))
+            else:
+                rec.mrp_production_id.qty_producing = rec.qty_done
+
+    @api.depends('product_id')
+    def _compute_product_domain(self):
+        for rec in self:
+            boms_ids = self.env['mrp.bom'].search([])
+            print(f'boms_ids: {boms_ids}')
+            all_products = [bom.product_tmpl_id.id for bom in boms_ids]
+            print(f'all_products : {all_products}')
+            rec.product_domain = all_products
+
+    @api.depends('product_id')
+    def _compute_bill_of_material_domain(self):
+        for rec in self:
+            if rec.product_id:
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.id)])
+                rec.bom_domain = [bom.id for bom in boms]
+                print("le boms", rec.bom_domain)
+            else:
+                rec.bom_domain = []
+
+    @api.onchange('product_id')
+    def _get_default_bill_of_material(self):
+        for rec in self:
+            if rec.product_id:
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+                if bom_ids:
+                    rec.bom_id = bom_ids[0]
 
 
 class MrpPlanningDays(models.Model):
