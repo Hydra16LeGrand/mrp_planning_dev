@@ -98,17 +98,6 @@ class MrpPlanning(models.Model):
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
     detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
 
-    # @api.depends('section_ids')
-    # def _compute_section_first(self):
-    #     for rec in self:
-    #         if rec.section_ids:
-    #
-    #             ls = [sect.id for sect in rec.section_ids]
-    #             ls = [sect.id for sect in rec.section_ids]
-    #             rec.section_first = ls[0]
-    #         else:
-    #             rec.section_first = False
-
     @api.depends('section_ids')
     def _compute_section_first(self):
         for rec in self:
@@ -370,7 +359,6 @@ class MrpPlanning(models.Model):
                     "product_uom_id": line.uom_id.id,
                     "date_planned_start": datetime.combine(line.date, datetime.min.time()),
                     "packaging_line_id": line.packaging_line_id.id,
-                    # "section_id": line.section_id.id,
                     "planning_line_id": line.planning_line_id.id,
                     "detailed_pl_id": line.id,
                     "planning_id": self.id,

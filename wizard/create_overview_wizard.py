@@ -25,7 +25,6 @@ class WizardOverview(models.TransientModel):
             "res_model": "overview.wizard",
             "type": "ir.actions.act_window",
             "view_mode": "form",
-            # "view_id": self.env.ref("mrp_planning.view_create_overview_wizard_from").id,
             'target': 'new',
             "context": {
                 'start_date': self.start_date,
@@ -54,10 +53,6 @@ class WizardOverview(models.TransientModel):
             planning_id = self.planning_id
             print("la deucieme action", planning_id)
 
-
-
-        # Vérifie s'il y a un ID actif dans le contexte
-
         # Verif if products of planning have a bill of material
         verif_bom = planning_id.verif_bom()
         # Verif if products of planning have all qty informations necessary
@@ -73,9 +68,7 @@ class WizardOverview(models.TransientModel):
 
         if start_date and not end_date:
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
-            print("detailed_pl_ids avant", detailed_pl_ids)
             detailed_pl_ids = detailed_pl_ids.filtered(lambda rec: rec.date == start_date)
-            print("detailed_pl_ids apres", detailed_pl_ids)
 
             for line in detailed_pl_ids:
                 lines = line.date
@@ -137,8 +130,6 @@ class WizardOverview(models.TransientModel):
                 required_qty = dl.qty * line.product_qty
                 on_hand_qty = on_hand_qty
 
-                print("la valeur du champ main_stock:", main_stock)
-
                 dico = {
                     'product_id': product_id,
                     'required_qty': required_qty,
@@ -163,7 +154,6 @@ class WizardOverview(models.TransientModel):
 
                 overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
                 overview['required_qty'] = required_qty
-                print('Operation', overview['required_qty'] - (overview['on_hand_qty'] + overview['main_stock']))
                 overview['missing_qty'] = (
                     overview['required_qty'] - overview['on_hand_qty'] + overview['main_stock']
                     if overview['on_hand_qty'] + overview['main_stock'] < overview['required_qty']

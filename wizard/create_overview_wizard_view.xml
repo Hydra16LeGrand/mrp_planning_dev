@@ -5,19 +5,18 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
-                    <group>
-                        <group>
+                    <group class="oe_box" style="display: flex;">
+                        <group style="flex: 1;">
                             <field name="start_date" widget="daterange" options="{'related_end_date': 'end_date'}"/>
                         </group>
-                        <group>
+                        <group style="flex: 1;">
                             <field name="end_date" widget="daterange" options="{'related_end_date': 'start_date'}"/>
                         </group>
-                        <group>
+                        <group style="flex: 1;">
                             <button name="create_days_overview_wizard" string="Valider" type="object"
                                     class="oe_highlight"/>
                         </group>
                     </group>
-
                     <notebook>
                         <page name="overview_page" string="Overview">
                             <field name="overview_line_ids" widget="one2many">
