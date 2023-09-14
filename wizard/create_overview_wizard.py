@@ -25,16 +25,16 @@ class WizardOverview(models.TransientModel):
 			planning = self.env['mrp.planning'].browse(self.env.context.get('active_id'))
 
 			# Verif if products of planning have a bill of material
-			verif_bom = planning.verif_bom()
+			# verif_bom = planning.verif_bom()
 			# Verif if products of planning have all qty informations necessary
 			verif_product_proportion = planning.verif_product_proportion()
-			if verif_bom:
-				raise ValidationError(
-					_(
-						"No bill of material find for %s. Please create a one."
-						% verif_bom.name
-					)
-				)
+			# if verif_bom:
+			# 	raise ValidationError(
+			# 		_(
+			# 			"No bill of material find for %s. Please create a one."
+			# 			% verif_bom.name
+			# 		)
+			# 	)
 
 			if verif_product_proportion:
 				raise ValidationError(
@@ -49,17 +49,17 @@ class WizardOverview(models.TransientModel):
 
 		overview_line = []
 		for dl in planning.detailed_pl_ids:
-			bom_id = self.env["mrp.bom"].search(
-				[("product_tmpl_id", "=", dl.product_id.product_tmpl_id.id)]
-			)
-			bom_id = bom_id[0]
+			# bom_id = self.env["mrp.bom"].search(
+			# 	[("product_tmpl_id", "=", dl.product_id.product_tmpl_id.id)]
+			# )
+			# bom_id = bom_id[0]
 			temp_stock = self.env["stock.location"].search([("temp_stock", "=", 1), ('plant_id', '=', planning.plant_id.id)])
 			if not temp_stock:
 				raise ValidationError(
 					_("No temp location find. Please configure it or contact support.")
 				)
 
-			for line in bom_id.bom_line_ids:
+			for line in dl.bom_id.bom_line_ids:
 				quant = self.env["stock.quant"].search(
 					[
 						("product_id", "=", line.product_id.id),
@@ -72,7 +72,7 @@ class WizardOverview(models.TransientModel):
 				)
 
 				product_id = line.product_id.id
-				required_qty = dl.qty * line.product_qty / bom_id.product_qty
+				required_qty = dl.qty * line.product_qty / dl.bom_id.product_qty
 				on_hand_qty = on_hand_qty
 
 				if line.location_id.id:

@@ -332,12 +332,12 @@ class MrpPlanning(models.Model):
         }
         return action
 
-    def verif_bom(self):
-        for pl in self.planning_line_ids:
-            if not self.env["mrp.bom"].search([('product_tmpl_id', '=', pl.product_id.product_tmpl_id.id)]):
-                return pl.product_id
-
-        return False
+    # def verif_bom(self):
+    #     for pl in self.planning_line_ids:
+    #         if not self.env["mrp.bom"].search([('product_tmpl_id', '=', pl.product_id.product_tmpl_id.id)]):
+    #             return pl.product_id
+    #
+    #     return False
 
     def verif_product_proportion(self):
         for pl in self.planning_line_ids:
@@ -351,25 +351,25 @@ class MrpPlanning(models.Model):
     def generate_mo(self):
 
         # Verif if products of planning have a bill of material
-        verif_bom = self.verif_bom()
+        # verif_bom = self.verif_bom()
         picking_type_id = self.env['stock.picking.type'].search(
             [('plant_id', '=', self.plant_id.id), ('code', '=', 'mrp_operation')])
-        if verif_bom:
-            raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
+        # if verif_bom:
+        #     raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
 
         if not picking_type_id.default_location_src_id or not picking_type_id.default_location_dest_id:
             raise ValidationError(
                 _(f"Please configure the picking type '{picking_type_id.name}' locations before this action."))
 
         for line in self.detailed_pl_ids:
-            if line.display_type == False:
-                bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
-                bom_id = bom_id[0]
-                qty = line.uom_id._compute_quantity(line.qty, bom_id.product_uom_id)
+            if not line.display_type:
+                # bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
+                # bom_id = bom_id[0]
+                qty = line.uom_id._compute_quantity(line.qty, line.bom_id.product_uom_id)
                 production = self.env['mrp.production'].create({
                     "product_id": line.product_id.id,
                     "product_ref": line.product_id.name,
-                    "bom_id": bom_id.id,
+                    "bom_id": line.bom_id.id,
                     "product_qty": qty,
                     "product_uom_id": line.uom_id.id,
                     "date_planned_start": datetime.combine(line.date, datetime.min.time()),
@@ -547,6 +547,7 @@ class MrpPlanning(models.Model):
                 'qty': line.qty,
                 'capacity': line.capacity,
                 'product_id': line.product_id.id,
+                'bom_id': line.bom_id.id,
                 'uom_id': line.uom_id.id,
                 'uom_domain': [(6, 0, line.uom_domain.ids)],
                 'packaging_line_id': line.packaging_line_id.id,
@@ -1152,9 +1153,9 @@ class MrpDetailPlanningLine(models.Model):
     @api.onchange('qty')
     def _update_quantity_variants_onchange_qty(self):
         for rec in self:
-            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-            if bom_ids:
-                rec.bom_id = bom_ids[0]
+            # bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            # if bom_ids:
+            #     rec.bom_id = bom_ids[0]
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 rec.recent_qty = rec.qty
                 rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
@@ -1165,9 +1166,9 @@ class MrpDetailPlanningLine(models.Model):
     @api.onchange('capacity')
     def _update_quantity_variants_onchange_capacity(self):
         for rec in self:
-            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-            if bom_ids:
-                rec.bom_id = bom_ids[0]
+            # bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            # if bom_ids:
+            #     rec.bom_id = bom_ids[0]
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 # print("Affectation qty 2", rec.recent_qty, rec.qty)
                 if rec.qty != rec.recent_qty:
@@ -1179,9 +1180,9 @@ class MrpDetailPlanningLine(models.Model):
     @api.onchange('package')
     def _update_quantity_variants_onchange_package(self):
         for rec in self:
-            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-            if bom_ids:
-                rec.bom_id = bom_ids[0]
+            # bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            # if bom_ids:
+            #     rec.bom_id = bom_ids[0]
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 if rec.recent_qty != rec.qty:
                     rec.qty = rec.package * rec.bom_id.packing
@@ -1228,18 +1229,18 @@ class MrpDetailPlanningLine(models.Model):
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
     qty_done = fields.Integer(_("Quantity done"))
 
-    # def action_manage_production(self):
-    #     production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
-    #     action = {
-    #         "name": f"Manufacturing order",
-    #         "type": "ir.actions.act_window",
-    #         "res_model": "mrp.production",
-    #         "view_mode": "form",
-    #         "res_id": production_id.id,
-    #         "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
-    #         "target": "new",
-    #     }
-    #     return action
+    def action_manage_production(self):
+        production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
+        action = {
+            "name": f"Manufacturing order",
+            "type": "ir.actions.act_window",
+            "res_model": "mrp.production",
+            "view_mode": "form",
+            "res_id": production_id.id,
+            "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
+            "target": "new",
+        }
+        return action
 
     def unlink(self):
         for rec in self:
