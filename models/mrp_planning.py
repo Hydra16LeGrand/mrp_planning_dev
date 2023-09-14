@@ -211,6 +211,7 @@ class MrpPlanning(models.Model):
                     'qty': pline.qty,
                     'capacity': pline.capacity,
                     'product_id': pline.product_id,
+                    'bom_id': pline.bom_id,
                     'packaging_line_id': pline.packaging_line_id,
                     'section_id': pline.section_id,
                     'mrp_days': pline.mrp_days,
@@ -230,6 +231,7 @@ class MrpPlanning(models.Model):
                             'date_char': day['name'],
                             'date': day['date'],
                             'product_id': val['product_id'].id,
+                            'bom_id': val['bom_id'].id,
                             'package': val['package'],
                             'qty': val['qty'],
                             'capacity': val['capacity'],
@@ -330,12 +332,12 @@ class MrpPlanning(models.Model):
         }
         return action
 
-    def verif_bom(self):
-        for pl in self.planning_line_ids:
-            if not self.env["mrp.bom"].search([('product_tmpl_id', '=', pl.product_id.product_tmpl_id.id)]):
-                return pl.product_id
-
-        return False
+    # def verif_bom(self):
+    #     for pl in self.planning_line_ids:
+    #         if not self.env["mrp.bom"].search([('product_tmpl_id', '=', pl.product_id.product_tmpl_id.id)]):
+    #             return pl.product_id
+    #
+    #     return False
 
     def verif_product_proportion(self):
         for pl in self.planning_line_ids:
@@ -349,25 +351,25 @@ class MrpPlanning(models.Model):
     def generate_mo(self):
 
         # Verif if products of planning have a bill of material
-        verif_bom = self.verif_bom()
+        # verif_bom = self.verif_bom()
         picking_type_id = self.env['stock.picking.type'].search(
             [('plant_id', '=', self.plant_id.id), ('code', '=', 'mrp_operation')])
-        if verif_bom:
-            raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
+        # if verif_bom:
+        #     raise ValidationError(_("No bill of material find for %s. Please create a one." % verif_bom.name))
 
         if not picking_type_id.default_location_src_id or not picking_type_id.default_location_dest_id:
             raise ValidationError(
                 _(f"Please configure the picking type '{picking_type_id.name}' locations before this action."))
 
         for line in self.detailed_pl_ids:
-            if line.display_type == False:
-                bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
-                bom_id = bom_id[0]
-                qty = line.uom_id._compute_quantity(line.qty, bom_id.product_uom_id)
+            if not line.display_type:
+                # bom_id = self.env["mrp.bom"].search([('product_tmpl_id', '=', line.product_id.product_tmpl_id.id)])
+                # bom_id = bom_id[0]
+                qty = line.uom_id._compute_quantity(line.qty, line.bom_id.product_uom_id)
                 production = self.env['mrp.production'].create({
                     "product_id": line.product_id.id,
                     "product_ref": line.product_id.name,
-                    "bom_id": bom_id.id,
+                    "bom_id": line.bom_id.id,
                     "product_qty": qty,
                     "product_uom_id": line.uom_id.id,
                     "date_planned_start": datetime.combine(line.date, datetime.min.time()),
@@ -545,6 +547,7 @@ class MrpPlanning(models.Model):
                 'qty': line.qty,
                 'capacity': line.capacity,
                 'product_id': line.product_id.id,
+                'bom_id': line.bom_id.id,
                 'uom_id': line.uom_id.id,
                 'uom_domain': [(6, 0, line.uom_domain.ids)],
                 'packaging_line_id': line.packaging_line_id.id,
@@ -1099,6 +1102,7 @@ class MrpPlanninLine(models.Model):
     employee_number = fields.Integer(_("EN"))
 
     product_id = fields.Many2one("product.product", string=_("Article"), required=True)
+    product_domain = fields.Many2many('product.product', compute='_compute_product_domain')
     uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1)
     uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain")
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
@@ -1111,6 +1115,15 @@ class MrpPlanninLine(models.Model):
     planning_id = fields.Many2one("mrp.planning")
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
+
+    @api.depends('product_id')
+    def _compute_product_domain(self):
+        for rec in self:
+            boms_ids = self.env['mrp.bom'].search([])
+            print(f'boms_ids: {boms_ids}')
+            all_products = [bom.product_tmpl_id.id for bom in boms_ids]
+            print(f'all_products : {all_products}')
+            rec.product_domain = all_products
 
 
 class MrpDetailPlanningLine(models.Model):
@@ -1140,9 +1153,9 @@ class MrpDetailPlanningLine(models.Model):
     @api.onchange('qty')
     def _update_quantity_variants_onchange_qty(self):
         for rec in self:
-            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-            if bom_ids:
-                rec.bom_id = bom_ids[0]
+            # bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            # if bom_ids:
+            #     rec.bom_id = bom_ids[0]
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 rec.recent_qty = rec.qty
                 rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
@@ -1153,9 +1166,9 @@ class MrpDetailPlanningLine(models.Model):
     @api.onchange('capacity')
     def _update_quantity_variants_onchange_capacity(self):
         for rec in self:
-            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-            if bom_ids:
-                rec.bom_id = bom_ids[0]
+            # bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            # if bom_ids:
+            #     rec.bom_id = bom_ids[0]
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 # print("Affectation qty 2", rec.recent_qty, rec.qty)
                 if rec.qty != rec.recent_qty:
@@ -1167,9 +1180,9 @@ class MrpDetailPlanningLine(models.Model):
     @api.onchange('package')
     def _update_quantity_variants_onchange_package(self):
         for rec in self:
-            bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
-            if bom_ids:
-                rec.bom_id = bom_ids[0]
+            # bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+            # if bom_ids:
+            #     rec.bom_id = bom_ids[0]
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 if rec.recent_qty != rec.qty:
                     rec.qty = rec.package * rec.bom_id.packing
@@ -1181,11 +1194,13 @@ class MrpDetailPlanningLine(models.Model):
     date = fields.Date(_("Date"), required=1)
     product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
     product_id = fields.Many2one("product.product", string=_("Désignation"), required=True)
+    product_domain = fields.Many2many('product.product', compute='_compute_product_domain')
     package = fields.Float(_("Package"))
     qty = fields.Float(_("Quantity"), required=1)
     capacity = fields.Float(_("Capacity"))
     recent_qty = fields.Integer()
-    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"))
+    bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
     state = fields.Selection([
         ('draft', _("Draft")),
         ('confirmed', _("Confirmed")),
@@ -1214,18 +1229,18 @@ class MrpDetailPlanningLine(models.Model):
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
     qty_done = fields.Integer(_("Quantity done"))
 
-    # def action_manage_production(self):
-    #     production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
-    #     action = {
-    #         "name": f"Manufacturing order",
-    #         "type": "ir.actions.act_window",
-    #         "res_model": "mrp.production",
-    #         "view_mode": "form",
-    #         "res_id": production_id.id,
-    #         "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
-    #         "target": "new",
-    #     }
-    #     return action
+    def action_manage_production(self):
+        production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
+        action = {
+            "name": f"Manufacturing order",
+            "type": "ir.actions.act_window",
+            "res_model": "mrp.production",
+            "view_mode": "form",
+            "res_id": production_id.id,
+            "views": [(self.env.ref('mrp.mrp_production_form_view').id, 'form')],
+            "target": "new",
+        }
+        return action
 
     def unlink(self):
         for rec in self:
@@ -1248,20 +1263,35 @@ class MrpDetailPlanningLine(models.Model):
             if rec.qty_done > rec.qty:
                 rec.qty_done = False
                 raise UserError(_('The quantity made cannot be greater than the planned quantity'))
-            elif rec.qty == rec.qty_done:
-                if rec.mrp_production_id.reservation_state == 'assigned':
-                    rec.mrp_production_id.qty_producing = rec.qty_done
-                    for move in rec.mrp_production_id.move_raw_ids:
-                        move.quantity_done = move.should_consume_qty
-                else:
-                    raise UserError(_('Unavailability of components, please create supply orders'))
-            elif rec.qty_done < rec.qty:
-                if rec.mrp_production_id.reservation_state == 'assigned':
-                    rec.mrp_production_id.qty_producing = rec.qty_done
-                    for move in rec.mrp_production_id.move_raw_ids:
-                        move.quantity_done = move.should_consume_qty
-                else:
-                    raise UserError(_('Unavailability of components, please create supply orders'))
+            else:
+                rec.mrp_production_id.qty_producing = rec.qty_done
+
+    @api.depends('product_id')
+    def _compute_product_domain(self):
+        for rec in self:
+            boms_ids = self.env['mrp.bom'].search([])
+            print(f'boms_ids: {boms_ids}')
+            all_products = [bom.product_tmpl_id.id for bom in boms_ids]
+            print(f'all_products : {all_products}')
+            rec.product_domain = all_products
+
+    @api.depends('product_id')
+    def _compute_bill_of_material_domain(self):
+        for rec in self:
+            if rec.product_id:
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.id)])
+                rec.bom_domain = [bom.id for bom in boms]
+                print("le boms", rec.bom_domain)
+            else:
+                rec.bom_domain = []
+
+    @api.onchange('product_id')
+    def _get_default_bill_of_material(self):
+        for rec in self:
+            if rec.product_id:
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', self.product_id.id)])
+                if bom_ids:
+                    rec.bom_id = bom_ids[0]
 
 
 class MrpPlanningDays(models.Model):

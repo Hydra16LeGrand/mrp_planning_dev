@@ -18,8 +18,8 @@
                             attrs="{'invisible': [('state','not in',('04_mo_generated','confirm'))]}"/>
                     <button name="%(mrp_planning.action_report_planning_details)d" string="Print Planning" type="action"
                             attrs="{'invisible': [('state', '=', 'draft')]}"/>
-                    <button name="action_product_replacement" type="object" string="Replace product"
-                            attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary"/>
+<!--                    <button name="action_product_replacement" type="object" string="Replace product"-->
+<!--                            attrs="{'invisible': [('state', 'not in', ['04_mo_generated'])]}" class="btn-primary"/>-->
                     <button name="action_mark_productions_as_done" type="object" string="FINALIZE PRODUCTION"
                             class="btn-warning"
                             confirm="This action will complete all manufacturing orders process in this planning. Proceed?"
@@ -79,8 +79,9 @@
                                    attrs="{'readonly': [('state', 'not in', ['draft'])]}"
                                    context="{'default_section_id':section_first, 'default_begin_date':begin_date, 'default_end_date': end_date}">
                                 <tree editable="bottom">
+                                    <field name="product_domain" invisible="1"/>
                                     <field name="product_id" options="{'no_create': 1, 'no_open': 1}"
-                                           domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]"/>
+                                           domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products']), ('id', 'in', product_domain)]"/>
                                     <field name="packaging_line_domain" invisible="1"/>
                                     <field name="packaging_line_first" invisible="1"/>
                                     <field name="bom_domain" invisible="1"/>
@@ -154,7 +155,8 @@
                                         <group>
                                             <group attrs="{'invisible': [('display_type', '!=', False)]}">
                                                 <field name="packaging_line_id" string="Packaging Line ID"/>
-                                                <field name="product_id" string="Product ID"/>
+                                                <field name="product_domain" invisible="1"/>
+                                                <field name="product_id" string="Product ID" domain="[('id', 'in', product_domain)]"/>
                                                 <field name="package" string="Package"/>
                                             </group>
                                             <group attrs="{'invisible': [('display_type', '!=', False)]}">
@@ -185,24 +187,36 @@
                                     <field name="display_type" invisible="1"/>
                                     <field name="name" readonly="1" string=" " style="width:80%%"/>
                                     <field name="product_ref"/>
+                                    <field name="product_domain" invisible="1"/>
                                     <field name="product_id"
-                                           domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products'])]"
-                                           optional="show"/>
+                                           domain="[('detailed_type_custom', 'in', ['final_product', 'packaging', 'semi_finished_products']), ('id', 'in', product_domain)]"
+                                           optional="show"
+                                           options="{'no_open': 1, 'no_create': 1}"
+                                           attrs="{'readonly': [('state', '=', 'done')]}"
+                                    />
+                                    <field name="bom_domain" invisible="1"/>
+                                    <field name="bom_id" domain="[('id', 'in', bom_domain)]" options="{'no_create': 1}"
+                                           optional="hide"/>
                                     <field name="packaging_line_domain" invisible="1"/>
                                     <field name="packaging_line_id" optional="show"
                                            options="{'no_open': 1, 'no_create': 1}"
-                                           domain="[('id', 'in', packaging_line_domain)]"/>
-                                    <field name="section_id" optional="show" options="{'no_open': 1, 'no_create': 1}"
-                                           domain="[('id', 'in', parent.section_ids)]"/>
+                                           domain="[('id', 'in', packaging_line_domain)]"
+                                           attrs="{'readonly': [('state', '=', 'done')]}"
+                                    />
+                                    <field name="section_id" optional="show"
+                                           options="{'no_open': 1, 'no_create': 1}"
+                                           domain="[('id', 'in', parent.section_ids)]"
+                                           attrs="{'readonly': [('state', '=', 'done')]}"
+                                    />
                                     <field name="mrp_production_id" string="Order" optional="hide"
                                            attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated')]}"/>
-                                    <field name="package"/>
-                                    <field name="qty"/>
+                                    <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="qty" attrs="{'readonly': [('state', '=', 'done')]}"/>
 <!--                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>-->
-                                    <field name="qty_done" string="Quantity done" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"/>
-                                    <field name="capacity"/>
-                                    <field name="employee_number" optional="hide"/>
-                                    <field name="date"/>
+                                    <field name="qty_done" string="Quantity done" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])], 'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="employee_number" optional="hide" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="date" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="state"
                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"
                                            widget="badge" decoration-info="state == 'draft'"
@@ -212,9 +226,9 @@
 <!--                                    <button name="action_manage_production" type="object" title="Manage Production"-->
 <!--                                            icon="fa-flask"-->
 <!--                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"/>-->
-                                    <button name="action_replace_product_from_planning" type="object"
-                                            title="Replace Product" icon="fa-retweet"
-                                            attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}"/>
+<!--                                    <button name="action_replace_product_from_planning" type="object"-->
+<!--                                            title="Replace Product" icon="fa-retweet"-->
+<!--                                            attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}"/>-->
                                 </tree>
                             </field>
                         </page>
