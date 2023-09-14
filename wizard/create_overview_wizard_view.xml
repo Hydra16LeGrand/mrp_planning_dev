@@ -5,6 +5,18 @@
         <field name="arch" type="xml">
             <form>
                 <sheet>
+                    <group class="oe_box" style="display: flex;">
+                        <group style="flex: 1;">
+                            <field name="start_date" widget="daterange" options="{'related_end_date': 'end_date'}"/>
+                        </group>
+                        <group style="flex: 1;">
+                            <field name="end_date" widget="daterange" options="{'related_end_date': 'start_date'}"/>
+                        </group>
+                        <group style="flex: 1;">
+                            <button name="create_days_overview_wizard" string="Valider" type="object"
+                                    class="oe_highlight"/>
+                        </group>
+                    </group>
                     <notebook>
                         <page name="overview_page" string="Overview">
                             <field name="overview_line_ids" widget="one2many">
@@ -15,6 +27,7 @@
                                     <field name="on_hand_qty"/>
                                     <field name="missing_qty"/>
                                     <field name="qty_to_order"/>
+                                    <field name="main_stock"/>
                                     <field name="uom_id"/>
                                     <field name="bom_ids" invisible="1" widget="many2many_tags"/>
                                 </tree>
@@ -49,6 +62,7 @@
                             class="oe_highlight"/>
                     <button string="Annuler" special="cancel"
                             invisible="context.get('total_missing_qty') == 0"/>
+
                 </footer>
             </form>
 

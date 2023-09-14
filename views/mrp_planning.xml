@@ -45,6 +45,7 @@
                             <field string="Supply order(s)" name="internal_transfer_count"
                                    widget="statinfo"/>
                         </button>
+
                     </div>
                     <div class="oe_title">
                         <h1>
@@ -54,9 +55,9 @@
                     <group>
                         <group>
                             <field name="plant_id" options="{'no_open': 1, 'no_create': 1}" invisible="1"/>
-                            <field name="section_ids" widget="many2many_tags"
+                            <field name="section_ids"
                                    attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
-                            <field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+<!--                            <field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>-->
                             <field name="section_first" invisible="1"/>
                         </group>
                         <group class="oe_inline">
@@ -89,8 +90,6 @@
                                            optional="hide"/>
                                     <field name="packaging_line_id" domain="[('id', 'in', packaging_line_domain)]"
                                            options="{'no_create': 1}"/>
-                                    <field name="section_id" options="{'no_open': 1, 'no_create': 1}"
-                                           domain="[('id', 'in', parent.section_ids)]"/>
                                     <field name="package"/>
                                     <field name="qty"/>
                                     <field name="capacity"/>
@@ -117,8 +116,6 @@
                                                 <field name="packaging_line_id"
                                                        domain="[('id', 'in', packaging_line_domain)]"
                                                        options="{'no_create': 1}"/>
-                                                <field name="section_id" options="{'no_open': 1, 'no_create': 1}"
-                                                       domain="[('id', 'in', parent.section_ids)]"/>
 
                                             </group>
                                             <group>
@@ -179,12 +176,17 @@
 <!--                                        <label for="name" string="Packaging line section"-->
 <!--                                               attrs="{'invisible': [('display_type', '!=', 'line_note')]}"/>-->
                                         <field name="name" readonly="1" string=" " style="width:80%%"/>
+                                        <field name="date" invisible="0"/>
+                                        <button name="create_days_overview_wizard" type="object"
+                                            string="Bill of manufacturing" icon="fa-flask" context="{'overview_date': date}"/>
                                     </sheet>
                                 </form>
+
                                 <tree editable="bottom" create="False" limit="500">
                                     <field name="planning_line_id" invisible="1"/>
                                     <field name="planning_id" invisible="1"/>
                                     <field name="display_type" invisible="1"/>
+                                    <field name ="id"/>
                                     <field name="name" readonly="1" string=" " style="width:80%%"/>
                                     <field name="product_ref"/>
                                     <field name="product_domain" invisible="1"/>
@@ -200,14 +202,8 @@
                                     <field name="packaging_line_domain" invisible="1"/>
                                     <field name="packaging_line_id" optional="show"
                                            options="{'no_open': 1, 'no_create': 1}"
-                                           domain="[('id', 'in', packaging_line_domain)]"
-                                           attrs="{'readonly': [('state', '=', 'done')]}"
-                                    />
-                                    <field name="section_id" optional="show"
-                                           options="{'no_open': 1, 'no_create': 1}"
-                                           domain="[('id', 'in', parent.section_ids)]"
-                                           attrs="{'readonly': [('state', '=', 'done')]}"
-                                    />
+                                           domain="[('id', 'in', packaging_line_domain)]"/>
+
                                     <field name="mrp_production_id" string="Order" optional="hide"
                                            attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated')]}"/>
                                     <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
@@ -230,6 +226,8 @@
 <!--                                            title="Replace Product" icon="fa-retweet"-->
 <!--                                            attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}"/>-->
                                 </tree>
+
+
                             </field>
                         </page>
                     </notebook>
@@ -248,8 +246,8 @@
         <field name="arch" type="xml">
             <tree default_order="create_date DESC">
                 <field name="reference"/>
-                <field name="code"/>
-                <field name="section_ids" widget="many2many_tags"/>
+<!--                <field name="code"/>-->
+                <field name="section_ids"/>
 
                 <field name="state" widget="badge" decoration-info="state == 'draft'"
                        decoration-danger="state == 'cancel'" decoration-warning="state == 'confirm'"
