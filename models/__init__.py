@@ -11,5 +11,4 @@ from . import mrp_production
 from . import stock_picking
 from . import stock_quant
 from . import uom_uom_inherit
-from . import mrp_bom
 from . import res_config_settings
