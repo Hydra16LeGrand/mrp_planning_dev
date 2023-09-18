@@ -46,7 +46,6 @@ class WizardOverview(models.TransientModel):
 
 		elif start_date:
 			planning_id = self.planning_id
-			print("la deucieme action", planning_id)
 
 		# Verif if products of planning have a bill of material
 		verif_product_proportion = planning_id.verif_product_proportion()
@@ -54,7 +53,6 @@ class WizardOverview(models.TransientModel):
 		if verif_product_proportion:
 			raise ValidationError(_("No quantity found for %s in %s"% (verif_product_proportion[0],verif_product_proportion[1],)))
 
-		overview_line = []
 		detailed_pl_ids = planning_id.detailed_pl_ids.filtered(lambda self: self.date != False)
 
 		if start_date and not end_date:
@@ -63,28 +61,23 @@ class WizardOverview(models.TransientModel):
 
 			for line in detailed_pl_ids:
 				lines = line.date
-				print("les dates planning line deatils",line.name, line.id )
 
 		elif start_date and end_date:
-			print("dans le elif")
 			start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
 			end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
 
-			if start_date < planning_id.begin_date:
-				raise ValidationError(_("The date entered in start date is invalid"))
-			elif end_date > planning_id.end_date:
-				raise ValidationError(_("The date entered in end date is invalid"))
+			# if start_date < planning_id.begin_date:
+			# 	raise ValidationError(_("The date entered in start date is invalid"))
+			# elif end_date > planning_id.end_date:
+			# 	raise ValidationError(_("The date entered in end date is invalid"))
 
 			# Utilisez la fonction `timedelta` pour obtenir une liste de dates entre start_date et end_date, y compris ces dates
 			date_range = [start_date + timedelta(days=i) for i in range((end_date - start_date).days + 1)]
 			# Filtrez les enregistrements en vérifiant si la date de chaque enregistrement est dans la plage de dates
-			print("Date range=============", detailed_pl_ids)
 			detailed_pl_ids = detailed_pl_ids.filtered(lambda rec: rec.date in date_range)
-			print("detailed_pl_ids --------", detailed_pl_ids)
 
-		# Dans le elif j'aimerais filtered le element qui sont compris entre strart_date et end_date sachant que entre les deux date il peut il avoir. 
-		# Donc veut filtrer pour tout les jours de start_date jusqua end_date
-
+		# Get needs line for operation processing
+		overview_line = []
 		for dl in detailed_pl_ids:
 
 			bom_id = dl.bom_id
@@ -94,58 +87,61 @@ class WizardOverview(models.TransientModel):
 					_("No temp location find. Please configure it or contact support.")
 				)
 
+			
 			for line in bom_id.bom_line_ids:
-				quant = self.env["stock.quant"].search(
+
+				# Get temp stock quantity
+				temp_stock_quant_ids = self.env["stock.quant"].search(
 					[
 						("product_id", "=", line.product_id.id),
 						("location_id", "=", temp_stock.id),
 					]
 				)
-
-
-				quant_ids = self.env['stock.quant'].search([
-					('product_id', '=', line.product_id.id),
-					('location_id.usage', '=', 'internal')  # 'internal' pour le stock natif
-				])
-				main_stock = sum(quant_ids.mapped('quantity'))
+				temp_stock_quant_qty = sum(temp_stock_quant_ids.mapped('quantity'))
 
 				# Convert qty about unit of measure. Because of each raw material can have a different unit of measure for bom and storage(same categorie)
-				on_hand_qty = quant.product_uom_id._compute_quantity(
-					quant.available_quantity, line.product_uom_id
+				on_hand_qty = temp_stock_quant_ids[0].product_uom_id._compute_quantity(
+					temp_stock_quant_qty, line.product_uom_id
 				)
 
-				product_id = line.product_id.id
+				# Get reception stock quantity
+				reception_stock_quant_ids = self.env['stock.quant'].search([
+					('product_id', '=', line.product_id.id),
+					('location_id.replenish_location', '=', True)  # 'internal' pour le stock natif
+				])
+				main_stock_qty = sum(reception_stock_quant_ids.mapped('quantity'))
+				
 				required_qty = dl.qty * line.product_qty
 				on_hand_qty = on_hand_qty
-
 				dico = {
-					'product_id': product_id,
+					'product_id': line.product_id.id,
 					'required_qty': required_qty,
 					'on_hand_qty': on_hand_qty,
-					'main_stock': main_stock,
+					'main_stock_qty': main_stock_qty,
 					'uom_id': line.product_uom_id.id,
 					'location_id': line.location_id.id,
 					'bom_id': line.bom_id.id,
 				}
 				overview_line.append(dico)
 
+		print("Dico", overview_line)
 		# Delete duplicate lines and accumulate all of products required_qty
 		product_use_ids = []
 		overview_to_unlink = []
 		for overview in overview_line:
 			if not overview['product_id'] in product_use_ids:
 				product_use_ids.append(overview['product_id'])
-				ov_by_products = [planning for planning in overview_line if
-								  planning['product_id'] == overview['product_id']]
+				ov_by_products = [ovl for ovl in overview_line if
+								  ovl['product_id'] == overview['product_id']]
 				required_qty = 0
 				for line in ov_by_products:
 					required_qty += line['required_qty']
-
+				print('required_qty in ovl -------------', ov_by_products)
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
 				overview['required_qty'] = required_qty
 				overview['missing_qty'] = (
-					overview['required_qty'] - overview['on_hand_qty'] + overview['main_stock']
-					if overview['on_hand_qty'] + overview['main_stock'] < overview['required_qty']
+					overview['required_qty'] - overview['on_hand_qty'] + overview['main_stock_qty']
+					if overview['on_hand_qty'] + overview['main_stock_qty'] < overview['required_qty']
 					else 0
 				)
 			else:
@@ -181,31 +177,24 @@ class WizardOverview(models.TransientModel):
 
 		context = self.env.context
 		overview_ids = context.get("overview_ids", [])
-		planning_id = context.get("planning_id", False)
+		planning_id = self.env["mrp.planning"].browse(context.get("planning_id"))
 
 		if not planning_id:
-			raise ValidationError(_("Error during processing this action. If persist, contact support."))
-
-		# Récupère l'enregistrement du modèle 'mrp.planning' correspondant à l'ID de planning
-		planning_id = self.env["mrp.planning"].browse(planning_id)
-
-		# On peut maintenant accéder aux informations du planning
+			raise ValidationError(_("Error during processing this action. If persist, contact support."))		
 
 		# Recherche le type de transfert 'internal'
 		picking_type = self.env['stock.picking.type'].search(
 			[('code', '=', 'internal'), ('plant_id', '=', planning_id.plant_id.id)])
-
-		# Recherche des bons de livraison existants liés au planning
-		existing_pickings = self.env['stock.picking'].search([
-			('state', 'not in', ['cancel', 'done']),
-			('planning_id', '=', planning_id.id)
-		])
-		# Annule les bons de livraison existants
-		existing_pickings.action_cancel()
-
 		if not picking_type:
 			raise ValidationError(
 				_("Error during Delivery Note creation. Cannot find operation type. Contact support."))
+
+		# Annule les bons de livraison existants
+		self.env['stock.picking'].search([
+			('state', 'not in', ['cancel', 'done']),
+			('planning_id', '=', planning_id.id)
+			]).action_cancel()
+
 
 		# Recherche de l'emplacement 'stock tampon'
 		stock_tampon_location = self.env['stock.location'].search([('temp_stock', '=', 'True'), ('plant_id', '=', self.planning_id.plant_id.id)])
@@ -219,38 +208,24 @@ class WizardOverview(models.TransientModel):
 			'location_id': picking_type.default_location_src_id.id,
 			'location_dest_id': stock_tampon_location.id,
 			'picking_type_id': picking_type.id,
-			'planning_id': planning_id,
+			'planning_id': planning_id.id,
 		})
 
 		# Calcule la quantité totale manquante (missing_qty) de toutes les lignes d'overview
-		total_missing_qty = sum(self.overview_line_ids.mapped('missing_qty'))
-		if total_missing_qty == 0:
+		total_missing_qty = sum(self.overview_line_ids.mapped('qty_to_order'))
+		if total_missing_qty <= 0:
 			raise ValidationError(
-				_("The supply order cannot be created. The raw materials are in sufficient quantity in the stock."))
+				_("The supply order cannot be created. The quantity to order must exceed 0."))
 
 		# Parcourt les IDs des éléments d'overview pour créer les mouvements de stock
+		print("Les lignes de overview", self.overview_line_ids)
 		for data in self.overview_line_ids:
 			if not data.exists():
 				continue
 
-			if data.missing_qty != 0:
+			if data.qty_to_order > 0:
 				# Crée un mouvement de stock (stock.move)
-				if data.location_id:
-					print(f"data.location_id : {data.location_id}")
-					stock_move = self.env['stock.move'].create({
-						'name': f'Send {data.product_id.name}',
-						'product_id': data.product_id.id,
-						'product_uom_qty': data.qty_to_order,  # Quantité à transférer
-						'product_uom': data.uom_id.id,
-						'location_id': data.location_id.id,
-						'location_dest_id': stock_tampon_location.id,
-						'picking_type_id': picking_type.id,
-						'picking_id': stock_picking.id,
-					})
-
-				else:
-					print(f"No data.location_id")
-					stock_move = self.env['stock.move'].create({
+				move_to_create = {
 						'name': f'Send {data.product_id.name}',
 						'product_id': data.product_id.id,
 						'product_uom_qty': data.qty_to_order,  # Quantité à transférer
@@ -259,8 +234,14 @@ class WizardOverview(models.TransientModel):
 						'location_dest_id': stock_tampon_location.id,
 						'picking_type_id': picking_type.id,
 						'picking_id': stock_picking.id,
-					})
+					}
+				if data.location_id:
+					move_to_create['location_id'] = data.location_id.id
+					move_id = self.env['stock.move'].create(move_to_create)
 
+				else:
+					move_id = self.env['stock.move'].create(move_to_create)
+				print("MOve create -------------------", move_id)
 		return {
 			'type': 'ir.actions.client',
 			'tag': 'display_notification',
@@ -301,12 +282,12 @@ class WizardOverviewLine(models.TransientModel):
 			main_stock = sum(quant.mapped('quantity'))
 			overview.main_stock = main_stock
 
-	@api.depends('required_qty', 'product_id.net_weight')
-	def _compute_required_capacity_count(self):
-		for overview in self:
-			required_capacity = overview.required_qty * overview.product_id.net_weight
-			print("required_capacity", required_capacity)
-			overview.required_capacity = required_capacity
+	# @api.depends('required_qty', 'product_id.net_weight')
+	# def _compute_required_capacity_count(self):
+	# 	for overview in self:
+	# 		required_capacity = overview.required_qty * overview.product_id.net_weight
+	# 		print("required_capacity", required_capacity)
+	# 		overview.required_capacity = required_capacity
 
 	product_id = fields.Many2one("product.product", string=_("Raw materiel"))
 	required_qty = fields.Float(_("Required qty"), digits=(16, 0))
@@ -319,8 +300,8 @@ class WizardOverviewLine(models.TransientModel):
 	bom_ids = fields.Many2many("mrp.bom", string=_("Bill of materials"))
 	overview_id = fields.Many2one("overview.wizard", string=_("Overview"))
 	qty_to_order = fields.Float(_("Quantity to order"), default=lambda self: self.missing_qty, digits=(16, 0))
-	required_capacity = fields.Float(string=_("Required capacity"), compute="_compute_required_capacity_count",
-									 digits=(16, 0))
+	# required_capacity = fields.Float(string=_("Required capacity"), compute="_compute_required_capacity_count",
+	# 								 digits=(16, 0))
 	main_stock = fields.Float(
 		_("Main Stock"), compute="_compute_main_stock_count", digits=(16, 0))
 

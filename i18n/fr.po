@@ -184,7 +184,7 @@ msgid ""
 "operation ?"
 msgstr ""
 "Toutes les commandes de fournitures précédentes seront annulées, êtes-vous "
-"sûr de le faireopération ?"
+"sûr de le faire ?"
 
 #. module: mrp_planning
 #. odoo-python

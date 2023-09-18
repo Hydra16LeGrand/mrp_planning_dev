@@ -55,7 +55,7 @@
         'views/stock_picking_type_views.xml',
         'views/stock_quant_package_inherit.xml',
         'views/res_config_settings.xml',
-        'views/menu_inheritance.xml',
+        # 'views/menu_inheritance.xml',
 
     ],
 

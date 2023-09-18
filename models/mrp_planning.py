@@ -306,6 +306,12 @@ class MrpPlanning(models.Model):
             raise ValidationError(
                 _(f"Please configure the picking type '{picking_type_id.name}' locations before this action."))
 
+        rm_location_id = self.env['stock.location'].search([('temp_stock', '=', True), ('plant_id', '=', self.plant_id.id)])
+        unpackaged_finished_product = self.env['stock.location'].search([('unpackaged_finished_product', '=', True), ('plant_id', '=', self.plant_id.id)])
+
+        if not rm_location_id:
+            raise ValidationError(_("No location found for raw materials. Please ensure to configure it."))
+
         for line in self.detailed_pl_ids:
             if not line.display_type:
                 qty = line.uom_id._compute_quantity(line.qty, line.bom_id.product_uom_id)
@@ -321,8 +327,8 @@ class MrpPlanning(models.Model):
                     "detailed_pl_id": line.id,
                     "planning_id": self.id,
                     "plant_id": self.plant_id.id,
-                    "location_src_id": picking_type_id.default_location_src_id.id,
-                    "location_dest_id": picking_type_id.default_location_dest_id.id,
+                    "location_src_id": rm_location_id.id,
+                    "location_dest_id": unpackaged_finished_product.id,
                 })
                 production.action_confirm()
 
@@ -424,43 +430,8 @@ class MrpPlanning(models.Model):
 
                 return result_dict
 
-    # Action to confirm productions orders of current planning
-    # def action_confirm_productions(self):
-    #     for dpl in self.detailed_pl_ids:
-    #         production_id = self.env['mrp.production'].search(
-    #             [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['draft']]])
-    #         production_id.action_confirm() if production_id else False
-    #
-    #     self.mrp_production_general_state = "confirm"
-    #     message = (f"<p><b><em> (Detailed planning lines)</em> State :</b></p><ul>"
-    #                f"<li><p><b> Draft <span style='font-size: 1.5em;'>&#8594;</span> <span style='color: #0182b6;'>Confirmed</span></b></p></li>")
-    #     mrp_planning = self.env['mrp.planning'].browse(self.id)
-    #     mrp_planning.message_post(body=message)
-    #     return {
-    #         'type': 'ir.actions.client',
-    #         'tag': 'display_notification',
-    #         'params': {
-    #             'type': 'success',
-    #             'message': _("Manufacturing orders confirm with success!"),
-    #             'next': {'type': 'ir.actions.act_window_close'},
-    #         }
-    #     }
-
     # Action to finalize planning's products manufacturing
     def action_mark_productions_as_done(self):
-        # if self.detailed_pl_ids.filtered(lambda self: self.state == 'progress'):
-        #     raise ValidationError(_("You have to manage line(s) in progress state before this action."))
-        #
-        # productions = []
-        # for dpl in self.detailed_pl_ids:
-        #     production_id = self.env['mrp.production'].search(
-        #         [['detailed_pl_id', '=', dpl.id], ['state', 'in', ['confirmed', 'progress', 'to_close']]])
-        #     if production_id:
-        #         productions.append(production_id.id)
-        #
-        # production_ids = self.env['mrp.production'].browse(productions)
-        # result = production_ids.button_mark_done()
-        # return result
         detailed_line = [dpl.id for dpl in self.detailed_pl_ids if dpl.qty_done and dpl.mrp_production_id.state not in ['cancel', 'done']]
         if detailed_line:
             action = {
@@ -475,7 +446,7 @@ class MrpPlanning(models.Model):
             }
             return action
         else:
-            raise UserError(_("No production order to finalize"))
+            raise UserError(_("No production order to finalize. Ensure to fill manufacted qty field"))
 
     # Dupliquer le formulaire de planning avec les données qui doivent etre gardé dans le nouveau
     def copy(self, default=None):
