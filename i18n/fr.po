@@ -1479,7 +1479,7 @@ msgstr "Usine principale MP"
 #: model:ir.actions.act_window,name:mrp_planning.action_rm_plastic_factory
 #: model:ir.ui.menu,name:mrp_planning.menu_mrp_rm_plastic_factory
 msgid "RM plastic factory"
-msgstr "Usine de plstique MP"
+msgstr "Usine de plastique MP"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1487,7 +1487,7 @@ msgstr "Usine de plstique MP"
 #: model:ir.model.fields,field_description:mrp_planning.field_stock_location__temp_stock
 #, python-format
 msgid "Raw material location"
-msgstr "Emplacement temporaire"
+msgstr "Emplacement MP"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1808,7 +1808,7 @@ msgid ""
 "This location can't be both a temp location and a packaged finished product "
 "location."
 msgstr ""
-"Cet emplacement ne peut pas être à la fois un emplacement temporaire et un "
+"Cet emplacement ne peut pas être à la fois un emplacement  MP et un "
 "produit fini emballé."
 
 #. module: mrp_planning
@@ -1819,7 +1819,7 @@ msgid ""
 "This location can't be both a temp location and an unpackaged finished "
 "product location."
 msgstr ""
-"Cet emplacement ne peut pas être à la fois un emplacement temporaire et un "
+"Cet emplacement ne peut pas être à la fois un emplacement MP et un "
 "produit fini emballé."
 
 #. module: mrp_planning
