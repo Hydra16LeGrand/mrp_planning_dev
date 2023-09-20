@@ -48,21 +48,21 @@ class ValidateProduction(models.TransientModel):
                 rec.production_id.action_assign()
                 print("Assignation ----", rec.production_id.reservation_state)
                 if rec.qty == rec.qty_done:
-                    if rec.production_id.reservation_state == 'assigned':
-                        for move in rec.production_id.move_raw_ids:
-                            move.quantity_done = move.should_consume_qty
-                        rec.production_id.button_mark_done()
-                    else:
-                        print("Le else")
-                        raise UserError(_('Unavailability of components, please create supply orders'))
+                    # if rec.production_id.reservation_state == 'assigned':
+                    for move in rec.production_id.move_raw_ids:
+                        move.quantity_done = move.should_consume_qty
+                    rec.production_id.button_mark_done()
+                # else:
+                #     print("Le else")
+                #     raise UserError(_('Unavailability of components, please create supply orders'))
                 elif rec.qty_done < rec.qty:
-                    if rec.production_id.reservation_state == 'assigned':
-                        for move in rec.production_id.move_raw_ids:
-                            move.quantity_done = move.should_consume_qty
-                        # rec.production_id.with_context(default_mrp_production_ids=None, skip_consumption=True).button_mark_done()
-                        rec.production_id.with_context(skip_backorder=True).button_mark_done()
-                    else:
-                        raise UserError(_('Unavailability of components, please create supply orders'))
+                    # if rec.production_id.reservation_state == 'assigned':
+                    for move in rec.production_id.move_raw_ids:
+                        move.quantity_done = move.should_consume_qty
+                    # rec.production_id.with_context(default_mrp_production_ids=None, skip_consumption=True).button_mark_done()
+                    rec.production_id.with_context(skip_backorder=True).button_mark_done()
+                # else:
+                #     raise UserError(_('Unavailability of components, please create supply orders'))
 
 
 class ValidateProductionLine(models.TransientModel):

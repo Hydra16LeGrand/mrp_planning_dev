@@ -1958,7 +1958,7 @@ msgid ""
 "done."
 msgstr ""
 "Vous ne pouvez pas annuler une planification qui possède un de ses ordres de"
-" fabricationfait."
+" fabrication fait."
 
 #. module: mrp_planning
 #. odoo-python

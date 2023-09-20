@@ -493,10 +493,10 @@ class MrpPlanning(models.Model):
 
         for elm in pls:
             product = self.env['product.product'].browse(elm['product_id'])
-            section = self.env['mrp.section'].browse(elm['section_id'])
+            # section = self.env['mrp.section'].browse(elm['section_id'])
             packaging_line = self.env['mrp.packaging.line'].browse(elm['packaging_line_id'])
 
-            message += f"<li>{product.name}, packaging line {packaging_line.name}, section {section.name}</li>"
+            message += f"<li>{product.name}, packaging line {packaging_line.name}</li>" #, section {section.name}
 
         return message
 

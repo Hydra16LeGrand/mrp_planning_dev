@@ -141,9 +141,9 @@
                         </page>
                         <page name="detailed_planning_lines" attrs="{'invisible': [('detailed_pl_ids', '=', [])]}"
                               string="Detailed planning lines" autofocus="autofocus">
-<!--                            <field name="detailed_pl_ids" widget="section_and_note_one2many" mode="tree"-->
-<!--                                   attrs="{'readonly': [('state', 'in', ['cancel', '04_mo_generated'])]}"-->
-<!--                                   context="{'search_default_gp_packaging_line_id': 1}">-->
+                            <!--                            <field name="detailed_pl_ids" widget="section_and_note_one2many" mode="tree"-->
+                            <!--                                   attrs="{'readonly': [('state', 'in', ['cancel', '04_mo_generated'])]}"-->
+                            <!--                                   context="{'search_default_gp_packaging_line_id': 1}">-->
                             <field name="detailed_pl_ids" widget="section_and_note_one2many" mode="tree"
                                    context="{'search_default_gp_packaging_line_id': 1}">
                                 <form>
@@ -153,12 +153,14 @@
                                             <group attrs="{'invisible': [('display_type', '!=', False)]}">
                                                 <field name="packaging_line_id" string="Packaging Line ID"/>
                                                 <field name="product_domain" invisible="1"/>
-                                                <field name="product_id" string="Product ID" domain="[('id', 'in', product_domain)]"/>
+                                                <field name="product_id" string="Product ID"
+                                                       domain="[('id', 'in', product_domain)]"/>
                                                 <field name="package" string="Package"/>
                                             </group>
                                             <group attrs="{'invisible': [('display_type', '!=', False)]}">
                                                 <field name="qty" string="Quantity"/>
-                                                <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>
+                                                <field name="qty_done" string="Quantity done"
+                                                       attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>
                                                 <field name="capacity" string="Capacity"/>
                                                 <field name="employee_number" string="Employee Number"/>
                                                 <field name="state" widget="badge"
@@ -171,14 +173,15 @@
                                                 />
                                             </group>
                                         </group>
-<!--                                        <label for="name" string="Sections Name"-->
-<!--                                               attrs="{'invisible': [('display_type', '!=', 'line_section')]}"/>-->
-<!--                                        <label for="name" string="Packaging line section"-->
-<!--                                               attrs="{'invisible': [('display_type', '!=', 'line_note')]}"/>-->
+                                        <!--                                        <label for="name" string="Sections Name"-->
+                                        <!--                                               attrs="{'invisible': [('display_type', '!=', 'line_section')]}"/>-->
+                                        <!--                                        <label for="name" string="Packaging line section"-->
+                                        <!--                                               attrs="{'invisible': [('display_type', '!=', 'line_note')]}"/>-->
                                         <field name="name" readonly="1" string=" " style="width:80%%"/>
                                         <field name="date" invisible="0"/>
                                         <button name="create_days_overview_wizard" type="object"
-                                            string="Bill of manufacturing" icon="fa-flask" context="{'overview_date': date}"/>
+                                                string="Bill of manufacturing" icon="fa-flask"
+                                                context="{'overview_date': date}"/>
                                     </sheet>
                                 </form>
 
@@ -186,7 +189,7 @@
                                     <field name="planning_line_id" invisible="1"/>
                                     <field name="planning_id" invisible="1"/>
                                     <field name="display_type" invisible="1"/>
-                                    <field name ="id"/>
+                                    <field name="id" invisible="1"/>
                                     <field name="name" readonly="1" string=" " style="width:80%%"/>
                                     <field name="product_ref"/>
                                     <field name="product_domain" invisible="1"/>
@@ -202,29 +205,33 @@
                                     <field name="packaging_line_domain" invisible="1"/>
                                     <field name="packaging_line_id" optional="show"
                                            options="{'no_open': 1, 'no_create': 1}"
+                                           attrs="{'readonly': [('state', '=', 'done')]}"
                                            domain="[('id', 'in', packaging_line_domain)]"/>
 
                                     <field name="mrp_production_id" string="Order" optional="hide"
                                            attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated')]}"/>
-                                    <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="qty" attrs="{'readonly': [('state', '=', 'done')]}"/>
-<!--                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>-->
-                                    <field name="qty_done" string="Quantity done" attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])], 'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="employee_number" optional="hide" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="date" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="package"/>
+                                    <field name="qty"/>
+                                                                        <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                                                        <field name="qty" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <!--                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>-->
+                                    <field name="qty_done" string="Quantity done"
+                                           attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])], 'readonly': [('state', '=', 'done')]}"/>
+                                                                        <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                                                        <field name="employee_number" optional="hide" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                                                        <field name="date" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="state"
                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"
                                            widget="badge" decoration-info="state == 'draft'"
                                            decoration-danger="state == 'cancel'" decoration-bf="state == 'confirmed'"
                                            decoration-warning="state == 'progress'"
                                            decoration-success="state == 'done'"/>
-<!--                                    <button name="action_manage_production" type="object" title="Manage Production"-->
-<!--                                            icon="fa-flask"-->
-<!--                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"/>-->
-<!--                                    <button name="action_replace_product_from_planning" type="object"-->
-<!--                                            title="Replace Product" icon="fa-retweet"-->
-<!--                                            attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}"/>-->
+                                    <!--                                    <button name="action_manage_production" type="object" title="Manage Production"-->
+                                    <!--                                            icon="fa-flask"-->
+                                    <!--                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])]}"/>-->
+                                    <!--                                    <button naeme="action_replace_product_from_planning" type="object"-->
+                                    <!--                                            title="Replace Product" icon="fa-retweet"-->
+                                    <!--                                            attrs="{'column_invisible': [('parent.state', 'not in', ['04_mo_generated'])]}"/>-->
                                 </tree>
 
 
