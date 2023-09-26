@@ -269,20 +269,20 @@ class MrpPlanning(models.Model):
         self.state = "draft"
         return True
 
-    def create_overview_wizard(self):
-
-        action = {
-            "name": "Raw Material Overview",
-            "res_model": "overview.wizard",
-            "type": "ir.actions.act_window",
-            "view_mode": "form",
-            # "view_id": self.env.ref("view_create_overview_wizard_from").id,
-            'target': 'new',
-            "context": {
-                "planning_id": self.id,
-            },
-        }
-        return action
+    # def create_overview_wizard(self):
+    #
+    #     action = {
+    #         "name": "Raw Material Overview",
+    #         "res_model": "overview.wizard",
+    #         "type": "ir.actions.act_window",
+    #         "view_mode": "form",
+    #         # "view_id": self.env.ref("view_create_overview_wizard_from").id,
+    #         'target': 'new',
+    #         "context": {
+    #             "planning_id": self.id,
+    #         },
+    #     }
+    #     return action
 
     def verif_product_proportion(self):
         for pl in self.planning_line_ids:
@@ -908,27 +908,27 @@ class MrpPlanninLine(models.Model):
             else:
                 rec.mrp_days = False
 
-    package = fields.Float(_("Package"))
+    package = fields.Float(_("Package"), tracking=True)
     # qty_compute = fields.Integer(_("Qty per day"))
-    recent_qty = fields.Integer()
+    recent_qty = fields.Integer(tracking=True)
     qty = fields.Float(_("Qty per day"), compute="_compute_qty", store=True, readonly=False)
-    capacity = fields.Float(_("Capacity"))
-    employee_number = fields.Integer(_("EN"))
+    capacity = fields.Float(_("Capacity"), tracking=True)
+    employee_number = fields.Integer(_("EN"), tracking=True)
 
-    product_id = fields.Many2one("product.product", string=_("Article"), required=True)
+    product_id = fields.Many2one("product.product", string=_("Article"), required=True, tracking=True)
     product_domain = fields.Many2many('product.product', compute='_compute_product_domain')
-    uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1)
-    uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain")
+    uom_id = fields.Many2one("uom.uom", _("Unit of measure"), required=1, tracking=True)
+    uom_domain = fields.Many2many("uom.uom", compute="_compute_uom_domain", tracking=True)
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
-    packaging_line_first = fields.Many2one("mrp.packaging.line")
+    packaging_line_first = fields.Many2one("mrp.packaging.line", tracking=True)
     packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
 
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', compute="_compute_mrp_days")
-    begin_date = fields.Date(_('Begin Date'))
-    end_date = fields.Date(_('End Date'))
-    planning_id = fields.Many2one("mrp.planning")
+    begin_date = fields.Date(_('Begin Date'), tracking=True)
+    end_date = fields.Date(_('End Date'), tracking=True)
+    planning_id = fields.Many2one("mrp.planning", tracking=True)
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
-    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1, tracking=True)
 
     @api.depends('product_id')
     def _compute_product_domain(self):
@@ -994,17 +994,17 @@ class MrpDetailPlanningLine(models.Model):
             else:
                 rec.capacity, rec.qty = 0, 0
 
-    date_char = fields.Char(_("Date"))
-    date = fields.Date(_("Date"))
-    product_ref = fields.Char(related="product_id.default_code", string=_("Article"))
-    product_id = fields.Many2one("product.product", string=_("Désignation"), required=True)
+    date_char = fields.Char(_("Date"), tracking=True)
+    date = fields.Date(_("Date"), tracking=True)
+    product_ref = fields.Char(related="product_id.default_code", string=_("Article"), tracking=True)
+    product_id = fields.Many2one("product.product", string=_("Désignation"), required=True, tracking=True)
     product_domain = fields.Many2many('product.product', compute='_compute_product_domain')
-    package = fields.Float(_("Package"),digits=(16, 4))
-    qty = fields.Float(_("Quantity"), required=1)
-    capacity = fields.Float(_("Capacity"),digits=(16, 2))
-    recent_qty = fields.Integer()
+    package = fields.Float(_("Package"),digits=(16, 4), tracking=True)
+    qty = fields.Float(_("Quantity"), required=1, tracking=True)
+    capacity = fields.Float(_("Capacity"),digits=(16, 2), tracking=True)
+    recent_qty = fields.Integer(tracking=True)
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
-    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1)
+    bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1, tracking=True)
     state = fields.Selection([
         ('draft', _("Draft")),
         ('confirmed', _("Confirmed")),
@@ -1012,26 +1012,26 @@ class MrpDetailPlanningLine(models.Model):
         ('done', _("Done")),
         ('to_close', _("To close")),
         ('cancel', _("Cancelled")),
-    ], string=_("Production order state"), compute="_compute_state")
+    ], string=_("Production order state"), compute="_compute_state", tracking=True)
 
-    employee_number = fields.Integer(_("EN"), default=lambda self: self.packaging_line_id.ppp_ids.search(
+    employee_number = fields.Integer(_("EN"), tracking=True, default=lambda self: self.packaging_line_id.ppp_ids.search(
         [('product_id', '=', self.product_id.id)], limit=1).employee_number)
 
-    uom_id = fields.Many2one("uom.uom", related="planning_line_id.uom_id")
+    uom_id = fields.Many2one("uom.uom", related="planning_line_id.uom_id", tracking=True)
     packaging_line_id = fields.Many2one("mrp.packaging.line", required=1, tracking=True)
-    planning_line_id = fields.Many2one("mrp.planning.line")
+    planning_line_id = fields.Many2one("mrp.planning.line", tracking=True)
     # section_id = fields.Many2one("mrp.section", required=True)
-    planning_id = fields.Many2one("mrp.planning")
+    planning_id = fields.Many2one("mrp.planning", tracking=True)
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     display_type = fields.Selection(
         selection=[
             ('line_section', "Section"),
             ('line_note', "Note"),
         ],
-        default=False)
+        default=False, tracking=True)
     name = fields.Text()
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
-    qty_done = fields.Integer(_("Quantity done"))
+    qty_done = fields.Integer(_("Quantity done"), tracking=True)
 
     def action_manage_production(self):
         production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
@@ -1123,5 +1123,5 @@ class MrpPlanningDays(models.Model):
     _name = "mrp.planning.days"
     _rec_name = "name"
 
-    name = fields.Char(_("Day"))
-    date = fields.Date(_("Full Date"))
+    name = fields.Char(_("Day"), tracking=True)
+    date = fields.Date(_("Full Date"), tracking=True)
