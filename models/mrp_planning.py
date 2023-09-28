@@ -63,6 +63,21 @@ class MrpPlanning(models.Model):
         plant_id = self.env['mrp.plant'].search([('is_principal', '=', True)])
         return plant_id.id if plant_id else False
 
+    # @api.depends('planning_line_ids')
+    # def _compute_product_field(self):
+    #     for rec in self:
+    #         print("Le compute s'exécute........................")
+    #         print('Le rec.planning_line_ids..................', rec.planning_line_ids)
+    #         product_ids = [line.product_id.id for line in rec.planning_line_ids]
+    #
+    #         print("Les product_ids.......................", product_ids)
+    #         if product_ids:
+    #             print("Dans le if............")
+    #             rec.product_id = product_ids[0]  # Vous pouvez choisir comment gérer plusieurs produits ici
+    #             print("Le rec.product_id..................", rec.product_id)
+    #         else:
+    #             rec.product_id = False
+
     reference = fields.Char(_("Reference"), default=lambda self: _('New'), tracking=True)
     code = fields.Char(_("Code"), default=lambda self: self.env['ir.config_parameter'].sudo().get_param('mrp_planning.code'), tracking=True)
     state = fields.Selection([
@@ -97,6 +112,9 @@ class MrpPlanning(models.Model):
     plant_id = fields.Many2one("mrp.plant", string=_("Plant"), default=_get_default_plant, tracking=2)
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
     detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
+
+    # product_id = fields.Many2one('mrp.planning.line', string=_('Product'), compute="_compute_product_field")
+
 
     @api.depends('section_ids')
     def _compute_section_first(self):
@@ -269,20 +287,20 @@ class MrpPlanning(models.Model):
         self.state = "draft"
         return True
 
-    # def create_overview_wizard(self):
-    #
-    #     action = {
-    #         "name": "Raw Material Overview",
-    #         "res_model": "overview.wizard",
-    #         "type": "ir.actions.act_window",
-    #         "view_mode": "form",
-    #         # "view_id": self.env.ref("view_create_overview_wizard_from").id,
-    #         'target': 'new',
-    #         "context": {
-    #             "planning_id": self.id,
-    #         },
-    #     }
-    #     return action
+    def create_overview_wizard(self):
+
+        action = {
+            "name": "Raw Material Overview",
+            "res_model": "overview.wizard",
+            "type": "ir.actions.act_window",
+            "view_mode": "form",
+            # "view_id": self.env.ref("view_create_overview_wizard_from").id,
+            'target': 'new',
+            "context": {
+                "planning_id": self.id,
+            },
+        }
+        return action
 
     def verif_product_proportion(self):
         for pl in self.planning_line_ids:
@@ -773,6 +791,30 @@ class MrpPlanning(models.Model):
                             mrp_planning.message_post(body=message_to_delete_dl)
 
 
+    def undo_last_action(self):
+        # Récupérez la dernière action réalisée dans le modèle 'ir.actions.act_window.history'
+        last_action = self.env['ir.actions.act_window.history'].search([
+            ('user_id', '=', self.env.user.id),
+        ], order="create_date desc", limit=1)
+
+        if last_action:
+            # Ouvrez la vue précédente en utilisant l'action récupérée
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': last_action.res_model,
+                'res_id': last_action.res_id,
+                'view_mode': 'form',
+                'target': 'current',
+            }
+        else:
+            return {
+                'warning': {
+                    'title': 'Aucune action à annuler',
+                    'message': 'Aucune action précédente à annuler.',
+                }
+            }
+
+
 class MrpPlanninLine(models.Model):
     _name = "mrp.planning.line"
     _inherit = ["mail.thread", "mail.activity.mixin"]
@@ -1020,7 +1062,7 @@ class MrpDetailPlanningLine(models.Model):
     uom_id = fields.Many2one("uom.uom", related="planning_line_id.uom_id", tracking=True)
     packaging_line_id = fields.Many2one("mrp.packaging.line", required=1, tracking=True)
     planning_line_id = fields.Many2one("mrp.planning.line", tracking=True)
-    # section_id = fields.Many2one("mrp.section", required=True)
+    section_id = fields.Many2one("mrp.section", required=True)
     planning_id = fields.Many2one("mrp.planning", tracking=True)
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     display_type = fields.Selection(
