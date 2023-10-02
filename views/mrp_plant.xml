@@ -145,8 +145,19 @@
         <field name="view_mode">kanban</field>
     </record>
 
+    <record id="action_mrp_planning_order" model="ir.actions.act_window">
+        <field name="name">Manufacturing planning order</field>
+        <field name="res_model">mrp.detail.planning.line</field>
+        <field name="view_mode">graph</field>
+    </record>
+
+
     <menuitem id="mrp_plant_menu_conf" parent="mrp.menu_mrp_configuration" action="action_mrp_plant_conf"
               name="Manufacturing plants"/>
     <menuitem id="mrp_plant_menu_dashboard" parent="mrp.menu_mrp_manufacturing" sequence="1"
               action="action_mrp_plant_dashboard" name="Plants"/>
+
+    <menuitem id="menu_mrp_planning_order" action="action_mrp_planning_order"
+              parent="mrp.menu_mrp_reporting" sequence="50"/>
+
 </odoo>
