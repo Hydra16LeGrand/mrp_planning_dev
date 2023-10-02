@@ -63,20 +63,6 @@ class MrpPlanning(models.Model):
         plant_id = self.env['mrp.plant'].search([('is_principal', '=', True)])
         return plant_id.id if plant_id else False
 
-    # @api.depends('planning_line_ids')
-    # def _compute_product_field(self):
-    #     for rec in self:
-    #         print("Le compute s'exécute........................")
-    #         print('Le rec.planning_line_ids..................', rec.planning_line_ids)
-    #         product_ids = [line.product_id.id for line in rec.planning_line_ids]
-    #
-    #         print("Les product_ids.......................", product_ids)
-    #         if product_ids:
-    #             print("Dans le if............")
-    #             rec.product_id = product_ids[0]  # Vous pouvez choisir comment gérer plusieurs produits ici
-    #             print("Le rec.product_id..................", rec.product_id)
-    #         else:
-    #             rec.product_id = False
 
     reference = fields.Char(_("Reference"), default=lambda self: _('New'), tracking=True)
     code = fields.Char(_("Code"), default=lambda self: self.env['ir.config_parameter'].sudo().get_param('mrp_planning.code'), tracking=True)
@@ -182,7 +168,6 @@ class MrpPlanning(models.Model):
     # This function generate detailed planning lines and regroup them by sections and by packaging line.
     # Each detailed planning line will be related to a production order
     def action_confirm(self):
-
         if not self.planning_line_ids:
             raise ValidationError(_("You have to give at least one planning line"))
 
@@ -791,29 +776,6 @@ class MrpPlanning(models.Model):
                             mrp_planning.message_post(body=message_to_delete_dl)
 
 
-    def undo_last_action(self):
-        # Récupérez la dernière action réalisée dans le modèle 'ir.actions.act_window.history'
-        last_action = self.env['ir.actions.act_window.history'].search([
-            ('user_id', '=', self.env.user.id),
-        ], order="create_date desc", limit=1)
-
-        if last_action:
-            # Ouvrez la vue précédente en utilisant l'action récupérée
-            return {
-                'type': 'ir.actions.act_window',
-                'res_model': last_action.res_model,
-                'res_id': last_action.res_id,
-                'view_mode': 'form',
-                'target': 'current',
-            }
-        else:
-            return {
-                'warning': {
-                    'title': 'Aucune action à annuler',
-                    'message': 'Aucune action précédente à annuler.',
-                }
-            }
-
 
 class MrpPlanninLine(models.Model):
     _name = "mrp.planning.line"
@@ -950,6 +912,8 @@ class MrpPlanninLine(models.Model):
             else:
                 rec.mrp_days = False
 
+
+
     package = fields.Float(_("Package"), tracking=True)
     # qty_compute = fields.Integer(_("Qty per day"))
     recent_qty = fields.Integer(tracking=True)
@@ -966,8 +930,8 @@ class MrpPlanninLine(models.Model):
     packaging_line_id = fields.Many2one("mrp.packaging.line", tracking=True, required=True)
 
     mrp_days = fields.Many2many('mrp.planning.days', string='Mrp Days', compute="_compute_mrp_days")
-    begin_date = fields.Date(_('Begin Date'), tracking=True)
-    end_date = fields.Date(_('End Date'), tracking=True)
+    begin_date = fields.Date(_('Begin Date'), tracking=True, required=True)
+    end_date = fields.Date(_('End Date'), tracking=True, required=True)
     planning_id = fields.Many2one("mrp.planning", tracking=True)
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1, tracking=True)
@@ -980,6 +944,14 @@ class MrpPlanninLine(models.Model):
             all_products = [bom.product_tmpl_id.id for bom in boms_ids]
             print(f'all_products : {all_products}')
             rec.product_domain = all_products
+
+    # @api.onchange('product_id')
+    # def verif_field_pl_date(self):
+    #     for rec in self:
+    #         if rec.planning_id.begin_date == rec.planning_id.end_date == False:
+    #             if rec.product_id != False:
+    #                 raise ValidationError(
+    #                     _("It is necessary to fill in all the fields for the rest"))
 
 
 class MrpDetailPlanningLine(models.Model):

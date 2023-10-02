@@ -27,9 +27,6 @@
                             confirm="Planning lines will no longer be editable. Are you sure to do this?"/>
                     <button name="generate_mo" type="object" string="Generate MO" states="confirm" class="oe_highlight"
                             confirm="Are you sure to do this action ?"/>
-
-                    <button name="undo_last_action" type="object" string="CTRL Z" class="oe_highlight"
-                            confirm="Are you sure to do this action ?"/>
                     <!--                    <button name="create_overview_wizard" type="object" string="RM Overview"-->
                     <!--                            attrs="{'invisible': [('state','not in',('04_mo_generated','confirm'))]}"/>-->
 
@@ -233,9 +230,6 @@
                                            attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated'),('state', '=', 'done')]}"/>
                                     <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="qty" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="qty" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <!--                                    <field name="qty_done" string="Quantity done" attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>-->
                                     <field name="qty_done" string="Quantity done"
                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])], 'readonly': [('state', '=', 'done')]}"/>
                                     <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
@@ -293,7 +287,7 @@
         <field name="arch" type="xml">
             <graph string="Manufacturing planning orders">
                 <field name="product_id"/>
-                <field name="qty" type="measure"/>
+                <field name="qty_done" type="measure"/>
             </graph>
         </field>
     </record>

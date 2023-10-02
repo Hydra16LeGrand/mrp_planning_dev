@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 16.0+e\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-09-26 11:42+0000\n"
-"PO-Revision-Date: 2023-09-26 11:42+0000\n"
+"POT-Creation-Date: 2023-09-29 10:42+0000\n"
+"PO-Revision-Date: 2023-09-29 10:42+0000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -484,7 +484,7 @@ msgstr "Créé sur"
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_wizard_finished_product_line__old_quantity
 msgid "Current quantity in stock"
-msgstr "Quantité actuelle en stock"
+msgstr "Qté actuelle en stock"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
@@ -1011,6 +1011,17 @@ msgid "Manufacturing Overview"
 msgstr "Présentation de la fabrication"
 
 #. module: mrp_planning
+#: model:ir.actions.act_window,name:mrp_planning.action_mrp_planning_order
+#: model:ir.ui.menu,name:mrp_planning.menu_mrp_planning_order
+msgid "Manufacturing planning order"
+msgstr ""
+
+#. module: mrp_planning
+#: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_graph
+msgid "Manufacturing planning orders"
+msgstr ""
+
+#. module: mrp_planning
 #: model:ir.actions.act_window,name:mrp_planning.action_mrp_plant_conf
 #: model:ir.actions.act_window,name:mrp_planning.action_mrp_plant_dashboard
 msgid "Manufacturing plant"
@@ -1055,7 +1066,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__missing_qty
 #, python-format
 msgid "Missing qty"
-msgstr "Quantité manquante"
+msgstr "Qté manquante"
 
 #. module: mrp_planning
 #: model:ir.model.fields.selection,name:mrp_planning.selection__mrp_planning__state__04_mo_generated
@@ -1170,7 +1181,7 @@ msgstr ""
 #: code:addons/my_addons/Sivop/mrp_planning/wizard/create_overview_wizard.py:0
 #, python-format
 msgid "No quantity found for %s in %s"
-msgstr "Aucune quantité trouvée pour %s dans %s"
+msgstr "Aucune qté trouvée pour %s dans %s"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1249,7 +1260,7 @@ msgstr "Nombre de messages avec erreur de livraison"
 #: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__on_hand_qty
 #, python-format
 msgid "On hand qty"
-msgstr "Quantité disponible"
+msgstr "Qté disponible"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
@@ -1555,7 +1566,7 @@ msgstr "Proportions des produits"
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__qty
 msgid "Qty per day"
-msgstr "Quantité par jour"
+msgstr "Qté par jour"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1576,7 +1587,7 @@ msgstr "Quantité par jour"
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 #, python-format
 msgid "Quantity"
-msgstr "Quantité"
+msgstr "Qté"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1587,7 +1598,7 @@ msgstr "Quantité"
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
 #, python-format
 msgid "Quantity done"
-msgstr ""
+msgstr "Qté faite"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1596,7 +1607,7 @@ msgstr ""
 #: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__qty_to_order
 #, python-format
 msgid "Quantity to order"
-msgstr "Quantité à commander"
+msgstr "Qté à commander"
 
 #. module: mrp_planning
 #: model:ir.model,name:mrp_planning.model_stock_quant
@@ -1652,7 +1663,7 @@ msgstr "Remettre en brouillon"
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__recent_qty
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_planning_line__recent_qty
 msgid "Recent Qty"
-msgstr "Quantité récente"
+msgstr "Qté récente"
 
 #. module: mrp_planning
 #. odoo-python
@@ -1703,7 +1714,7 @@ msgstr "Produit de remplacement"
 #: model:ir.model.fields,field_description:mrp_planning.field_overview_wizard_line__required_qty
 #, python-format
 msgid "Required qty"
-msgstr "Quantité requise"
+msgstr "Qté requise"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__activity_user_id
@@ -1729,6 +1740,7 @@ msgstr "Erreur de livraison SMS"
 #: code:addons/mrp_planning/wizard/mrp_immediate_production_inherit.py:0
 #: code:addons/my_addons/Sivop/mrp_planning/models/mrp_packaging_line.py:0
 #: code:addons/my_addons/Sivop/mrp_planning/wizard/mrp_immediate_production_inherit.py:0
+#: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__section_id
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_immediate_production_line__section_id
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__section_id
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_production__section_id
@@ -1868,8 +1880,8 @@ msgstr "Le nom court de l’usine doit être unique par entreprise !"
 msgid ""
 "The supply order cannot be created. The quantity to order must exceed 0."
 msgstr ""
-"La commande d'approvisionnement ne peut pas être créée. La quantité à "
-"commander doit être supérieure à 0."
+"La commande d'approvisionnement ne peut pas être créée. La qté à commander "
+"doit être supérieure à 0."
 
 #. module: mrp_planning
 #. odoo-python
@@ -1879,8 +1891,7 @@ msgstr ""
 msgid ""
 "The transfer quantity cannot be greater than the current stock quantity."
 msgstr ""
-"La quantité transférée ne peut pas être supérieure à la quantité en stock "
-"actuelle."
+"La qté transférée ne peut pas être supérieure à la qté en stock actuelle."
 
 #. module: mrp_planning
 #. odoo-python
@@ -1920,7 +1931,7 @@ msgstr "Il n’y a aucun ordre de fabrication pour ce produit pour ces jours."
 #: code:addons/my_addons/Sivop/mrp_planning/wizard/create_picking_finished_product.py:0
 #, python-format
 msgid "There can be no transfer when there is no quantity."
-msgstr "Il ne peut y avoir de transfert lorsqu’il n’y a pas de quantité."
+msgstr "Il ne peut y avoir de transfert lorsqu’il n’y a pas de qté."
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.replace_product_form
@@ -2092,8 +2103,8 @@ msgstr "Valider la ligne de production"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.view_create_overview_wizard_from
-msgid "Valider"
-msgstr ""
+msgid "Validate"
+msgstr "Valider"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_packaging_line__website_message_ids
@@ -2197,7 +2208,7 @@ msgstr "Vous devez donner au moins une ligne de planification"
 #: code:addons/my_addons/Sivop/mrp_planning/wizard/create_picking_finished_product.py:0
 #, python-format
 msgid "You must put a parcel proportional to the quantity"
-msgstr "Vous devez mettre un colis proportionnel à la quantité"
+msgstr "Vous devez mettre un colis proportionnel à la qté"
 
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.mrp_planning_form
