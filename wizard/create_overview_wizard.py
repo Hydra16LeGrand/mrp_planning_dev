@@ -102,7 +102,7 @@ class WizardOverview(models.TransientModel):
 				# Convert qty about unit of measure. Because of each raw material can have a different unit of measure for bom and storage(same categorie)
 				on_hand_qty = temp_stock_quant_ids[0].product_uom_id._compute_quantity(
 					temp_stock_quant_qty, line.product_uom_id
-				)
+				) if temp_stock_quant_ids else 0
 
 				# Get reception stock quantity
 				reception_stock_quant_ids = self.env['stock.quant'].search([

@@ -415,7 +415,7 @@ class MrpPlanning(models.Model):
 
                 for detailed_planning_line in rec.detailed_pl_ids:
                     if not detailed_planning_line.display_type:
-                        section = detailed_planning_line.section_id
+                        section = rec.section_ids
                         packaging_line = detailed_planning_line.packaging_line_id
 
                         grouped_lines[section][packaging_line].append(detailed_planning_line)
@@ -491,12 +491,13 @@ class MrpPlanning(models.Model):
             return ""
         message = f"<p><em> {label} : </em></p><ul>"
 
+        print("Pls ---------------", pls)
         for elm in pls:
             product = self.env['product.product'].browse(elm['product_id'])
-            section = self.env['mrp.section'].browse(elm['section_id'])
+            # section = self.env['mrp.section'].browse(elm['section_id'])
             packaging_line = self.env['mrp.packaging.line'].browse(elm['packaging_line_id'])
 
-            message += f"<li>{product.name}, packaging line {packaging_line.name}, section {section.name}</li>"
+            message += f"<li>{product.name}, packaging line {packaging_line.name}</li>"
 
         return message
 
@@ -826,7 +827,7 @@ class MrpPlanninLine(models.Model):
     def _compute_bill_of_material_domain(self):
         for rec in self:
             if rec.product_id:
-                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id), ('state', '=', 'done')])
                 rec.bom_domain = [bom.id for bom in boms]
                 print("le boms", rec.bom_domain)
             else:
@@ -839,7 +840,7 @@ class MrpPlanninLine(models.Model):
         print('le code',code)
         for rec in self:
             if rec.product_id:
-                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id), ('state', '=', 'done')])
                 if bom_ids:
                     rec.bom_id = bom_ids[0]
 
@@ -849,7 +850,7 @@ class MrpPlanninLine(models.Model):
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 rec.recent_qty = rec.qty
                 rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
-                rec.capacity = rec.qty * rec.bom_id.net_weight
+                rec.capacity = rec.qty * rec.bom_id.capacity
             else:
                 rec.recent_qty, rec.package, rec.capacity = 0, 0, 0
 
@@ -870,7 +871,7 @@ class MrpPlanninLine(models.Model):
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 if rec.recent_qty != rec.qty:
                     rec.qty = rec.package * rec.bom_id.packing
-                    rec.capacity = rec.qty * rec.bom_id.net_weight
+                    rec.capacity = rec.qty * rec.bom_id.capacity
             else:
                 rec.capacity, rec.qty = 0, 0
 
@@ -970,7 +971,7 @@ class MrpDetailPlanningLine(models.Model):
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 rec.recent_qty = rec.qty
                 rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
-                rec.capacity = rec.qty * rec.bom_id.net_weight
+                rec.capacity = rec.qty * rec.bom_id.capacity
             else:
                 rec.recent_qty, rec.package, rec.capacity = 0, 0, 0
 
@@ -990,7 +991,7 @@ class MrpDetailPlanningLine(models.Model):
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 if rec.recent_qty != rec.qty:
                     rec.qty = rec.package * rec.bom_id.packing
-                    rec.capacity = rec.qty * rec.bom_id.net_weight
+                    rec.capacity = rec.qty * rec.bom_id.capacity
             else:
                 rec.capacity, rec.qty = 0, 0
 
@@ -1031,7 +1032,7 @@ class MrpDetailPlanningLine(models.Model):
         default=False)
     name = fields.Text()
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
-    qty_done = fields.Integer(_("Quantity done"))
+    qty_done = fields.Integer(_("Qté fabriqué"))
 
     def action_manage_production(self):
         production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
@@ -1089,7 +1090,7 @@ class MrpDetailPlanningLine(models.Model):
     def _compute_bill_of_material_domain(self):
         for rec in self:
             if rec.product_id:
-                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                boms = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id), ('state', '=', 'done')])
                 rec.bom_domain = [bom.id for bom in boms]
             else:
                 rec.bom_domain = []
@@ -1098,7 +1099,7 @@ class MrpDetailPlanningLine(models.Model):
     def _get_default_bill_of_material(self):
         for rec in self:
             if rec.product_id:
-                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id)])
+                bom_ids = self.env['mrp.bom'].search([('product_tmpl_id', '=', rec.product_id.product_tmpl_id.id), ('state', '=', 'done')])
                 if bom_ids:
                     rec.bom_id = bom_ids[0]
 

@@ -186,7 +186,7 @@
                                     <field name="planning_line_id" invisible="1"/>
                                     <field name="planning_id" invisible="1"/>
                                     <field name="display_type" invisible="1"/>
-                                    <field name ="id"/>
+                                    <!-- <field name ="id"/> -->
                                     <field name="name" readonly="1" string=" " style="width:80%%"/>
                                     <field name="product_ref"/>
                                     <field name="product_domain" invisible="1"/>
