@@ -223,14 +223,14 @@ class WizardOverview(models.TransientModel):
 			if not data.exists():
 				continue
 
-			if data.qty_to_order > 0:
+			if data.qty_to_order > 0 and data.product_id.product_tmpl_id.detailed_type != 'consu':
 				# Crée un mouvement de stock (stock.move)
 				move_to_create = {
 						'name': f'Send {data.product_id.name}',
 						'product_id': data.product_id.id,
 						'product_uom_qty': data.qty_to_order,  # Quantité à transférer
 						'product_uom': data.uom_id.id,
-						'location_id': picking_type.default_location_src_id.id,
+						'location_id': data.location_id.id,
 						'location_dest_id': stock_tampon_location.id,
 						'picking_type_id': picking_type.id,
 						'picking_id': stock_picking.id,
