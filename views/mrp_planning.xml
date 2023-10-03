@@ -197,9 +197,6 @@
                                         <!--                                               attrs="{'invisible': [('display_type', '!=', 'line_note')]}"/>-->
                                         <field name="name" readonly="1" string=" " style="width:80%%"/>
                                         <field name="date" invisible="0"/>
-                                        <button name="create_days_overview_wizard" type="object"
-                                                string="Bill of manufacturing" icon="fa-flask"
-                                                context="{'overview_date': date}"/>
                                     </sheet>
                                 </form>
 
@@ -234,7 +231,7 @@
                                     <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="employee_number" optional="hide"
                                            attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="date" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="date" optional="hide" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="state"
                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', []),('state', '=', 'done')]}"
                                            widget="badge" decoration-info="state == 'draft'"

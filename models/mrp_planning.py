@@ -1117,22 +1117,6 @@ class MrpDetailPlanningLine(models.Model):
                 if bom_ids:
                     rec.bom_id = bom_ids[0]
 
-    def create_days_overview_wizard(self):
-        action = {
-            "name": "Raw Material Overview Of Day",
-            "res_model": "overview.wizard",
-            "type": "ir.actions.act_window",
-            "view_mode": "form",
-            # "view_id": self.env.ref("mrp_planning.view_create_overview_wizard_from").id,
-            'target': 'new',
-            "context": {
-                'planning_ids': self.planning_id.id,
-                'planning_id': self.planning_id.id,
-            }
-
-        }
-        return action
-
 
 class MrpPlanningDays(models.Model):
     _name = "mrp.planning.days"

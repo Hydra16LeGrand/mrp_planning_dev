@@ -1190,7 +1190,7 @@ msgstr "Aucune qté trouvée pour %s dans %s"
 #, python-format
 msgid "No temp location find. Please configure it or contact support."
 msgstr ""
-"Aucun emplacement temporaire trouvé. Veuillez le configurer ou contacter le "
+"Aucun emplacement de matière première trouvé. Veuillez le configurer ou contacter le "
 "support."
 
 #. module: mrp_planning
@@ -1200,7 +1200,7 @@ msgstr ""
 #, python-format
 msgid "No temp location found. Please configure it or contact support."
 msgstr ""
-"Aucun emplacement temporaire trouvé. Veuillez le configurer ou contacter le "
+"Aucun emplacement de matière première trouvé. Veuillez le configurer ou contacter le "
 "support."
 
 #. module: mrp_planning
@@ -1350,7 +1350,7 @@ msgstr "Produit fini emballé"
 #: model:ir.model.fields,field_description:mrp_planning.field_validate_production_line__packaging_line_id
 #, python-format
 msgid "Packaging Line"
-msgstr "Ligne de conditionnement"
+msgstr "conditionnement"
 
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__packaging_line_domain
@@ -1551,7 +1551,7 @@ msgstr "Ordre de production"
 #. module: mrp_planning
 #: model:ir.model.fields,field_description:mrp_planning.field_mrp_detail_planning_line__state
 msgid "Production order state"
-msgstr "État de l'ordre de fabrication"
+msgstr "État"
 
 #. module: mrp_planning
 #. odoo-python
