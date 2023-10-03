@@ -1623,13 +1623,13 @@ msgstr "Aperçu des matières premières"
 #: model:ir.actions.act_window,name:mrp_planning.action_rm_main_factory
 #: model:ir.ui.menu,name:mrp_planning.menu_mrp_rm_main_factory
 msgid "RM main factory"
-msgstr "Usine principale MP"
+msgstr "Stock Usine principale"
 
 #. module: mrp_planning
 #: model:ir.actions.act_window,name:mrp_planning.action_rm_plastic_factory
 #: model:ir.ui.menu,name:mrp_planning.menu_mrp_rm_plastic_factory
 msgid "RM plastic factory"
-msgstr "Usine de plastique MP"
+msgstr "Stock Usine plastique"
 
 #. module: mrp_planning
 #: model:ir.actions.act_window,name:mrp_planning.action_create_overview_wizard

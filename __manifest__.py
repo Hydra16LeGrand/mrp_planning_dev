@@ -25,6 +25,7 @@
         'mrp',
         'hr',
         'stock_manager',
+        'mrp_bom',
     ],
 
     # always loaded

@@ -1034,7 +1034,7 @@ class MrpDetailPlanningLine(models.Model):
     uom_id = fields.Many2one("uom.uom", related="planning_line_id.uom_id", tracking=True)
     packaging_line_id = fields.Many2one("mrp.packaging.line", required=1, tracking=True)
     planning_line_id = fields.Many2one("mrp.planning.line", tracking=True)
-    section_id = fields.Many2one("mrp.section", required=True)
+    section_id = fields.Many2one("mrp.section", related="planning_id.section_ids")
     planning_id = fields.Many2one("mrp.planning", tracking=True)
     packaging_line_domain = fields.Many2many("mrp.packaging.line", compute="_compute_packaging_line_domain")
     display_type = fields.Selection(
