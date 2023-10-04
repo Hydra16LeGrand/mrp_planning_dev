@@ -19,6 +19,7 @@
         <field name="arch" type="xml">
             <form>
                 <header>
+                    <field name="production_completed" invisible="1" />
                     <button name="action_cancel" type="object" string="Cancel" states="confirm,04_mo_generated"
                             confirm="This action will cancel all manufacturing orders linked to this planning. Are you sure to do this ?"/>
                     <button name="action_draft" type="object" string="Re-draft" states="cancel"/>
@@ -42,8 +43,12 @@
                             class="btn-warning"
                             confirm="This action will complete all manufacturing orders process in this planning. Proceed?"
                             attrs="{'invisible': ['|', ('state', '!=', '04_mo_generated'), ('detailed_pl_done_state', '!=', False)]}"/>
+                    <button name="copy_qty" type="object" string="COPY QUANTITIES"
+                            class="oe_highlight"
+                            attrs="{'invisible': ['|', ('mrp_production_ids', '=', []), ('production_completed', '=', True)]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="draft,confirm,04_mo_generated"
                            statusbar_invisible="cancel" attrs="{'invisible': [('state', '=', '0')]}"/>
+
                     <field name="detailed_pl_done_state" invisible="1"/>
                 </header>
                 <sheet>
@@ -226,7 +231,7 @@
                                            attrs="{'column_invisible': [('parent.state', '!=', '04_mo_generated'),('state', '=', 'done')]}"/>
                                     <field name="package" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="qty" attrs="{'readonly': [('state', '=', 'done')]}"/>
-                                    <field name="qty_done" string="Quantity done"
+                                    <field name="qty_done" string="Qty done"
                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])], 'readonly': [('state', '=', 'done')]}"/>
                                     <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="employee_number" optional="hide"

@@ -58,10 +58,10 @@ class MrpPlanning(models.Model):
         for rec in self:
             rec.internal_transfer_count = len(self.picking_ids)
 
-    @api.onchange('product_id')
-    def _get_default_plant(self):
-        plant_id = self.env['mrp.plant'].search([('is_principal', '=', True)])
-        return plant_id.id if plant_id else False
+    # @api.onchange('product_id')
+    # def _get_default_plant(self):
+    #     plant_id = self.env['mrp.plant'].search([('is_principal', '=', True)])
+    #     return plant_id.id if plant_id else False
 
     reference = fields.Char(_("Reference"), default=lambda self: _('New'), tracking=True)
     code = fields.Char(_("Code"),
@@ -96,11 +96,17 @@ class MrpPlanning(models.Model):
     picking_ids = fields.One2many('stock.picking', 'planning_id', string='Planning MRP', tracking=True)
     internal_transfer_count = fields.Integer(string=_("Supply count"),
                                              compute='_compute_internal_transfer_count')
-    plant_id = fields.Many2one("mrp.plant", string=_("Plant"), default=_get_default_plant, tracking=2)
+    plant_id = fields.Many2one("mrp.plant", string=_("Plant"), required=1, tracking=2)
     section_first = fields.Many2one('mrp.section', compute='_compute_section_first')
     detailed_pl_done_state = fields.Boolean(copy=False, compute='_compute_detailed_pl_done_state')
 
-    # product_id = fields.Many2one('mrp.planning.line', string=_('Product'), compute="_compute_product_field")
+    production_completed = fields.Boolean(string=_("Production completed"), compute="_compute_production_completed")
+
+    @api.depends('detailed_pl_ids.state')
+    def _compute_production_completed(self):
+        for rec in self:
+            rec.production_completed = 0 if not rec.detailed_pl_ids.filtered(lambda self: self.state == 'done') else 1
+            print("calcul du production_completed --------", rec.production_completed)
 
     @api.depends('section_ids')
     def _compute_section_first(self):
@@ -774,6 +780,15 @@ class MrpPlanning(models.Model):
                             large_line = self.env['mrp.detail.planning.line'].browse(line_dl)
                             message_to_delete_dl += f"<li><p><b>{detail['product_id']['name']}, large section {large_section.name}, large line {large_line.name}</b></p></li>"
                             mrp_planning.message_post(body=message_to_delete_dl)
+
+
+    def copy_qty(self):
+        line_to_cpte = self.detailed_pl_ids.filtered(lambda rec: rec.qty_done == 0 and rec.state not in ['draft', 'cancel', 'done']).filtered(lambda rec: rec.display_type == False)
+        print("Ligne a calcccc++++++++++++++++++", line_to_cpte)
+        for line in line_to_cpte:
+
+            line.qty_done = line.qty
+            line._onchange_qty_done()
 
 
 class MrpPlanninLine(models.Model):
