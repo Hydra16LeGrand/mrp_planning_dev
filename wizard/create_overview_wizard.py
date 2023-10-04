@@ -139,11 +139,12 @@ class WizardOverview(models.TransientModel):
 				print('required_qty in ovl -------------', ov_by_products)
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
 				overview['required_qty'] = required_qty
-				overview['missing_qty'] = (
-					overview['required_qty'] - overview['on_hand_qty']
-					if overview['on_hand_qty']< overview['required_qty']
-					else 0
-				)
+				if overview['on_hand_qty'] > overview['required_qty']:
+					overview['missing_qty'] = 0
+				elif overview['on_hand_qty'] < overview['required_qty'] and overview['on_hand_qty'] > 0:
+					overview['missing_qty'] = overview['required_qty'] - overview['on_hand_qty']
+				else:
+					overview['missing_qty'] = overview['required_qty']
 			else:
 				overview_to_unlink.append(overview)
 
@@ -294,14 +295,14 @@ class WizardOverviewLine(models.TransientModel):
 			main_stock = sum(quant.mapped('quantity'))
 			overview.main_stock = main_stock
 
-			if overview.product_id.detailed_type_custom == 'consu':
-				overview.qty_to_order = 0
-				overview.on_hand_qty = overview.required_qty
-				overview.missing_qty = 0
-				overview.qty_to_order_readonly = True
-			else:
-				overview.qty_to_order = overview.missing_qty
-				overview.qty_to_order_readonly = False
+			# if overview.product_id.detailed_type_custom == 'consu':
+			# 	overview.qty_to_order = 0
+			# 	overview.on_hand_qty = overview.required_qty
+			# 	overview.missing_qty = 0
+			# 	overview.qty_to_order_readonly = True
+			# else:
+			# 	overview.qty_to_order = overview.missing_qty
+			# 	overview.qty_to_order_readonly = False
 
 	# @api.depends('required_qty', 'product_id.net_weight')
 	# def _compute_required_capacity_count(self):
