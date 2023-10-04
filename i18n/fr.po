@@ -690,7 +690,7 @@ msgid ""
 "Error during Delivery Note creation. Cannot find operation type. Contact "
 "support."
 msgstr ""
-"Erreur lors de la création du bon de livraison. Impossible de trouver le "
+"Erreur lors de la création de l'ordre de ravitaillement. Impossible de trouver le "
 "type d'opération. Contacter support."
 
 #. module: mrp_planning
