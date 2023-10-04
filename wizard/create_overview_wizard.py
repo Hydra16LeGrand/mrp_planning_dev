@@ -3,8 +3,6 @@ from odoo.exceptions import ValidationError
 from datetime import datetime
 from datetime import timedelta
 
-
-
 class WizardOverview(models.TransientModel):
 	_name = 'overview.wizard'
 	_description = 'Overview Wizard'
@@ -30,7 +28,6 @@ class WizardOverview(models.TransientModel):
 
 		return action
 
-
 	@api.model
 	def default_get(self, fields_list):
 		res = super(WizardOverview, self).default_get(fields_list)
@@ -44,8 +41,9 @@ class WizardOverview(models.TransientModel):
 		if planning:
 			planning_id = self.env['mrp.planning'].browse(planning)
 
-		elif start_date:
+		elif start_date and end_date:
 			planning_id = self.planning_id
+
 
 		# Verif if products of planning have a bill of material
 		verif_product_proportion = planning_id.verif_product_proportion()
@@ -168,6 +166,8 @@ class WizardOverview(models.TransientModel):
 		res.update({
 			'planning_id': planning_id.id,
 			'overview_line_ids': overview_lines,
+			'start_date': start_date,
+			'end_date': end_date,
 		})
 
 		return res
