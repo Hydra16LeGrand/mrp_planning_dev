@@ -25,10 +25,10 @@
                                     <field name="required_qty"/>
                                     <!-- <field name="required_capacity"/> -->
                                     <field name="on_hand_qty"/>
-                                    <field name="missing_qty"/>
-                                    <field name="qty_to_order"/>
                                     <field name="main_stock"/>
                                     <field name="uom_id"/>
+                                    <field name="missing_qty"/>
+                                    <field name="qty_to_order"/>
                                     <field name="bom_ids" invisible="1" widget="many2many_tags"/>
                                 </tree>
 

@@ -12,11 +12,11 @@
                     <tree create="false" delete="false" editable="1">
                         <field name="product_id" options="{'no_open': True}" readonly="1" force_save="1"/>
                         <field name="packaging_line_id" options="{'no_open': True}" readonly="1" force_save="1"/>
-                        <field name="qty" readonly="1" force_save="1"/>
+                        <field name="qty" string="Qté initiale" readonly="1" force_save="1"/>
                         <field name="qty_done" readonly="1" force_save="1"/>
                         <field name="production_id" options="{'no_open': True}" readonly="1" force_save="1"/>
                         <field name="date" readonly="1" force_save="1"/>
-                        <field name="to_be_processed" widget="boolean_toggle"/>
+                        <field name="to_be_processed" widget="boolean_toggle" optional="hide" />
                     </tree>
                 </field>
                 <footer>

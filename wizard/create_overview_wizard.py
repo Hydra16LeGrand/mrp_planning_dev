@@ -112,7 +112,7 @@ class WizardOverview(models.TransientModel):
 				main_stock_qty = sum(reception_stock_quant_ids.mapped('quantity'))
 				
 				required_qty = dl.qty * line.product_qty
-				on_hand_qty = on_hand_qty
+
 				dico = {
 					'product_id': line.product_id.id,
 					'required_qty': required_qty,
@@ -130,15 +130,19 @@ class WizardOverview(models.TransientModel):
 		overview_to_unlink = []
 		for overview in overview_line:
 			if not overview['product_id'] in product_use_ids:
-				product_use_ids.append(overview['product_id'])
+				product_id = self.env['product.product'].browse(overview['product_id'])
+				product_use_ids.append(product_id.id)
 				ov_by_products = [ovl for ovl in overview_line if
-								  ovl['product_id'] == overview['product_id']]
+								  ovl['product_id'] == product_id.id]
 				required_qty = 0
 				for line in ov_by_products:
 					required_qty += line['required_qty']
-				print('required_qty in ovl -------------', ov_by_products)
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
+
 				overview['required_qty'] = required_qty
+				if product_id.product_tmpl_id.detailed_type == 'consu':
+					overview['on_hand_qty'] = overview['required_qty']
+
 				if overview['on_hand_qty'] > overview['required_qty']:
 					overview['missing_qty'] = 0
 				elif overview['on_hand_qty'] < overview['required_qty'] and overview['on_hand_qty'] > 0:
