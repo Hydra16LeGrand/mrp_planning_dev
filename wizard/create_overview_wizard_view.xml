@@ -42,7 +42,8 @@
                                             <group>
                                                 <field name="on_hand_qty"/>
                                                 <field name="missing_qty" readonly="1"/>
-                                                <field name="qty_to_order"/>
+                                                <field name="qty_to_order_readonly" invisible="1"/>
+                                                <field name="qty_to_order" attrs="{'readonly':[('qty_to_order_readonly','!=', False)]}"/>
                                                 <field name="location_id" invisible="1"/>
                                             </group>
                                         </group>

@@ -2,6 +2,8 @@ from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
 from datetime import datetime
 from datetime import timedelta
+from lxml import etree
+from lxml.etree import LxmlError
 
 class WizardOverview(models.TransientModel):
 	_name = 'overview.wizard'
@@ -138,8 +140,8 @@ class WizardOverview(models.TransientModel):
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
 				overview['required_qty'] = required_qty
 				overview['missing_qty'] = (
-					overview['required_qty'] - overview['on_hand_qty'] + overview['main_stock_qty']
-					if overview['on_hand_qty'] + overview['main_stock_qty'] < overview['required_qty']
+					overview['required_qty'] - overview['on_hand_qty']
+					if overview['on_hand_qty']< overview['required_qty']
 					else 0
 				)
 			else:
@@ -150,6 +152,17 @@ class WizardOverview(models.TransientModel):
 
 		filtered_overview_line = [overview for overview in overview_line if overview]
 		overview_line = filtered_overview_line
+
+		print(".................self.overview_line_ids................",self.overview_line_ids)
+
+		print("le overview_line",overview_line)
+
+		for rec in self.overview_line_ids:
+			print("Dans ma boucle...................",rec.product_id.detailed_type_custom)
+			if rec.product_id.detailed_type_custom == 'consu':
+				rec.qty_to_order = 0
+			else:
+				rec.qty_to_order = rec.missing_qty
 
 		overview_lines = []
 		for element in overview_line:
@@ -278,9 +291,17 @@ class WizardOverviewLine(models.TransientModel):
 				('product_id', '=', overview.product_id.id),
 				('location_id', '=', overview.location_id.id)
 			])
-
 			main_stock = sum(quant.mapped('quantity'))
 			overview.main_stock = main_stock
+
+			if overview.product_id.detailed_type_custom == 'consu':
+				overview.qty_to_order = 0
+				overview.on_hand_qty = overview.required_qty
+				overview.missing_qty = 0
+				overview.qty_to_order_readonly = True
+			else:
+				overview.qty_to_order = overview.missing_qty
+				overview.qty_to_order_readonly = False
 
 	# @api.depends('required_qty', 'product_id.net_weight')
 	# def _compute_required_capacity_count(self):
@@ -304,4 +325,4 @@ class WizardOverviewLine(models.TransientModel):
 	# 								 digits=(16, 0))
 	main_stock = fields.Float(
 		_("Main Stock"), compute="_compute_main_stock_count", digits=(16, 0))
-
+	qty_to_order_readonly = fields.Boolean(string="Readonly Qty")
