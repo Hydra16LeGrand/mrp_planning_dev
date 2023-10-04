@@ -140,8 +140,6 @@ class WizardOverview(models.TransientModel):
 				overview['bom_ids'] = [ov['bom_id'] for ov in ov_by_products]
 
 				overview['required_qty'] = required_qty
-				if product_id.product_tmpl_id.detailed_type == 'consu':
-					overview['on_hand_qty'] = overview['required_qty']
 
 				if overview['on_hand_qty'] > overview['required_qty']:
 					overview['missing_qty'] = 0
@@ -149,6 +147,10 @@ class WizardOverview(models.TransientModel):
 					overview['missing_qty'] = overview['required_qty'] - overview['on_hand_qty']
 				else:
 					overview['missing_qty'] = overview['required_qty']
+
+				if product_id.product_tmpl_id.detailed_type == 'consu':
+					overview['on_hand_qty'] = overview['required_qty']
+					overview['missing_qty'] = 0
 			else:
 				overview_to_unlink.append(overview)
 
