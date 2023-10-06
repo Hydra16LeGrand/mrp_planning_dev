@@ -1,0 +1,52 @@
+<odoo>
+    <record id="initialize_operation_from" model="ir.ui.view">
+        <field name="name">initialize.operation.form</field>
+        <field name="model">initialize.operation</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <notebook>
+                        <page name="io_lines" string="Overview">
+                            <field name="io_line_ids" widget="one2many">
+                                <tree create="false" delete="0">
+                                    <field name="product_id" />
+                                    <field name="location_id" />
+                                    <field name="on_hand_qty" />
+                                    <field name="product_uom_id" />
+                                    <field name="to_send_qty" />
+                                </tree>
+
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="product_id" readonly="1"/>
+                                                <field name="product_uom_id" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="on_hand_qty" readonly="1" />
+                                                <field name="location_id" invisible="1"/>
+                                                <field name="to_send_qty" />
+                                            </group>
+                                        </group>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+
+
+                <footer>
+                    <button name="intiliaze_operation" type="object"
+                            string="Initialize operation"
+                            class="oe_highlight"/>
+                    <button string="Annuler" special="cancel"/>
+
+                </footer>
+            </form>
+
+        </field>
+    </record>
+
+</odoo>

@@ -24,6 +24,7 @@
         'base',
         'mrp',
         'hr',
+        'stock',
         'stock_manager',
         'mrp_bom',
     ],
@@ -43,6 +44,7 @@
         'wizard/create_picking_finished_product.xml',
         'wizard/calculating_packs_view.xml',
         'wizard/validate_production.xml',
+        'wizard/initialize_operation_views.xml',
 
         'views/mrp_planning.xml',
         'views/mrp_section.xml',

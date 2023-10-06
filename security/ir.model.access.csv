@@ -18,3 +18,5 @@ access_calculating_pack,access.calculating.pack,model_calculating_pack,,1,1,1,1
 access_calculating_pack_line,access.calculating.pack.line,model_calculating_pack_line,,1,1,1,1
 access_validate_production,access.validate.production,model_validate_production,,1,1,1,1
 access_validate_production_line,access.validate.production.line,model_validate_production_line,,1,1,1,1
+access_initialize_operation,acess.initialize.operation,model_initialize_operation,,1,1,1,1
+access_initialize_operation_line,acess.initialize.operation.line,model_initialize_operation_line,,1,1,1,1

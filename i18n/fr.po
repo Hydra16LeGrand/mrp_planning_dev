@@ -1322,7 +1322,7 @@ msgstr "Colis"
 #. module: mrp_planning
 #: model_terms:ir.ui.view,arch_db:mrp_planning.view_mrp_production_filter_inherit
 msgid "Package Lines"
-msgstr "Lignes de colis"
+msgstr "Lignes de conditionnement"
 
 #. module: mrp_planning
 #. odoo-python

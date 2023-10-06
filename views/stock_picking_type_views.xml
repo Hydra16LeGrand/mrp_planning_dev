@@ -50,9 +50,11 @@
             <xpath expr="//field[@name='product_id']" position="before">
                 <header>
                     <button name="finished_product_transfer" type="object" string="Finished product transfer"
-                            invisible="context.get('rm_main_factory', True)"/>
+                            invisible="1"/>
                     <button name="calculating_packs" type="object" string="Calculating packs"
-                            invisible="context.get('rm_main_factory', True)"/>
+                            invisible="1"/>
+                    <button name="make_delivery" type="object" string="LIVRER"
+                            invisible="context.get('rm_main_factory', True)" class="oe_highlight"/>
                 </header>
             </xpath>
             <xpath expr="//field[@name='available_quantity']" position="attributes">
