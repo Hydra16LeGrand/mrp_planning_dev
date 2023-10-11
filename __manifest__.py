@@ -53,7 +53,7 @@
         'views/stock_location_views.xml',
         'views/mrp_production_views.xml',
 
-        'views/mrp_bom_views.xml',
+        # 'views/mrp_bom_views.xml',
         'views/mrp_plant.xml',
         'views/stock_picking_type_views.xml',
         'views/stock_quant_package_inherit.xml',
