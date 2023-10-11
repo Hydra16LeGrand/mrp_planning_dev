@@ -80,6 +80,7 @@
                             <field name="plant_id" options="{'no_open': 1, 'no_create': 1}" invisible="1"/>
                             <field name="section_ids"
                                    attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>
+                            <field name="team_ids" widget="many2many_tags" />
                             <!--                            <field name="code" attrs="{'readonly': [('state', 'not in', ['draft'])]}"/>-->
                             <field name="section_first" invisible="1"/>
                         </group>
@@ -116,6 +117,7 @@
                                     <field name="package"/>
                                     <field name="qty"/>
                                     <field name="capacity"/>
+                                    <field name="team_ids" options="{'no_open': 1, 'no_create': 1}" />
                                     <field name="uom_domain" invisible="1"/>
                                     <field name="uom_id" optional="hide" domain="[('id', 'in', uom_domain)]"
                                            options="{'no_create': 1, 'no_open': 1}"/>
@@ -234,6 +236,7 @@
                                     <field name="qty_done" string="Qty done"
                                            attrs="{'column_invisible': [('parent.mrp_production_ids', '=', [])], 'readonly': [('state', '=', 'done')]}"/>
                                     <field name="capacity" attrs="{'readonly': [('state', '=', 'done')]}"/>
+                                    <field name="team_ids" options="{'no_open': 1, 'no_create': 1}" />
                                     <field name="employee_number" optional="hide"
                                            attrs="{'readonly': [('state', '=', 'done')]}"/>
                                     <field name="date" optional="hide" attrs="{'readonly': [('state', '=', 'done')]}"/>
@@ -277,7 +280,7 @@
                        decoration-danger="state == 'cancel'" decoration-warning="state == 'confirm'"
                        decoration-success="state == '04_mo_generated'"/>
 
-                <!-- <field name="team_ids" widget="many2many_tags" /> -->
+<!--                 <field name="team_ids" widget="many2many_tags" />-->
             </tree>
         </field>
     </record>
