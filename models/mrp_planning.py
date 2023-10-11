@@ -66,7 +66,7 @@ class MrpPlanning(models.Model):
     reference = fields.Char(_("Reference"), default=lambda self: _('New'), tracking=True)
     code = fields.Char(_("Code"),
                        default=lambda self: self.env['ir.config_parameter'].sudo().get_param('mrp_planning.code'),
-                       tracking=True)
+                       tracking=True, copy=True)
     state = fields.Selection([
         ('cancel', "Cancelled"),
         ('draft', "Draft"),
@@ -314,14 +314,13 @@ class MrpPlanning(models.Model):
             raise ValidationError(
                 _(f"Please configure the picking type '{picking_type_id.name}' locations before this action."))
 
-        rm_location_id = self.env['stock.location'].search(
-            [('temp_stock', '=', True), ('plant_id', '=', self.plant_id.id)])
-        unpackaged_finished_product = self.env['stock.location'].search(
-            [('unpackaged_finished_product', '=', True), ('plant_id', '=', self.plant_id.id)])
+        # rm_location_id = self.env['stock.location'].search(
+        #     [('temp_stock', '=', True), ('plant_id', '=', self.plant_id.id)])
+        # unpackaged_finished_product = self.env['stock.location'].search(
+        #     [('unpackaged_finished_product', '=', True), ('plant_id', '=', self.plant_id.id)])
 
-        if not rm_location_id:
-            raise ValidationError(_("No location found for raw materials. Please ensure to configure it."))
-
+        # if not rm_location_id:
+        #     raise ValidationError(_("No location found for raw materials. Please ensure to configure it."))
         for line in self.detailed_pl_ids:
             if not line.display_type:
                 qty = line.uom_id._compute_quantity(line.qty, line.bom_id.product_uom_id)
@@ -337,8 +336,9 @@ class MrpPlanning(models.Model):
                     "detailed_pl_id": line.id,
                     "planning_id": self.id,
                     "plant_id": self.plant_id.id,
-                    "location_src_id": rm_location_id.id,
-                    "location_dest_id": unpackaged_finished_product.id,
+                    "location_src_id": picking_type_id.default_location_src_id.id,
+                    "location_dest_id": picking_type_id.default_location_dest_id.id,
+                    "picking_type_id": picking_type_id.id,
                 })
                 production.action_confirm()
 

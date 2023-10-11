@@ -27,6 +27,8 @@
                 <group string="Group by">
                     <filter string="Category of Location" name="storage_category"
                             context="{'group_by': 'storage_category_id'}"/>
+                    <filter string="Entrepôts" name="by_warehouse"
+                            context="{'group_by': 'warehouse_id'}"/>
                 </group>
             </xpath>
         </field>
@@ -37,7 +39,7 @@
         <field name="context">
             {
             'search_default_in_location':1,
-            'search_default_storage_category': 1,
+            'search_default_by_warehouse': 1,
             }
         </field>
     </record>

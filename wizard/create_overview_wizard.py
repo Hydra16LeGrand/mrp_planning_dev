@@ -160,17 +160,6 @@ class WizardOverview(models.TransientModel):
 		filtered_overview_line = [overview for overview in overview_line if overview]
 		overview_line = filtered_overview_line
 
-		print(".................self.overview_line_ids................",self.overview_line_ids)
-
-		print("le overview_line",overview_line)
-
-		for rec in self.overview_line_ids:
-			print("Dans ma boucle...................",rec.product_id.detailed_type_custom)
-			if rec.product_id.detailed_type_custom == 'consu':
-				rec.qty_to_order = 0
-			else:
-				rec.qty_to_order = rec.missing_qty
-
 		overview_lines = []
 		for element in overview_line:
 			overview_lines.append((0, 0, {

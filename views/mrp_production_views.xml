@@ -66,7 +66,6 @@
 		  'default_company_id':allowed_company_ids[0],
 
 		  'search_default_by_plants': 1,
-		  'search_default_group_by_section':1,
 		  'search_default_group_by_packaging_line_id':1,
 		  }
 		</field>

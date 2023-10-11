@@ -182,7 +182,7 @@
                                             </group>
                                             <group attrs="{'invisible': [('display_type', '!=', False)]}">
                                                 <field name="qty" string="Quantity"/>
-                                                <field name="qty_done" string="Quantity done"
+                                                <field name="qty_done" string="Qté faite"
                                                        attrs="{'readonly': [('state', '!=', 'confirmed')]}"/>
                                                 <field name="capacity" string="Capacity"/>
                                                 <field name="employee_number" string="Employee Number"/>
