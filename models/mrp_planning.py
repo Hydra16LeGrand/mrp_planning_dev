@@ -86,7 +86,7 @@ class MrpPlanning(models.Model):
                                  default=lambda self: self.env.company.id)
     section_ids = fields.Many2one("mrp.section", string=_("Sections"), required=True, tracking=5)
 
-    # team_ids = fields.Many2many("mrp.team", string=_("Teams"), tracking=True, required=True)
+    team_ids = fields.Many2many("mrp.team", string=_("Teams"), tracking=True, required=True)
 
     planning_line_ids = fields.One2many("mrp.planning.line", "planning_id", string=_("Planning lines"), tracking=5)
     detailed_pl_ids = fields.One2many("mrp.detail.planning.line", "planning_id", string=_("Detailed planning lines"),
@@ -949,6 +949,7 @@ class MrpPlanninLine(models.Model):
     planning_id = fields.Many2one("mrp.planning", tracking=True)
     bom_domain = fields.Many2many("mrp.bom", compute="_compute_bill_of_material_domain")
     bom_id = fields.Many2one("mrp.bom", string=_("Bill of material"), required=1, tracking=True)
+    team_ids = fields.Many2one('mrp.team', string=_("Team"))
 
     @api.depends('product_id')
     def _compute_product_domain(self):
@@ -1060,6 +1061,7 @@ class MrpDetailPlanningLine(models.Model):
     name = fields.Text()
     mrp_production_id = fields.Many2one("mrp.production", compute="_compute_mrp_production_id")
     qty_done = fields.Integer(_("Qté fabriqué"), tracking=True)
+    team_ids = fields.Many2one('mrp.team', string=_("Team"))
 
     def action_manage_production(self):
         production_id = self.env['mrp.production'].search([('detailed_pl_id', '=', self.id)])
