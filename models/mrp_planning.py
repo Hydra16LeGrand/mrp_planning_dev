@@ -879,7 +879,7 @@ class MrpPlanninLine(models.Model):
             if rec.product_id and rec.packaging_line_id and rec.bom_id:
                 # print("Affectation qty 2", rec.recent_qty, rec.qty)
                 if rec.qty != rec.recent_qty:
-                    rec.qty = rec.capacity / rec.bom_id.net_weight if rec.bom_id.net_weight != 0 else 0
+                    rec.qty = rec.capacity / rec.bom_id.capacity if rec.bom_id.capacity != 0 else 0
                     rec.package = rec.qty / rec.bom_id.packing if rec.bom_id.packing != 0 else 0
             else:
                 rec.package, rec.qty = 0, 0
