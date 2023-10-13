@@ -956,11 +956,20 @@ class MrpPlanninLine(models.Model):
     @api.depends('product_id')
     def _compute_product_domain(self):
         for rec in self:
-            boms_ids = self.env['mrp.bom'].search([])
-            print(f'boms_ids: {boms_ids}')
-            all_products = [bom.product_tmpl_id.id for bom in boms_ids]
-            print(f'all_products : {all_products}')
-            rec.product_domain = all_products
+            # boms_ids = self.env['mrp.bom'].search([])
+            # print(f'boms_ids: {boms_ids}')
+            # all_products = [bom.product_tmpl_id.id for bom in boms_ids]
+            # print(f'all_products : {all_products}')
+            # rec.product_domain = all_products
+
+            product_tmpl_ids = self.env['product.template'].search([('relookage','=',False), '|',('is_composed','=',True),('detailed_type_custom', 'in', ['packaging', 'semi_finished_products'])])
+            for product in product_tmpl_ids:
+                if product_tmpl_ids:
+                    elements = [prod.id for prod in product_tmpl_ids]
+                    rec.product_domain = elements
+
+                else:
+                    rec.product_domain = False
 
     # @api.onchange('product_id')
     # def verif_field_pl_date(self):
