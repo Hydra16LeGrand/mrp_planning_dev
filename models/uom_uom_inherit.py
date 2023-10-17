@@ -33,5 +33,4 @@ class UomUomInherit(models.Model):
 
             if to_unit and round:
                 amount = amount.quantize(Decimal(".00001"), rounding=ROUND_UP)
-            print(f"float(amount) : {float(amount)}")
             return float(amount)

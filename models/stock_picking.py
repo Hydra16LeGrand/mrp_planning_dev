@@ -1,12 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError
 
 
 class StockPickingTypeInherit(models.Model):
     _inherit = "stock.picking.type"
-
-    plant_id = fields.Many2one("mrp.plant", _("Plant"))
-
 
     def get_mrp_stock_picking_action_picking_type(self):
         action = {
@@ -34,16 +33,6 @@ class StockPickingTypeInherit(models.Model):
         }
         return action
 
-    @api.onchange('plant_id')
-    def onchange_plant_id(self):
-        if self.plant_id:
-            # Empêcher toute modification future du champ plant_id
-            plant_id = self.search([('plant_id', '=', self.plant_id.id), ('code', '=', self.code)])
-            if plant_id:
-                raise ValidationError(
-                    _(f"This factory is already selected in other plant. This factory have to be selected only once"))
-
-
     def write(self, vals):
 
         if self.code == 'internal':  # Vérifier le type d'opération
@@ -54,6 +43,7 @@ class StockPickingTypeInherit(models.Model):
 
         res = super(StockPickingTypeInherit, self).write(vals)
         return res
+
 
 class StockPickingInherit(models.Model):
     _inherit = "stock.picking"

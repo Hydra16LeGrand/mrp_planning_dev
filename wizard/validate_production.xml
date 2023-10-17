@@ -20,7 +20,6 @@
                     </tree>
                 </field>
                 <footer>
-<!--                    <field name="count_to_be_processed" invisible="1"/>-->
                     <button name="validate" type="object" string="Apply" class="btn-primary" />
                     <button string="Cancel" special="cancel" class="btn-default"/>
                 </footer>

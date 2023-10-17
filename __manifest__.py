@@ -38,7 +38,6 @@
 
         'reports/planning_detail_template.xml',
 
-        'wizard/replace_product_views.xml',
         'wizard/create_overview_wizard_view.xml',
         'wizard/mrp_immediate_production_inherit.xml',
         'wizard/create_picking_finished_product.xml',
@@ -53,17 +52,10 @@
         'views/stock_location_views.xml',
         'views/mrp_production_views.xml',
 
-        # 'views/mrp_bom_views.xml',
         'views/mrp_plant.xml',
         'views/stock_picking_type_views.xml',
         'views/stock_quant_package_inherit.xml',
         'views/res_config_settings.xml',
-        # 'views/menu_inheritance.xml',
 
-    ],
-
-    # only loaded in demonstration mode
-    'demo': [
-        'demo/demo.xml',
     ],
 }

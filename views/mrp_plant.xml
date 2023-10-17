@@ -30,7 +30,7 @@
                             <field name="company_id" options="{'no_create': 1, 'no_open': 1}"/>
                         </group>
                         <group string="Stock supply" name="stock_supply">
-                            <field name="picking_type_internal"/>
+                            <field name="picking_type_internal_id"/>
                             <field name="supply_location_src_id"/>
                             <field name="supply_location_dest_id"/>
 

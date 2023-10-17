@@ -5,7 +5,7 @@
         <field name="model">calculating.pack</field>
         <field name="arch" type="xml">
             <form string="Calculating Packs">
-                <field name="cal_packs_line" widget="section_and_note_one2many" mode="tree" force_save="1">
+                <field name="cal_packs_line_ids" widget="section_and_note_one2many" mode="tree" force_save="1">
                     <tree create="false" delete="false" editable="1">
                         <field name="product_id" options="{'no_open': True}" readonly="1" force_save="1"/>
                         <field name="pack_of" readonly="1" force_save="1"/>
@@ -15,12 +15,4 @@
             </form>
         </field>
     </record>
-<!--    <record id="action_calculating_packs" model="ir.actions.act_window">-->
-<!--        <field name="name">Calculating Packs</field>-->
-<!--        <field name="type">ir.actions.act_window</field>-->
-<!--        <field name="res_model">calculating.pack</field>-->
-<!--        <field name="view_mode">form</field>-->
-<!--        <field name="view_id" ref="view_calculating_packs_form"/>-->
-<!--        <field name="target">new</field>-->
-<!--    </record>-->
 </odoo>

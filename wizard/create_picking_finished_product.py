@@ -53,8 +53,12 @@ class CreatePickingFinishedProduct(models.TransientModel):
 
         for location_id, lines in lines_by_location.items():
 
+            warehouse_id = self.env['stock.warehouse'].search([('manufacture_to_resupply', '=', True)])
+            if not warehouse_id:
+                raise ValidationError(
+                    _("No manufacturing warehouse found. Ensure to check \"manufacture to resupply\" field in warehouse settings."))
             picking_type = self.env['stock.picking.type'].search(
-                [('code', '=', 'internal')], limit=1)
+                [('code', '=', 'internal'), ('warehouse_id', '=', warehouse_id.id)], limit=1)
             location_dest_id = self.env['stock.location'].search([
                 ('plant_id.is_principal', '!=', False),
                 ('packaged_finished_product', '=', True)
@@ -98,7 +102,6 @@ class CreatePickingFinishedProduct(models.TransientModel):
                     })
 
                     stock_picking.sudo().action_put_in_pack()
-                    print(f"stock_picking : {stock_picking}")
                     move_line = self.env['stock.move.line'].search([
                         ('move_id', '=', stock_move.id)
                     ])
@@ -106,7 +109,6 @@ class CreatePickingFinishedProduct(models.TransientModel):
                         'quotient': quotient,
                         'move_line': move_line,
                         'pack_of': line.pack_of,
-                        # quotient: move_line
                     }
                     quant_lst.append(quant_dico)
 
@@ -118,27 +120,14 @@ class CreatePickingFinishedProduct(models.TransientModel):
 
             # Ajoutez le nombre de colis dans stock_quant
             if quant_lst:
-                print(f"quant_lst : {quant_lst}")
                 for elm in quant_lst:
                     quant_id = self.env['stock.quant'].search([
                         ('package_id', '=', elm['move_line'].result_package_id.id)
                     ])
-                    print(f'quant_id : {quant_id}')
                     pack = f"{elm['quotient']} pack of {elm['pack_of']}"
                     quant_id.pack_of = pack
                     quant_id.pack = elm['pack_of']
                     quant_id.package = elm['quotient']
-                    print(f"quant_id.pack_of: {quant_id.pack_of}")
-                    # print(f"key : {elm.keys()}")
-                    # print(f"value : {elm.values()}")
-                    # for val in elm.values():
-                    #     move_line = val
-                    #     print(f"move_line : {move_line}")
-                    #     quant_id = self.env['stock.quant'].search([
-                    #         ('package_id', '=', move_line.result_package_id.id)
-                    #     ])
-                    #     print(f"quant_id : {quant_id}")
-
 
         return {
             'type': 'ir.actions.client',

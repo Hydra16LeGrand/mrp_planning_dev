@@ -57,7 +57,21 @@
                                             </div>
                                             <br/>
                                             <div style="margin-left: 5px;">Packaging line :
-                                                <span t-field="packaging_line.name"/>
+                                                <span t-field="packaging_line[0].name"/>
+                                            </div>
+                                            <br/>
+                                            <div style="margin-left: 5px;">Teams :
+                                                <t t-set="teams" t-value="packaging_line[1]"/>
+
+                                                <t t-foreach="teams" t-as="team">
+                                                    <t t-if="teams[-1] != team">
+                                                        <span t-field="team.name"/>,
+                                                    </t>
+                                                    <t t-else="">
+                                                        <span t-field="team.name"/>
+                                                    </t>
+                                                </t>
+
                                             </div>
                                             <br/>
                                             <table class="table table-sm"
@@ -128,7 +142,6 @@
                                     </t>
                                 </div>
                             </t>
-
                         </div>
                     </t>
                 </div>

@@ -19,19 +19,6 @@
         </field>
     </record>
 
-    <record id="view_stock_picking_type_form_inherit" model="ir.ui.view">
-        <field name="name">stock.picking.type.form</field>
-        <field name="model">stock.picking.type</field>
-        <field name="inherit_id" ref="stock.view_picking_type_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//sheet/group/group[@name='locations']" position="after">
-                <group string="Plant" groups="stock.group_stock_multi_locations" name="plant" attrs="{'invisible': [('code', 'not in', ('mrp_operation','internal'))]}">
-                    <field name="plant_id" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
-                </group>
-            </xpath>
-        </field>
-    </record>
-
 
     <record model="ir.actions.act_window" id="action_rm_main_factory">
         <field name="context">{'group_by': 'location_id', 'rm_main_factory': False}</field>
@@ -53,7 +40,7 @@
                             invisible="1"/>
                     <button name="calculating_packs" type="object" string="Calculating packs"
                             invisible="1"/>
-                    <button name="make_delivery" type="object" string="LIVRER"
+                    <button name="make_delivery" type="object" string="DELIVER"
                             invisible="context.get('rm_main_factory', True)" class="oe_highlight"/>
                 </header>
             </xpath>

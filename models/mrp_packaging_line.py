@@ -1,7 +1,12 @@
+# -*- coding: utf-8 -*-
+
 from odoo import fields, models, api, _
 
 
 class MrpPackagingLine(models.Model):
+	"""
+	Model for product proportion in packaging line
+	"""
 	_name = "mrp.packaging.line"
 	_inherit = ["mail.thread", "mail.activity.mixin"]
 	_rec_name = "name"
@@ -11,11 +16,8 @@ class MrpPackagingLine(models.Model):
 	code = fields.Char(_("Code"))
 
 	ppp_ids = fields.One2many("mrp.packaging.pp", "packaging_line_id", string=_("Products proportions"))
-	section_id = fields.Many2one("mrp.section", string=_("Section"))
 
-"""
-Model for product proportion in packaging line
-"""
+
 class MrpPackagingPP(models.Model):
 	_name = "mrp.packaging.pp"
 	_description = "Mrp packaging product proportion"

@@ -23,7 +23,6 @@
                                 <tree create="false" delete="0" edit="false">
                                     <field name="product_id"/>
                                     <field name="required_qty"/>
-                                    <!-- <field name="required_capacity"/> -->
                                     <field name="on_hand_qty"/>
                                     <field name="main_stock"/>
                                     <field name="uom_id"/>

@@ -7,7 +7,6 @@
 			<tree>
 				<field name="name" />
 				<field name="code" />
-				<field name="section_id" />
 			</tree>
 		</field>
 	</record>
@@ -27,8 +26,6 @@
 						<group>
 							<field name="code" />
 						</group>
-						<group>
-						</group>
 					</group>
 					<notebook>
 						<page name="ppp_ids" string="Products proportions">
@@ -37,7 +34,7 @@
 									<field name="product_id" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
 									<field name="capacity" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
 									<field name="uom_id" readonly="1"/>
-									<field name="employee_number" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}" />
+									<field name="employee_number" options="{'limit': 10, 'create': false, 'create_edit': false, 'no_create': true}"/>
 								</tree>
 							</field>
 						</page>

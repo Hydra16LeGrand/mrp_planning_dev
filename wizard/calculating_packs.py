@@ -13,7 +13,6 @@ class CalculatingPack(models.TransientModel):
         res = super(CalculatingPack, self).default_get(fields_list)
 
         group_list = []
-        print(f"self.env.context : {fields_list}")
         if self.env.context.get('quant_line'):
             quant_line = self.env.context.get('quant_line')
             for elm in quant_line:
@@ -29,7 +28,6 @@ class CalculatingPack(models.TransientModel):
                 )
 
             if group_list:
-                print('group_list :', group_list)
                 total_packages_by_pack = {}
                 for rec in group_list:
                     product = rec['product_id']
@@ -43,7 +41,6 @@ class CalculatingPack(models.TransientModel):
                     else:
                         total_packages_by_pack[product_key] = package
 
-                print(f"total_packages_by_pack : {total_packages_by_pack}")
                 if total_packages_by_pack:
                     line_values = []
 
@@ -55,10 +52,10 @@ class CalculatingPack(models.TransientModel):
                             })
                         )
 
-                    res['cal_packs_line'] = line_values
+                    res['cal_packs_line_ids'] = line_values
         return res
 
-    cal_packs_line = fields.One2many('calculating.pack.line', inverse_name='calculating_packs_id',
+    cal_packs_line_ids = fields.One2many('calculating.pack.line', inverse_name='calculating_packs_id',
                                              string='Calculating packs line')
 
 

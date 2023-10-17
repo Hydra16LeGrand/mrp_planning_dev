@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from odoo import fields, models, api, _
 from odoo.exceptions import ValidationError
 
@@ -18,7 +20,6 @@ class StockLocationInherit(models.Model):
 			if all_temp_stock != 0:
 				raise ValidationError(_("A temp location already exists for this plant. Uncheck this one before this operation."))
 			else:
-				# packaged_finished_product = self.search_count([('packaged_finished_product', '=', 1), ('plant_id', '=', self.plant_id.id)])
 				if self.packaged_finished_product:
 					raise ValidationError(_("This location can't be both a temp location and a packaged finished product location."))
 				if self.unpackaged_finished_product:
